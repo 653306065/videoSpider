@@ -1,9 +1,16 @@
 eporner:
    home: https://www.eporner.com
-   savePath: D:\eporner\
+   savePath: C:\eporner\
    category:
       UHD: https://www.eporner.com/category/4k-porn/
-   thread: 40   
+   thread: 40  
+   
+javfinder:
+   home: https://www3.javfinder.is/
+   savePath: D:\javfinder 
+   category:
+      Uncensored: https://www3.javfinder.is/category/uncensored/page-{page}.html
+   thread: 30
       
 proxy:
    host: 127.0.0.1
