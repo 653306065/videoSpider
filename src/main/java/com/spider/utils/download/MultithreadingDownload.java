@@ -59,9 +59,8 @@ public class MultithreadingDownload {
 					if (executorService.isTerminated()) {
 						break;
 					}
-					double percentage = (MultithreadingDownload.downloadByte * 1.0) / (info.getContentLength() * 1.0)
-							* 100.0;
-					System.out.println("----已下载:" + String.valueOf(percentage) + "%-----");
+					double percentage = (MultithreadingDownload.downloadByte * 1.0) / (info.getContentLength() * 1.0) * 100.0;
+					logger.info("----已下载:" + String.valueOf(percentage) + "%-----");
 					Thread.sleep(1000 * 2);
 				}
 				downloadByte = 0;
