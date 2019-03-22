@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
@@ -17,6 +19,8 @@ import okhttp3.Response;
 public class MultithreadingDownload {
 
 	public static volatile long downloadByte = 0;
+	
+	private Logger logger =LoggerFactory.getLogger(MultithreadingDownload.class);
 
 	public void fileDownload(String HttpUrl,String path, Map<String, String> header,
 			Proxy proxy, int threadNum) {
@@ -24,18 +28,18 @@ public class MultithreadingDownload {
 			long startTime = System.currentTimeMillis();
 			File file = new File(path);
 			if (file.exists()) {
-				System.out.println(path + ",已存在");
+				logger.info(path + ",已存在");
 				return;
 			} else {
 				file.getParentFile().mkdirs();
 			}
 			DownloadFileInfo info = getDownloadFileInfo(HttpUrl,header, proxy);
 			if (!String.valueOf(info.getResponseCode()).startsWith("20")) {
-				System.out.println("----获取下载信息错误：responseCode=" + info.getResponseCode() + "----");
+				logger.info("----获取下载信息错误：responseCode=" + info.getResponseCode() + "----");
 				return;
 			} else {
-				System.out.println(path+",开始下载,url:" + HttpUrl);
-				System.out.println(JSON.toJSONString(info) + ",大小" + (info.getContentLength() / 1024.0 / 1024.0) + "m");
+				logger.info(path+",开始下载,url:" + HttpUrl);
+				logger.info(JSON.toJSONString(info) + ",大小" + (info.getContentLength() / 1024.0 / 1024.0) + "m");
 				long size = info.getContentLength() / threadNum;
 				RandomAccessFile raf = new RandomAccessFile(file, "rw");
 				raf.setLength(info.getContentLength());
@@ -61,14 +65,14 @@ public class MultithreadingDownload {
 					Thread.sleep(1000 * 2);
 				}
 				downloadByte = 0;
-				System.out.println("----" + path + ",下载完成----");
+				logger.info("----" + path + ",下载完成----");
 				long endTime = System.currentTimeMillis();
-				System.out.println("耗时:" + (endTime - startTime) / 1000 / 60.0 + "分钟");
+				logger.info("耗时:" + (endTime - startTime) / 1000 / 60.0 + "分钟");
 				raf.close();
 			}
 		} catch (Exception e) {
 			downloadByte = 0;
-			System.out.println("----下载异常----");
+			logger.info("----下载异常----");
 			new File(path).delete();
 			e.printStackTrace();
 		}

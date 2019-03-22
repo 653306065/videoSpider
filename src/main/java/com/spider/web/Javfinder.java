@@ -38,6 +38,9 @@ public class Javfinder {
 	@Autowired
 	private MultithreadingDownload multithreadingDownload;
 
+	@Value("${javfinder.categoryTemplate}")
+	private String categoryTemplate;
+
 	@Value("${javfinder.thread}")
 	private int thread;
 
@@ -69,23 +72,27 @@ public class Javfinder {
 		if (jsonObject.getBooleanValue("success")) {
 			JSONArray jsonArray = jsonObject.getJSONArray("data");
 			String file = jsonArray.getJSONObject(jsonArray.size() - 1).getString("file");
-			info.put("videoUrl",OKHttpUtils.getRedirectUrl(file, proxy));
+			info.put("videoUrl", OKHttpUtils.getRedirectUrl(file, proxy));
 		}
 		info.put("name", name);
 		return info;
 	}
 
 	public void downloadUncensored() {
+		downloadByCategory("uncensored");
+	}
+
+	public void downloadByCategory(String category) {
 		int page = 1;
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		while (true) {
-			String url = Uncensored.replace("@{page}", String.valueOf(page));
+			String url = categoryTemplate.replace("@{page}", String.valueOf(page)).replace("@{category}", category);
 			List<String> list = this.getVideoInfoUrlList(url);
 			for (String str : list) {
 				Map<String, String> map = this.getVideoUrl(str);
 				String fileUrl = map.get("videoUrl");
 				String date = simpleDateFormat.format(new Date());
-				String path = savePath + "\\" + date + "\\" + map.get("name") + ".mp4";
+				String path = savePath + "\\" + category + "\\" + date + "\\" + map.get("name") + ".mp4";
 				multithreadingDownload.fileDownload(fileUrl, path, null, proxy, thread);
 			}
 		}

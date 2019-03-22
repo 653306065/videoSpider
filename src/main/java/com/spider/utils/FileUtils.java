@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -52,14 +51,14 @@ public class FileUtils {
 
 	public static List<File> fileList = new ArrayList<File>();
 
-	public static List<File> getPathFileList(String path,List<File> list) {
+	public static List<File> getPathFileList(String path, List<File> list) {
 		File files = new File(path);
 		if (!files.exists() || !files.isDirectory() || files.listFiles().length == 0) {
 			return null;
 		} else {
 			for (File file : files.listFiles()) {
 				if (file.isDirectory()) {
-					getPathFileList(file.getAbsolutePath(),list);
+					getPathFileList(file.getAbsolutePath(), list);
 				} else {
 					list.add(file);
 				}
@@ -117,9 +116,7 @@ public class FileUtils {
 		}
 		File[] fileArr = files.listFiles();
 		for (File file : fileArr) {
-			// System.out.println(file.getName());
 			if (file.getName().indexOf(key) != -1) {
-				System.out.println(file.getName());
 				deleteFile(file.getAbsolutePath());
 			}
 		}
@@ -134,55 +131,6 @@ public class FileUtils {
 			}
 		}
 		file.delete();
-	}
-
-	static String[] textKeyArr = { "肏妈妈", "肏得妈妈", "妈妈的性欲", "妈妈好爽", "娘亲被你弄得好舒服", "妈妈被你弄得好舒服", "母亲浪叫", "母亲的肉穴", "妈妈的阴道",
-			"妈妈爽死", "大鸡巴儿子", "母亲骚穴", "母亲的屁股", "美母情动", "妈妈，好舒服", "亲生儿子的肉棒", "玩妈妈的乳房", "妈妈的小屄", "妈妈的乳头", "母亲的小穴", "骚妈妈",
-			"妈妈舒服死了", "母亲的阴唇", "妈妈的子宫", "射入母亲深处", "儿子大鸡巴", "儿子的肉棒好舒服", "奸淫妈妈", "妈妈含着儿子的肉棒", "妈妈，你舒服吗", "你又欺负妈妈",
-			"妈妈要飞了", "儿子的肉棒", "母亲阴道", "妈妈美穴", "母亲美穴", "爽死妈了", "母亲花蕊", "母亲小浪穴", "母亲浪穴", "妈妈小浪穴", "妈妈浪穴", "娘亲浪穴", "娘亲小浪穴",
-			"妈妈双乳", "妈妈乳峰", "妈妈的内裤", "妈妈的乳房", "妈妈的禁地", "妈妈的屁股", "小骚穴妈妈", "吃着儿子的肉棒", "大肉棒享受妈妈", "舔死你妈妈", "亲生儿子的淫辱",
-			"妈妈，来！把屁股翘高一点", "妈妈要死了", "快饶了妈妈吧", "妈妈不行了", "被儿子插入", "征服妈妈", "插入妈妈", "老妈的玉乳", "母亲的小骚穴", "妈妈的骚屄", "妈要丢了",
-			"妈被你插得好舒服", "饶了妈", "妈，要丢了", "亲母的蜜穴", "母子乱伦", "被自己儿子插入了", "老妈蜜穴", "亲生儿子奸淫", "亲娘的阴道", "奸淫老妈", "强奸妈妈", "强奸母亲",
-			"儿子阳精", "儿子性交", "来操娘", "操妈妈", "妈妈蜜穴", "母親子宮", "妈妈痒", "母子激情", "妈妈高潮", "妈妈的肉屄", "分开了老妈的双腿", "亲儿子你真棒",
-			"好儿子…好舒服", "占有妈妈", "母亲的穴" };
-
-	// static String[] textKeyArr= {"娘亲被你弄得好舒服"};
-
-	// static String[] textKeyArr = { "大肉棒", "阴茎", "肏屄", "阴唇", "小骚穴", "大鸡巴",
-	// "粗长的肉棒", "肉穴", "大龟头", "阴户", "龟头", "玉茎", "花蕊",
-	// "美穴", "小浪穴", "阴蒂", "阴道", "淫水", "蜜穴", "子宮", "骚屄", "浪穴", "肉棒", "操屄", "阳精",
-	// "射精", "交合处", "龙枪", "生命精华" };
-
-	public static List<File> getIncestText(List<File> fileList) throws Exception {
-		List<File> incestList = new ArrayList<File>();
-		for (File file : fileList) {
-			InputStream in = new FileInputStream(file);
-			// Reader reader=new InputStreamReader(in,"GB2312");
-			Reader reader = new InputStreamReader(in, "UTF-8");
-			// Reader reader = new InputStreamReader(in,
-			// codeString(file.getAbsolutePath()));
-			BufferedReader buffReader = new BufferedReader(reader);
-			// System.err.println(file.getName()+":");
-			tag: while (true) {
-				String line = buffReader.readLine();
-				if (line == null) {
-					break;
-				} else {
-					for (String key : textKeyArr) {
-						if (line.indexOf(key) != -1) {
-							System.out.println(file.getName() + ":" + line);
-							incestList.add(file);
-							in.close();
-							reader.close();
-							buffReader.close();
-							break tag;
-						}
-					}
-				}
-			}
-
-		}
-		return incestList;
 	}
 
 	public static void FileCopy(String oldPath, String newPath) throws IOException {
@@ -218,7 +166,7 @@ public class FileUtils {
 		default:
 			code = "GBK";
 		}
-
+		bin.close();
 		return code;
 	}
 
@@ -235,7 +183,6 @@ public class FileUtils {
 			OutputStream out = new FileOutputStream(path, true);
 			for (String str : lineList) {
 				out.write(str.getBytes());
-				// 写入一个换行
 				out.write("\r\n".getBytes());
 			}
 			out.close();
@@ -266,8 +213,7 @@ public class FileUtils {
 		return list;
 
 	}
-	
-	
+
 	public static String getMD5(File file) {
 		FileInputStream fileInputStream = null;
 		try {
@@ -284,9 +230,9 @@ public class FileUtils {
 			return null;
 		} finally {
 			try {
-				if (fileInputStream != null){
+				if (fileInputStream != null) {
 					fileInputStream.close();
-					}
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

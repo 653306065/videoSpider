@@ -7,9 +7,14 @@ import java.net.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.spider.utils.OKHttpUtils;
 
 public class DownloadThread extends Thread {
+	
+	private Logger logger =LoggerFactory.getLogger(DownloadThread.class);
 
 	private String httpUrl;
 
@@ -55,10 +60,10 @@ public class DownloadThread extends Thread {
 			}
 			raf.close();
 			in.close();
-			System.out.println(Thread.currentThread().getName() + ",下载完成");
+			logger.info(Thread.currentThread().getName() + ",下载完成");
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println(Thread.currentThread().getName() + ",下载异常");
+			logger.info(Thread.currentThread().getName() + ",下载异常");
 			new DownloadThread(this.httpUrl, this.header, this.proxy, this.startByte, this.endByte, this.file).run();
 		}
 
