@@ -7,7 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-import com.spider.web.Eporner;
+
+import com.spider.web.Javfinder;
 
 @SpringBootApplication
 public class Application {
@@ -16,7 +17,7 @@ public class Application {
 
 	public static void main(String[] args) {
 		ConfigurableApplicationContext context = SpringApplication.run(Application.class);
-		Eporner eporner=context.getBean(Eporner.class);
-		eporner.downloadDoublePenetration();
+		Javfinder javfinder=context.getBean(Javfinder.class);
+		javfinder.downloadUncensored();
 	}
 }

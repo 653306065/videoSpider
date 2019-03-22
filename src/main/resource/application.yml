@@ -6,10 +6,10 @@ eporner:
    thread: 40  
    
 javfinder:
-   home: https://www3.javfinder.is/
+   home: https://www3.javfinder.is
    savePath: D:\javfinder 
    category:
-      Uncensored: https://www3.javfinder.is/category/uncensored/page-{page}.html
+      Uncensored: https://www3.javfinder.is/category/uncensored/page-@{page}.html
    thread: 30
       
 proxy:
