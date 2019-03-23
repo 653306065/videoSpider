@@ -95,6 +95,7 @@ public class Javfinder {
 				String path = savePath + "\\" + category + "\\" + date + "\\" + map.get("name") + ".mp4";
 				multithreadingDownload.fileDownload(fileUrl, path, null, proxy, thread);
 			}
+			page++;
 		}
 	}
 }
