@@ -7,11 +7,12 @@ eporner:
    
 javfinder:
    home: https://www3.javfinder.is
-   savePath: C:\javfinder 
+   savePath: D:\javfinder 
    category:
       Uncensored: https://www3.javfinder.is/category/uncensored/page-@{page}.html
    categoryTemplate: https://www3.javfinder.is/category/@{category}/page-@{page}.html 
    thread: 30
+   ignoreCode: FC2,XXX-AV,Heydouga,Tokyo Hot,Pacopacomama
       
 proxy:
    host: 127.0.0.1

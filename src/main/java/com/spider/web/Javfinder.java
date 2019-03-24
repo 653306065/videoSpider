@@ -43,6 +43,9 @@ public class Javfinder {
 
 	@Value("${javfinder.thread}")
 	private int thread;
+	
+	@Value("${javfinder.ignoreCode}")
+	private String ignoreCode;
 
 	public List<String> getVideoInfoUrlList(String url) {
 		List<String> list = new ArrayList<String>();
@@ -88,12 +91,22 @@ public class Javfinder {
 		while (true) {
 			String url = categoryTemplate.replace("@{page}", String.valueOf(page)).replace("@{category}", category);
 			List<String> list = this.getVideoInfoUrlList(url);
-			for (String str : list) {
-				Map<String, String> map = this.getVideoUrl(str);
-				String fileUrl = map.get("videoUrl");
-				String date = simpleDateFormat.format(new Date());
-				String path = savePath + "\\" + category + "\\" + date + "\\" + map.get("name") + ".mp4";
-				multithreadingDownload.fileDownload(fileUrl, path, null, proxy, thread);
+			a:for (String str : list) {
+				try {
+					Map<String, String> map = this.getVideoUrl(str);
+					String fileUrl = map.get("videoUrl");
+					String date = simpleDateFormat.format(new Date());
+					String name=map.get("name");
+					for(String code :ignoreCode.split(",")) {
+						if(name.indexOf(code)!=-1) {
+							continue a;
+						}
+					}
+					String path = savePath + "\\" + category + "\\" + date + "\\" + map.get("name") + ".mp4";
+					multithreadingDownload.fileDownload(fileUrl, path, null, proxy, thread);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 			page++;
 		}
