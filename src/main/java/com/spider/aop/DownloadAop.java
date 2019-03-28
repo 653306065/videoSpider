@@ -49,6 +49,7 @@ public class DownloadAop {
 					newvideo.setName(videoFile.getName());
 					newvideo.setSavePath(videoFile.getAbsolutePath());
 					newvideo.setSize(videoFile.length());
+					newvideo.setSizeStr(videoFile.length()/1024.0/1024+"MB");
 					newvideo.setSource(httpUrl);
 					videoService.insert(newvideo);
 					logger.info("{},文件信息存储完成",newvideo.getName());

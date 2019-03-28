@@ -11,11 +11,21 @@ public class Video {
 
 	private long size;
 
+	private String sizeStr;
+
 	private String source;
 
 	private String savePath;
-	
+
 	private String md5;
+
+	public String getSizeStr() {
+		return sizeStr;
+	}
+
+	public void setSizeStr(String sizeStr) {
+		this.sizeStr = sizeStr;
+	}
 
 	public String getMd5() {
 		return md5;
