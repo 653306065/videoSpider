@@ -28,6 +28,25 @@ public class OKHttpUtils {
 		}
     }
     
+    public static String get(String url,Map<String,String> header,Proxy proxy) {
+    	try {
+			OkHttpClient httpClient=new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy).build();
+			Request.Builder builder=new Request.Builder();
+			for(Map.Entry<String, String> entry:header.entrySet()) {
+				builder.addHeader(entry.getKey(), entry.getValue());
+			}
+			Request request=builder.get().url(url).build();
+			Response response=httpClient.newCall(request).execute();
+			if(response.isSuccessful()) {
+				return response.body().string();
+			}
+			return null;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+    }
+    
     
     public static String getRedirectUrl(String url,Proxy proxy) {
     	try {

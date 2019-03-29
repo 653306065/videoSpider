@@ -4,8 +4,8 @@ import java.util.Date;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "video")
-public class Video {
+@Document(collection = "image")
+public class Image {
 
 	private String id;
 
@@ -20,31 +20,27 @@ public class Video {
 	private String savePath;
 
 	private String md5;
-	
+
 	private Date createDate;
-
-	public Date getCreateDate() {
-		return createDate;
+	
+	private Integer width;
+	
+	private Integer height;
+	
+	public Integer getWidth() {
+		return width;
 	}
 
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
+	public void setWidth(Integer width) {
+		this.width = width;
 	}
 
-	public String getSizeStr() {
-		return sizeStr;
+	public Integer getHeight() {
+		return height;
 	}
 
-	public void setSizeStr(String sizeStr) {
-		this.sizeStr = sizeStr;
-	}
-
-	public String getMd5() {
-		return md5;
-	}
-
-	public void setMd5(String md5) {
-		this.md5 = md5;
+	public void setHeight(Integer height) {
+		this.height = height;
 	}
 
 	public String getId() {
@@ -71,6 +67,14 @@ public class Video {
 		this.size = size;
 	}
 
+	public String getSizeStr() {
+		return sizeStr;
+	}
+
+	public void setSizeStr(String sizeStr) {
+		this.sizeStr = sizeStr;
+	}
+
 	public String getSource() {
 		return source;
 	}
@@ -86,4 +90,21 @@ public class Video {
 	public void setSavePath(String savePath) {
 		this.savePath = savePath;
 	}
+
+	public String getMd5() {
+		return md5;
+	}
+
+	public void setMd5(String md5) {
+		this.md5 = md5;
+	}
+
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+	
 }
