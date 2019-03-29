@@ -25,6 +25,10 @@ public class ImageDownload {
 			file.getParentFile().mkdirs();
 		}
 		byte[] bytes = OKHttpUtils.getBytes(url, header, proxy);
+		if(bytes==null) {
+			logger.info("{},下载失败",url);
+			return null;
+		}
 		try {
 			OutputStream outputStream = new FileOutputStream(savePath);
 			outputStream.write(bytes);

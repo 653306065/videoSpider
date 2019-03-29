@@ -63,7 +63,9 @@ public class DownloadAop {
 					logger.info("{},文件信息存储完成",newvideo.getName());
 				}else {
 					logger.info("{},md5验证失败", file.getName());
-					videoFile.delete();
+					if(videoFile.exists()) {
+						videoFile.delete();
+					}
 				}
 			} catch (Throwable e) {
 				e.printStackTrace();
@@ -92,6 +94,10 @@ public class DownloadAop {
 				joinPoint.proceed();
 				File imageFile=new File(path);
 				Image newImage = new Image();
+				if(!imageFile.exists()) {
+					logger.info("{}文件不存在",imageFile.getAbsoluteFile());
+					return;
+				}
 				String md5=FileUtils.getMD5(imageFile);
 				if(imageService.findByMd5(md5)==null){
 					logger.info("{},md5验证通过", file.getName());
@@ -107,10 +113,16 @@ public class DownloadAop {
 					newImage.setHeight(height);
 					newImage.setWidth(width);
 					imageService.insert(newImage);
+					if(height*width<1280*720) {
+						logger.info("{},图片清晰度太低",imageFile.getAbsoluteFile());
+						imageFile.delete();
+					}
 					logger.info("{},文件信息存储完成",newImage.getName());
 				}else {
 					logger.info("{},md5验证失败", file.getName());
-					imageFile.delete();
+					if(imageFile.exists()) {
+						imageFile.delete();
+					}
 				}
 			} catch (Throwable e) {
 				e.printStackTrace();
