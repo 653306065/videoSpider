@@ -91,8 +91,8 @@ public class Pixiv {
 						public void run() {
 							Map<String, String> header = new HashMap<>();
 							header.put("Referer", "https://www.pixiv.net/ranking.php?mode=daily&content=illust");
-							imageDownload.downloadFile(url, header,
-									savePath + "\\" + dateStr + "\\" + UUID.randomUUID() + ".jpg", proxy);
+							String fileName=url.split("/")[url.split("/").length-1];
+							imageDownload.downloadFile(url, header,savePath + "\\" + dateStr + "\\" + fileName, proxy);
 						}
 					});
 				}
