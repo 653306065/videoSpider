@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.slf4j.Logger;
@@ -59,27 +58,39 @@ public class Pixiv {
 		JSONObject jsonObject = JSON.parseObject(json);
 		JSONArray jsonArray = jsonObject.getJSONArray("contents");
 		for (int i = 0; i < jsonArray.size(); i++) {
-			logger.info(jsonArray.getJSONObject(i).getString("url"));
-			String imageurl = jsonArray.getJSONObject(i).getString("url").replace("c/240x480/img-master", "img-original").replace("_master1200", "");
-			logger.info(imageurl);
-			urlList.add(imageurl);
+			int illust_page_count=jsonArray.getJSONObject(i).getIntValue("illust_page_count");
+			for(int page=0;page<illust_page_count;page++) {
+				String imageurl = jsonArray.getJSONObject(i).getString("url").replace("c/240x480/img-master", "img-original").replace("_master1200", "").replace("p0", "p"+page);
+				logger.info(jsonArray.getJSONObject(i).getString("url"));	
+				String master1200=jsonArray.getJSONObject(i).getString("url").replace("c/240x480/img-master", "img-master").replace("p0", "p"+page);
+				logger.info(imageurl);
+				logger.info(master1200);
+				urlList.add(imageurl);
+				urlList.add(master1200);
+			}
 		}
 		
 		String page2 = R18Url.replace("@{date}", dateStr).replace("@{page}", String.valueOf(2));
-		String json2 = OKHttpUtils.get(url, header, proxy);
+		String json2 = OKHttpUtils.get(page2, header, proxy);
 		JSONObject jsonObject2 = JSON.parseObject(json2);
-		JSONArray jsonArray2 = jsonObject.getJSONArray("contents");
+		JSONArray jsonArray2 = jsonObject2.getJSONArray("contents");
 		for (int i = 0; i < jsonArray2.size(); i++) {
-			logger.info(jsonArray.getJSONObject(i).getString("url"));
-			String imageurl = jsonArray.getJSONObject(i).getString("url").replace("c/240x480/img-master", "img-original").replace("_master1200", "");
-			logger.info(imageurl);
-			urlList.add(imageurl);
+			int illust_page_count=jsonArray2.getJSONObject(i).getIntValue("illust_page_count");
+			for(int page=0;i<page;page++) {
+				String imageurl = jsonArray2.getJSONObject(i).getString("url").replace("c/240x480/img-master", "img-original").replace("_master1200", "").replace("p0", "p"+page);
+				logger.info(jsonArray2.getJSONObject(i).getString("url"));	
+				String master1200=jsonArray2.getJSONObject(i).getString("url").replace("c/240x480/img-master", "img-master").replace("p0", "p"+page);
+				logger.info(imageurl);
+				logger.info(master1200);
+				urlList.add(imageurl);
+				urlList.add(master1200);
+			}
 		}
 		return urlList;
 	}
 
 	public void downloadHistoryR18() {
-		Date date = new Date(110, 0, 0);
+		Date date = new Date();
 		while (true) {
 			try {
 				ExecutorService executorService = Executors.newFixedThreadPool(thread);;
@@ -107,7 +118,7 @@ public class Pixiv {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			date.setTime(date.getTime() + 1000 * 60 * 60 * 24);
+			date.setTime(date.getTime() - 1000 * 60 * 60 * 24);
 		}
 	}
 }

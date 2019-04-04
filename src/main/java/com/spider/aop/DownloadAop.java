@@ -43,6 +43,7 @@ public class DownloadAop {
 		Video video = videoService.findByName(file.getName());
 		if (video != null) {
 			logger.info(file.getName() + "已存在");
+			return;
 		} else {
 			try {
 				logger.info("{},文件名验证通过", file.getName());
@@ -88,6 +89,7 @@ public class DownloadAop {
 		Image image = imageService.findByName(file.getName());
 		if (image != null) {
 			logger.info(file.getName() + "已存在");
+			return;
 		} else {
 			try {
 				logger.info("{},文件名验证通过", file.getName());
