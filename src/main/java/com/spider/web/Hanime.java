@@ -65,7 +65,8 @@ public class Hanime {
 						executorService.execute(new Runnable() {
 							@Override
 							public void run() {
-								String path = savePath + "\\" + type + "\\" + UUID.randomUUID().toString()+"."+extension;
+								String name=UUID.randomUUID().toString().replace("-", "");
+								String path = savePath + "\\" + type + "\\" + name+"."+extension;
 								imageDownload.downloadFile(url, null, path, proxy);
 								logger.info("{},{},下载完成", filename, url);
 							}
