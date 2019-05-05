@@ -3,6 +3,7 @@ package com.spider.web;
 import java.net.Proxy;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -57,14 +58,20 @@ public class Hanime {
 					JSONObject data = array.getJSONObject(i);
 					String filename = data.getString("filename");
 					String url = data.getString("url");
-					executorService.execute(new Runnable() {
-						@Override
-						public void run() {
-							String path = savePath + "\\" + type + "\\" + filename;
-							imageDownload.downloadFile(url, null, path, proxy);
-							logger.info("{},{},下载完成", filename, url);
-						}
-					});
+					Integer width=data.getInteger("width");
+					Integer height=data.getInteger("height");
+					String extension=data.getString("extension");
+					if(width*height>=1920*1080) {
+						executorService.execute(new Runnable() {
+							@Override
+							public void run() {
+								String path = savePath + "\\" + type + "\\" + UUID.randomUUID().toString()+"."+extension;
+								imageDownload.downloadFile(url, null, path, proxy);
+								logger.info("{},{},下载完成", filename, url);
+							}
+						});
+					}
+					
 				}
 				executorService.shutdown();
 				while (true) {
