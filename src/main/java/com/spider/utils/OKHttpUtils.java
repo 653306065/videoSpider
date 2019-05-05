@@ -19,7 +19,9 @@ public class OKHttpUtils {
 			Request request=new Request.Builder().get().url(url).build();
 			Response response=httpClient.newCall(request).execute();
 			if(response.isSuccessful()) {
-				return response.body().string();
+				String html=response.body().string();
+				response.body().close();
+				return html;
 			}
 			return null;
 		} catch (Exception e) {
@@ -38,7 +40,9 @@ public class OKHttpUtils {
 			Request request=builder.get().url(url).build();
 			Response response=httpClient.newCall(request).execute();
 			if(response.isSuccessful()) {
-				return response.body().string();
+				String html=response.body().string();
+				response.body().close();
+				return html;
 			}
 			return null;
 		} catch (Exception e) {
@@ -55,7 +59,7 @@ public class OKHttpUtils {
 			Response response=httpClient.newCall(request).execute();
 			if(response.isSuccessful()) {
 				String redirectUrl=response.request().url().toString();
-				response.close();
+				response.body().close();
 				return redirectUrl;
 			}
 			return null;
@@ -127,7 +131,9 @@ public class OKHttpUtils {
 			Request request=new Request.Builder().get().url(url).build();
 			Response response=httpClient.newCall(request).execute();
 			if(response.isSuccessful()) {
-				return response.body().bytes();
+				byte[] bytes=response.body().bytes();
+				response.body().close();
+				return bytes;
 			}
 			return null;
 		} catch (Exception e) {
@@ -148,7 +154,9 @@ public class OKHttpUtils {
 			Request request=builder.get().url(url).build();
 			Response response=httpClient.newCall(request).execute();
 			if(response.isSuccessful()) {
-				return response.body().bytes();
+				byte[] bytes=response.body().bytes();
+				response.body().close();
+				return bytes;
 			}
 			return null;
 		} catch (Exception e) {
@@ -164,7 +172,9 @@ public class OKHttpUtils {
 			Request request=new Request.Builder().post(requestBody).url(url).build();
 			Response response=httpClient.newCall(request).execute();
 			if(response.isSuccessful()) {
-				return response.body().string();
+				String html=response.body().string();
+				response.body().close();
+				return html;
 			}
 			return null;
 		} catch (Exception e) {

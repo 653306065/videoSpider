@@ -6,6 +6,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import com.spider.web.Wallhaven;
+
 @SpringBootApplication
 public class Application {
 
@@ -13,5 +15,6 @@ public class Application {
 
 	public static void main(String[] args) {
 		ConfigurableApplicationContext context = SpringApplication.run(Application.class);
+		context.getBean(Wallhaven.class).downloadAnime4K();
 	}
 }

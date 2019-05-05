@@ -29,6 +29,20 @@ hanime:
    imageApi: https://hanime.tv/api/v3/community_uploads?channel_name__in[]=@{type}&__offset=@{offset}&__order=created_at,DESC
    thread: 30
 
+wallhaven:
+   home: https://alpha.wallhaven.cc
+   savePath: F:\wallhaven
+   imageApi: https://alpha.wallhaven.cc/search?q=&categories=@{categories}&purity=@{purity}&atleast=@{atleast}&sorting=date_added&order=desc&page=@{page}
+   categories:
+         - general
+         - anime
+         - people
+   purity: 
+         - SFW
+         - sketchy
+         - NSFW   
+   cookie: __cfduid=da602808aa2606b3820180121e271a9fa1557022333; _pk_ses.1.1f04=1; remember_82e5d2c56bdd0811318f0cf078b78bfc=eyJpdiI6IkJwQlpxXC9jVmpHRTU4dEw5SkU1Vm85NzlQRHp1WGdydG5FY0FmZjJCTW5rPSIsInZhbHVlIjoiQWxraWR0RmN5U3NNRk1NYnZJckg2MU5XeHh3TFZmZ25tZVVFXC9HYkI4OW5YaktEUkdiSFpXWGRsRXl1emJWYUwrOXpRVEFXd3Y5K3ZOK04zdXVuNnRTRkgzMUZ2TTZESXpSTzRSeFZMSDNISEVTbjlBczlUT2N6VmVldThQcEFBIiwibWFjIjoiZjM1ZTI1YmMyYmM5OWU2YTVjNDgxYzI4YmQxYjNiMDdlN2UzZWNmMTJjYzhmYzQ2YjcxM2NhYTFlMmVkNDdhYyJ9; wallhaven_session=eyJpdiI6InNmcEg1TldMbXlRT3lNMk1yZURRUXlMU2tSenh4WWNPOVBaNmtURWQwVjg9IiwidmFsdWUiOiJ1eWtXVDdNdTZXNDNPbUI2akZ6ald0QmtCa25CdVE1cUozUlwvdTJZSUxhajlpNWR2dnpUbEtoNjZcL3hiazRsWkc3Z2ZZSnBmOFVGbzgxQndKdjNLWjZ3PT0iLCJtYWMiOiJmZmIxMTExNjk1YWNiNzY0NzgwMzA1YzRmM2UxZmQzYjRiYjI4MmMyMGZiYjljNzczMDQ0MjIzYzMyYzllNjgwIn0%3D; _pk_id.1.1f04=6449a7455e666e40.1557022338.1.1557025741.1557022338.  
+     
       
 proxy:
    host: 127.0.0.1
