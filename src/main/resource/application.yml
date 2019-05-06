@@ -27,7 +27,11 @@ hanime:
    home: https://hanime.tv/
    savePath: D:\hanime
    imageApi: https://hanime.tv/api/v3/community_uploads?channel_name__in[]=@{type}&__offset=@{offset}&__order=created_at,DESC
-   thread: 30
+   thread: 24
+   videoListApi: https://search.hanime.tv
+   videoDownloadApi: https://members.hanime.tv/api/v1/downloads/@{slug}
+   auth: ad170b14e4c91572f9ab09709fae0754
+   auth_expires: 1557134607
 
 wallhaven:
    home: https://alpha.wallhaven.cc

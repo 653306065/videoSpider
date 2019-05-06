@@ -5,8 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-
-import com.spider.web.Wallhaven;
+import com.spider.web.Hanime;
 
 @SpringBootApplication
 public class Application {
@@ -15,6 +14,6 @@ public class Application {
 
 	public static void main(String[] args) {
 		ConfigurableApplicationContext context = SpringApplication.run(Application.class);
-		context.getBean(Wallhaven.class).downloadAnime4K();
+		context.getBean(Hanime.class).downloadVideo();
 	}
 }

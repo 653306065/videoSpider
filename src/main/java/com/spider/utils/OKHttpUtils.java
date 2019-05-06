@@ -4,8 +4,8 @@ import java.io.InputStream;
 import java.net.Proxy;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
 import okhttp3.FormBody;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -13,13 +13,14 @@ import okhttp3.Response;
 
 public class OKHttpUtils {
 
-    public static String get(String url,Proxy proxy) {
-    	try {
-			OkHttpClient httpClient=new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy).build();
-			Request request=new Request.Builder().get().url(url).build();
-			Response response=httpClient.newCall(request).execute();
-			if(response.isSuccessful()) {
-				String html=response.body().string();
+	public static String get(String url, Proxy proxy) {
+		try {
+			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy)
+					.build();
+			Request request = new Request.Builder().get().url(url).build();
+			Response response = httpClient.newCall(request).execute();
+			if (response.isSuccessful()) {
+				String html = response.body().string();
 				response.body().close();
 				return html;
 			}
@@ -28,19 +29,20 @@ public class OKHttpUtils {
 			e.printStackTrace();
 			return null;
 		}
-    }
-    
-    public static String get(String url,Map<String,String> header,Proxy proxy) {
-    	try {
-			OkHttpClient httpClient=new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy).build();
-			Request.Builder builder=new Request.Builder();
-			for(Map.Entry<String, String> entry:header.entrySet()) {
+	}
+
+	public static String get(String url, Map<String, String> header, Proxy proxy) {
+		try {
+			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy)
+					.build();
+			Request.Builder builder = new Request.Builder();
+			for (Map.Entry<String, String> entry : header.entrySet()) {
 				builder.addHeader(entry.getKey(), entry.getValue());
 			}
-			Request request=builder.get().url(url).build();
-			Response response=httpClient.newCall(request).execute();
-			if(response.isSuccessful()) {
-				String html=response.body().string();
+			Request request = builder.get().url(url).build();
+			Response response = httpClient.newCall(request).execute();
+			if (response.isSuccessful()) {
+				String html = response.body().string();
 				response.body().close();
 				return html;
 			}
@@ -49,16 +51,16 @@ public class OKHttpUtils {
 			e.printStackTrace();
 			return null;
 		}
-    }
-    
-    
-    public static String getRedirectUrl(String url,Proxy proxy) {
-    	try {
-			OkHttpClient httpClient=new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy).build();
-			Request request=new Request.Builder().get().url(url).build();
-			Response response=httpClient.newCall(request).execute();
-			if(response.isSuccessful()) {
-				String redirectUrl=response.request().url().toString();
+	}
+
+	public static String getRedirectUrl(String url, Proxy proxy) {
+		try {
+			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy)
+					.build();
+			Request request = new Request.Builder().get().url(url).build();
+			Response response = httpClient.newCall(request).execute();
+			if (response.isSuccessful()) {
+				String redirectUrl = response.request().url().toString();
 				response.body().close();
 				return redirectUrl;
 			}
@@ -67,14 +69,15 @@ public class OKHttpUtils {
 			e.printStackTrace();
 			return null;
 		}
-    }
-    
-    public static InputStream getInputStream(String url,Proxy proxy) {
-    	try {
-    		OkHttpClient httpClient=new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy).build();
-			Request request=new Request.Builder().get().url(url).build();
-			Response response=httpClient.newCall(request).execute();
-			if(response.isSuccessful()) {
+	}
+
+	public static InputStream getInputStream(String url, Proxy proxy) {
+		try {
+			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy)
+					.build();
+			Request request = new Request.Builder().get().url(url).build();
+			Response response = httpClient.newCall(request).execute();
+			if (response.isSuccessful()) {
 				return response.body().byteStream();
 			}
 			return null;
@@ -82,39 +85,40 @@ public class OKHttpUtils {
 			e.printStackTrace();
 			return null;
 		}
-    }
-    
-    public static Response getResponse(String url,Map<String,String> header,Proxy proxy) {
-    	try {
-    		OkHttpClient httpClient=new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy).build();
-    		Request.Builder builder=new Request.Builder();
-    		if(header!=null) {
-    			for(String key:header.keySet()) {
-        			builder.addHeader(key, header.get(key));
-        		}
-    		}
-			Request request=builder.get().url(url).build();
-			Response response=httpClient.newCall(request).execute();
-		    return response;
+	}
+
+	public static Response getResponse(String url, Map<String, String> header, Proxy proxy) {
+		try {
+			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy)
+					.build();
+			Request.Builder builder = new Request.Builder();
+			if (header != null) {
+				for (String key : header.keySet()) {
+					builder.addHeader(key, header.get(key));
+				}
+			}
+			Request request = builder.get().url(url).build();
+			Response response = httpClient.newCall(request).execute();
+			return response;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
-    }
-    
-    
-    public static InputStream getInputStream(String url,Map<String,String> header,Proxy proxy) {
-    	try {
-    		OkHttpClient httpClient=new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy).build();
-    		Request.Builder builder=new Request.Builder();
-    		if(header!=null) {
-    			for(String key:header.keySet()) {
-        			builder.addHeader(key, header.get(key));
-        		}
-    		}
-			Request request=builder.get().url(url).build();
-			Response response=httpClient.newCall(request).execute();
-			if(response.isSuccessful()) {
+	}
+
+	public static InputStream getInputStream(String url, Map<String, String> header, Proxy proxy) {
+		try {
+			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy)
+					.build();
+			Request.Builder builder = new Request.Builder();
+			if (header != null) {
+				for (String key : header.keySet()) {
+					builder.addHeader(key, header.get(key));
+				}
+			}
+			Request request = builder.get().url(url).build();
+			Response response = httpClient.newCall(request).execute();
+			if (response.isSuccessful()) {
 				return response.body().byteStream();
 			}
 			return null;
@@ -122,16 +126,16 @@ public class OKHttpUtils {
 			e.printStackTrace();
 			return null;
 		}
-    }
-    
-    
-    public static byte[] getBytes(String url,Proxy proxy) {
-    	try {
-    		OkHttpClient httpClient=new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy).build();
-			Request request=new Request.Builder().get().url(url).build();
-			Response response=httpClient.newCall(request).execute();
-			if(response.isSuccessful()) {
-				byte[] bytes=response.body().bytes();
+	}
+
+	public static byte[] getBytes(String url, Proxy proxy) {
+		try {
+			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy)
+					.build();
+			Request request = new Request.Builder().get().url(url).build();
+			Response response = httpClient.newCall(request).execute();
+			if (response.isSuccessful()) {
+				byte[] bytes = response.body().bytes();
 				response.body().close();
 				return bytes;
 			}
@@ -140,21 +144,22 @@ public class OKHttpUtils {
 			e.printStackTrace();
 			return null;
 		}
-    }
-    
-    public static byte[] getBytes(String url,Map<String,String> header,Proxy proxy) {
-    	try {
-    		OkHttpClient httpClient=new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy).build();
-    		Request.Builder builder=new Request.Builder();
-    		if(header!=null) {
-    			for(String key:header.keySet()) {
-        			builder.addHeader(key, header.get(key));
-        		}
-    		}
-			Request request=builder.get().url(url).build();
-			Response response=httpClient.newCall(request).execute();
-			if(response.isSuccessful()) {
-				byte[] bytes=response.body().bytes();
+	}
+
+	public static byte[] getBytes(String url, Map<String, String> header, Proxy proxy) {
+		try {
+			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy)
+					.build();
+			Request.Builder builder = new Request.Builder();
+			if (header != null) {
+				for (String key : header.keySet()) {
+					builder.addHeader(key, header.get(key));
+				}
+			}
+			Request request = builder.get().url(url).build();
+			Response response = httpClient.newCall(request).execute();
+			if (response.isSuccessful()) {
+				byte[] bytes = response.body().bytes();
 				response.body().close();
 				return bytes;
 			}
@@ -163,16 +168,17 @@ public class OKHttpUtils {
 			e.printStackTrace();
 			return null;
 		}
-    }
-    
-    public static String post(String url,Proxy proxy) {
-    	try {
-			OkHttpClient httpClient=new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy).build();
-			RequestBody requestBody=new FormBody.Builder().build();
-			Request request=new Request.Builder().post(requestBody).url(url).build();
-			Response response=httpClient.newCall(request).execute();
-			if(response.isSuccessful()) {
-				String html=response.body().string();
+	}
+
+	public static String post(String url, Proxy proxy) {
+		try {
+			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy)
+					.build();
+			RequestBody requestBody = new FormBody.Builder().build();
+			Request request = new Request.Builder().post(requestBody).url(url).build();
+			Response response = httpClient.newCall(request).execute();
+			if (response.isSuccessful()) {
+				String html = response.body().string();
 				response.body().close();
 				return html;
 			}
@@ -181,5 +187,29 @@ public class OKHttpUtils {
 			e.printStackTrace();
 			return null;
 		}
-    }
+	}
+
+	public static String postJson(String url, Map<String, String> header, String json, Proxy proxy) {
+		try {
+			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy).build();
+			RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json);
+			Request.Builder requestBuilder = new Request.Builder();
+			if (header != null) {
+				for (Map.Entry<String, String> entry : header.entrySet()) {
+					requestBuilder.addHeader(entry.getKey(), entry.getValue());
+				}
+			}
+			Request request = requestBuilder.post(body).url(url).build();
+			Response response = httpClient.newCall(request).execute();
+			if (response.isSuccessful()) {
+				String html = response.body().string();
+				response.body().close();
+				return html;
+			}
+			return null;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 }
