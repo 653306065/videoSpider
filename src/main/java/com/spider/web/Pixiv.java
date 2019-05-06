@@ -75,7 +75,6 @@ public class Pixiv {
 		JSONObject jsonObject2 = JSON.parseObject(json2);
 		JSONArray jsonArray2 = jsonObject2.getJSONArray("contents");
 		for (int i = 0; i < jsonArray2.size(); i++) {
-			int illust_page_count=jsonArray2.getJSONObject(i).getIntValue("illust_page_count");
 			for(int page=0;i<page;page++) {
 				String imageurl = jsonArray2.getJSONObject(i).getString("url").replace("c/240x480/img-master", "img-original").replace("_master1200", "").replace("p0", "p"+page);
 				logger.info(jsonArray2.getJSONObject(i).getString("url"));	
