@@ -65,7 +65,12 @@ public class DownloadAop {
 				} else {
 					logger.info("{},md5验证失败", file.getName());
 					if (videoFile.exists()) {
-						videoFile.delete();
+						boolean b= videoFile.delete();
+						if(b) {
+							logger.info("{},删除成功",file.getName());
+						}else {
+							logger.info("{},删除失败",file.getName());
+						}
 					}
 				}
 			} catch (Throwable e) {
@@ -118,7 +123,12 @@ public class DownloadAop {
 			} else {
 				logger.info("{},md5验证失败", file.getName());
 				if (imageFile.exists()&&!imageFile.getAbsolutePath().equals(imageService.findByMd5(md5).getSavePath())) {
-					imageFile.delete();
+					boolean b=imageFile.delete();
+					if(b) {
+						logger.info("{},删除成功",file.getName());
+					}else {
+						logger.info("{},删除失败",file.getName());
+					}
 				}
 			}
 		} catch (Throwable e) {

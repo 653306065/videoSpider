@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -62,7 +63,7 @@ public class Wallhaven {
 			executorService.execute(new Runnable() {
 				@Override
 				public void run() {
-					String name = imageUrl.split("-")[1];
+					String name = UUID.randomUUID().toString().replace("-", "")+imageUrl.split("-")[1];
 					String save = savePath + path + name;
 					imageDownload.downloadFile(imageUrl, null, save, proxy);
 				}

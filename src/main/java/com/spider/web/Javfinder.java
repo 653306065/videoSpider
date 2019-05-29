@@ -43,7 +43,7 @@ public class Javfinder {
 
 	@Value("${javfinder.thread}")
 	private int thread;
-	
+
 	@Value("${javfinder.ignoreCode}")
 	private String ignoreCode;
 
@@ -85,25 +85,44 @@ public class Javfinder {
 		downloadByCategory("uncensored");
 	}
 
+	public void downloadThisUrl(String url, String path) {
+		List<String> list = this.getVideoInfoUrlList(url);
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		for (String str : list) {
+			try {
+				Map<String, String> map = this.getVideoUrl(str);
+				String fileUrl = map.get("videoUrl");
+				String date = simpleDateFormat.format(new Date());
+				String name=map.get("name").replace(":", "");
+				String realPath = savePath + "\\" + path + "\\" + date + "\\" + name + ".mp4";
+				multithreadingDownload.fileDownload(fileUrl, realPath, null, proxy, thread);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
 	public void downloadByCategory(String category) {
 		int page = 1;
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		while (true) {
 			String url = categoryTemplate.replace("@{page}", String.valueOf(page)).replace("@{category}", category);
 			List<String> list = this.getVideoInfoUrlList(url);
-			a:for (String str : list) {
+			a: for (String str : list) {
 				try {
 					Map<String, String> map = this.getVideoUrl(str);
 					String fileUrl = map.get("videoUrl");
 					String date = simpleDateFormat.format(new Date());
-					String name=map.get("name");
-					for(String code :ignoreCode.split(",")) {
-						if(name.indexOf(code)!=-1) {
+					String name = map.get("name");
+					for (String code : ignoreCode.split(",")) {
+						if (name.indexOf(code) != -1) {
 							continue a;
 						}
 					}
-					String path = savePath + "\\" + category + "\\" + date + "\\" + map.get("name") + ".mp4";
-					multithreadingDownload.fileDownload(fileUrl, path, null, proxy, thread);
+					if (name.indexOf("1Pondo") != -1 || name.indexOf("Caribbeancom") != -1) {
+						String path = savePath + "\\" + category + "\\" + date + "\\" + map.get("name") + ".mp4";
+						multithreadingDownload.fileDownload(fileUrl, path, null, proxy, thread);
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
