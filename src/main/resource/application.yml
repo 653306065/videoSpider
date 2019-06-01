@@ -25,7 +25,7 @@ pixiv:
 
 hanime:
    home: https://hanime.tv/
-   savePath: D:\hanime
+   savePath: F:\hanime
    imageApi: https://hanime.tv/api/v3/community_uploads?channel_name__in[]=@{type}&__offset=@{offset}&__order=created_at,DESC
    thread: 15
    videoListApi: https://search.hanime.tv
@@ -34,9 +34,9 @@ hanime:
    auth_expires: 1557134607
 
 wallhaven:
-   home: https://alpha.wallhaven.cc
+   home: https://wallhaven.cc
    savePath: F:\wallhaven
-   imageApi: https://alpha.wallhaven.cc/search?q=&categories=@{categories}&purity=@{purity}&atleast=@{atleast}&sorting=date_added&order=desc&page=@{page}
+   imageApi: https://wallhaven.cc/search?q=&categories=@{categories}&purity=@{purity}&atleast=@{atleast}&sorting=date_added&order=desc&page=@{page}
    categories:
          - general
          - anime
@@ -45,12 +45,12 @@ wallhaven:
          - SFW
          - sketchy
          - NSFW   
-   cookie: __cfduid=da602808aa2606b3820180121e271a9fa1557022333; _pk_ses.1.1f04=1; remember_82e5d2c56bdd0811318f0cf078b78bfc=eyJpdiI6IkJwQlpxXC9jVmpHRTU4dEw5SkU1Vm85NzlQRHp1WGdydG5FY0FmZjJCTW5rPSIsInZhbHVlIjoiQWxraWR0RmN5U3NNRk1NYnZJckg2MU5XeHh3TFZmZ25tZVVFXC9HYkI4OW5YaktEUkdiSFpXWGRsRXl1emJWYUwrOXpRVEFXd3Y5K3ZOK04zdXVuNnRTRkgzMUZ2TTZESXpSTzRSeFZMSDNISEVTbjlBczlUT2N6VmVldThQcEFBIiwibWFjIjoiZjM1ZTI1YmMyYmM5OWU2YTVjNDgxYzI4YmQxYjNiMDdlN2UzZWNmMTJjYzhmYzQ2YjcxM2NhYTFlMmVkNDdhYyJ9; wallhaven_session=eyJpdiI6InNmcEg1TldMbXlRT3lNMk1yZURRUXlMU2tSenh4WWNPOVBaNmtURWQwVjg9IiwidmFsdWUiOiJ1eWtXVDdNdTZXNDNPbUI2akZ6ald0QmtCa25CdVE1cUozUlwvdTJZSUxhajlpNWR2dnpUbEtoNjZcL3hiazRsWkc3Z2ZZSnBmOFVGbzgxQndKdjNLWjZ3PT0iLCJtYWMiOiJmZmIxMTExNjk1YWNiNzY0NzgwMzA1YzRmM2UxZmQzYjRiYjI4MmMyMGZiYjljNzczMDQ0MjIzYzMyYzllNjgwIn0%3D; _pk_id.1.1f04=6449a7455e666e40.1557022338.1.1557025741.1557022338.  
+   cookie: __cfduid=d7de3bd7c0b7f35648d7ca4b45d092d0a1556795980; _pk_ses.1.01b8=1; remember_web_59ba36addc2b2f9401580f014c7f58ea4e30989d=eyJpdiI6IitTTVRFNFBmZVFtQ0ZZMit0M1JEWlE9PSIsInZhbHVlIjoiQmtqZXNRTlphbTlOMmlhUFJRSDhqaW5RNW9zMGhkWDVFQnd6YzRxYlNDbEM5Sys5bFhadlE1SllSOGZrb281TGFrTkxtaEFLaGtuUkY1azBueXlRS2JtT1k5cWtxVU5tbzJNMmlOOWRIalwvVmM3cE5Pd3BDd0JkSHlneEYrTVhTNWhtUER6Y1FXcmxiMUxcL2hjTk9cL05sSDJJZmJQQzhYRU1uRU5JQjZvQ25NOWRnaHBVeWp6XC9leXBEa3B2aVhpYyIsIm1hYyI6Ijg0ZTg3OTcwYTE4OWRlOWE4MjUyODMyNTIxYjU2NTBmMWM3NWM4Njc0MjE4YTU3M2I5NGE0NTI3YTg5Yzc2MDkifQ%3D%3D; _pk_id.1.01b8=893fa051d6a2880e.1559142259.2.1559144190.1559144132.; XSRF-TOKEN=eyJpdiI6IlFFNm4xNzRUUHB0ZjRTSG56NDlObXc9PSIsInZhbHVlIjoiN0dkSGN1YTdGN3FzM3dLRnJ6UFBrUkpSNXNiOEpTRWVzT3pTTUlTNkpQMXQ2YkNsbjRReFRxdlc1bWNrR0phSSIsIm1hYyI6ImU4MDFmOWNjMjNkMjllYmY2MGQ4MTNiYWFiMDZiNGFmZDE0MWZjMTg0MTUyMjc1YzNiZDM4N2NhMDBjYTMxNmMifQ%3D%3D; wallhaven_session=eyJpdiI6InNXRzZGYzhPRlh0SzQ3Z2hMd0dmWkE9PSIsInZhbHVlIjoiUUlxR3hMNnlmWm5FUlpEQjE4WDFmWXdYTmRjVXhGNGZ5bDM0anRSTUpOWU1pTEtPZkpwcnZVU1ZcL2ZyQnVjTlEiLCJtYWMiOiIzY2Y4MTlhMDQ1MjczMWU3ZGI4Y2E1ZjM2YzIxNTJhY2MwZjZjMzE3MzgxN2ExOTc1OGE1NzcwOWQzNDEzN2Q1In0%3D  
 
 longteng:
-   home: http://www.longteng12345.com/
+   home: http://www.longteng12345.com
    rank: http://www.longteng12345.com/top/allvisit/@{page}.html
-   savePath: G:\longteng   
+   savePath: F:\longteng   
    thread: 30 
       
 proxy:

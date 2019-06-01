@@ -73,7 +73,7 @@ public class Hanime {
 				for (int i = 0; i < array.size(); i++) {
 					JSONObject data = array.getJSONObject(i);
 					String filename = data.getString("filename");
-					String url = data.getString("url");
+					String url = data.getString("canonical_url");
 					Integer width = data.getInteger("width");
 					Integer height = data.getInteger("height");
 					String extension = data.getString("extension");

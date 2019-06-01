@@ -45,12 +45,12 @@ public class Wallhaven {
 		Map<String, String> header = new HashMap<String, String>();
 		header.put("cookie", cookie);
 		Document document = JsoupUtil.getDocumentByProxy(url, header);
-		Elements elements = document.getElementsByClass("thumb-listing-page").get(0).getElementsByTag("ul").get(0)
-				.getElementsByTag("li");
+		Elements elements = document.getElementsByClass("thumb-listing-page").get(0).getElementsByTag("ul").get(0).getElementsByTag("li");
 		for (Element element : elements) {
 			String id = element.getElementsByTag("figure").get(0).attr("data-wallpaper-id");
-			String pngImageUrl = "https://wallpapers.wallhaven.cc/wallpapers/full/wallhaven-" + id + ".png";
-			String jpgImageUrl = "https://wallpapers.wallhaven.cc/wallpapers/full/wallhaven-" + id + ".jpg";
+			String context=id.substring(0, 2);
+			String pngImageUrl = "https://w.wallhaven.cc/full/"+context+"/wallhaven-" + id + ".png";
+			String jpgImageUrl = "https://w.wallhaven.cc/full/"+context+"/wallhaven-" + id + ".jpg";
 			imageList.add(jpgImageUrl);
 			imageList.add(pngImageUrl);
 		}

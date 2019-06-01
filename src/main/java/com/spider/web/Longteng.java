@@ -1,9 +1,9 @@
 package com.spider.web;
 
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -99,12 +99,15 @@ public class Longteng {
 					public void run() {
 						try {
 							String name = map.get("name");
-							OutputStream outputStream = new FileOutputStream(savePath + "\\" + name + ".text");
+							OutputStream outputStream = new FileOutputStream(savePath + "\\" + name + ".txt");
+							OutputStreamWriter outputStreamWriter=new OutputStreamWriter(outputStream,"UTF-8");
+							BufferedWriter bufferedWriter=new BufferedWriter(outputStreamWriter);
 							List<String> chapterList = getChapterList(map.get("url"));
 							for (String url : chapterList) {
 								String text = getChapterText(url);
-								outputStream.write(text.getBytes(), 0, text.getBytes().length);
-								outputStream.flush();
+								bufferedWriter.write(text);
+								bufferedWriter.newLine();
+								bufferedWriter.flush();
 							}
 							outputStream.close();
 						} catch (Exception e) {
