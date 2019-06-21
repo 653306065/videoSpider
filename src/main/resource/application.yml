@@ -1,6 +1,6 @@
 eporner:
    home: https://www.eporner.com
-   savePath: C:\eporner\
+   savePath: E:\eporner\
    category:
       UHD: https://www.eporner.com/category/4k-porn/
    thread: 40  
@@ -27,7 +27,7 @@ hanime:
    home: https://hanime.tv/
    savePath: F:\hanime
    imageApi: https://hanime.tv/api/v3/community_uploads?channel_name__in[]=@{type}&__offset=@{offset}&__order=created_at,DESC
-   thread: 15
+   thread: 24
    videoListApi: https://search.hanime.tv
    videoDownloadApi: https://members.hanime.tv/api/v1/downloads/@{slug}
    auth: ad170b14e4c91572f9ab09709fae0754
@@ -35,7 +35,7 @@ hanime:
 
 wallhaven:
    home: https://wallhaven.cc
-   savePath: F:\wallhaven
+   savePath: G:\wallhaven
    imageApi: https://wallhaven.cc/search?q=&categories=@{categories}&purity=@{purity}&atleast=@{atleast}&sorting=date_added&order=desc&page=@{page}
    categories:
          - general

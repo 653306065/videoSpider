@@ -66,6 +66,25 @@ public class FileUtils {
 		}
 		return list;
 	}
+	
+	public static List<File> getPathFileListBySuffix(String path, List<File> list,String suffix) {
+		File files = new File(path);
+		if (!files.exists() || !files.isDirectory() || files.listFiles().length == 0) {
+			return null;
+		} else {
+			for (File file : files.listFiles()) {
+				if (file.isDirectory()) {
+					getPathFileListBySuffix(file.getAbsolutePath(), list,suffix);
+				} else {
+					if(file.getName().endsWith(suffix)) {
+						list.add(file);
+					}
+				}
+			}
+		}
+		return list;
+	}
+	
 
 	public static void changeFileMd5(File oldFile, File newFile) throws Exception {
 		InputStream in = new FileInputStream(oldFile);

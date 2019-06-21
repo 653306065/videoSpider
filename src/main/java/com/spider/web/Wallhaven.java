@@ -83,10 +83,10 @@ public class Wallhaven {
 			try {
 				String url = imageApi.replace("@{categories}", categories).replace("@{purity}", purity).replace("@{atleast}", atleast).replace("@{page}", String.valueOf(startPage));
 				List<String> list = getImageList(url);
-				downloadImageList(list, path);
 				if (list.size() == 0) {
 					break;
 				}
+				downloadImageList(list, path);
 				logger.info("第{}页,下载完成", String.valueOf(startPage));
 				startPage++;
 			} catch (Exception e) {
@@ -108,6 +108,30 @@ public class Wallhaven {
 		String purity="001";
 		String atleast = "";
 		String path="//NSFW//People//ALL//";
+		downloadImage(categories, purity, atleast, path);
+	}
+	
+	public void downloadNSFWPeople4K() {
+		String categories="001";
+		String purity="001";
+		String atleast = "3840x2160";
+		String path="//NSFW//People//4K//";
+		downloadImage(categories, purity, atleast, path);
+	}
+	
+	public void downloadNSFWPeople2K() {
+		String categories="001";
+		String purity="001";
+		String atleast = "2560x1440";
+		String path="//NSFW//People//2K//";
+		downloadImage(categories, purity, atleast, path);
+	}
+	
+	public void downloadNSFWPeople1080p() {
+		String categories="001";
+		String purity="001";
+		String atleast = "1920x1080";
+		String path="//NSFW//People//1080//";
 		downloadImage(categories, purity, atleast, path);
 	}
 	
