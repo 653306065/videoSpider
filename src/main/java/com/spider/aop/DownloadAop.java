@@ -91,6 +91,10 @@ public class DownloadAop {
 		String path = String.valueOf(args[2]);
 		File file = new File(path);
 		try {
+			if(imageService.findByUrl(httpUrl)!=null) {
+				logger.info("{},url已存在", httpUrl);
+				return;
+			}
 			joinPoint.proceed();
 			File imageFile = new File(path);
 			Image newImage = new Image();

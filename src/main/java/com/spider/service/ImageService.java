@@ -27,4 +27,9 @@ public class ImageService {
 		Query query = new Query(Criteria.where("md5").is(md5));
 		return mongoTemplate.findOne(query, Image.class);
 	}
+	
+	public Image findByUrl(String url) {
+		Query query = new Query(Criteria.where("source").is(url));
+		return mongoTemplate.findOne(query, Image.class);
+	}
 }
