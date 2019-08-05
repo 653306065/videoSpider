@@ -51,7 +51,7 @@ public class Hanime {
 
 	@Value("${hanime.auth_expires}")
 	private String auth_expires;
-	
+
 	@Autowired
 	private MultithreadingDownload multithreadingDownload;
 
@@ -77,17 +77,18 @@ public class Hanime {
 					Integer width = data.getInteger("width");
 					Integer height = data.getInteger("height");
 					String extension = data.getString("extension");
-					//if (width * height >= 1920 * 1080) {
-						executorService.execute(new Runnable() {
-							@Override
-							public void run() {
-								String name = UUID.randomUUID().toString().replace("-", "");
-								String path = savePath + "\\" + type + "\\" + name + "." + extension;
-								imageDownload.downloadFile(url, null, path, proxy);
-								logger.info("{},{},下载完成", filename, url);
-							}
-						});
-					//}
+					// if (width * height >= 1920 * 1080) {
+					executorService.execute(new Runnable() {
+						@Override
+						public void run() {
+							String random = UUID.randomUUID().toString().replace("-", "");
+							String name = filename.split("\\.")[0];
+							String path = savePath + "\\" + type + "\\" + name + "_" + random + "." + extension;
+							imageDownload.downloadFile(url, null, path, proxy);
+							logger.info("{},{},下载完成", filename, url);
+						}
+					});
+					// }
 
 				}
 				executorService.shutdown();
@@ -135,7 +136,7 @@ public class Hanime {
 		String json = "{\"auth_kind\":\"saved_download_token\",\"auth\":\"" + auth + "\",\"auth_expires\":\""
 				+ auth_expires + "\"}";
 		String data = OKHttpUtils.postJson(api, null, json, proxy);
-		if(data==null) {
+		if (data == null) {
 			return null;
 		}
 		JSONObject dataJson = JSON.parseObject(data);
@@ -169,12 +170,12 @@ public class Hanime {
 				for (String video : videoInfoList) {
 					JSONObject videoJson = JSON.parseObject(video);
 					String slug = videoJson.getString("slug");
-					String name=videoJson.getString("name")+".mp4";
+					String name = videoJson.getString("name") + ".mp4";
 					String url = getVideoUrl(slug);
-					if(url==null) {
+					if (url == null) {
 						continue;
 					}
-					String path=savePath+"\\video\\"+name;
+					String path = savePath + "\\video\\" + name;
 					multithreadingDownload.fileDownload(url, path, null, proxy, thread);
 					logger.info(url);
 				}
