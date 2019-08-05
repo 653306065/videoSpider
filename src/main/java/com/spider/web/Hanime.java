@@ -77,7 +77,7 @@ public class Hanime {
 					Integer width = data.getInteger("width");
 					Integer height = data.getInteger("height");
 					String extension = data.getString("extension");
-					if (width * height >= 1920 * 1080) {
+					//if (width * height >= 1920 * 1080) {
 						executorService.execute(new Runnable() {
 							@Override
 							public void run() {
@@ -87,7 +87,7 @@ public class Hanime {
 								logger.info("{},{},下载完成", filename, url);
 							}
 						});
-					}
+					//}
 
 				}
 				executorService.shutdown();

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import com.spider.entity.Image;
 import com.spider.entity.Video;
 import com.spider.service.ImageService;
+import com.spider.service.UrlRecordService;
 import com.spider.service.VideoService;
 import com.spider.utils.FileUtils;
 import com.spider.utils.ImageUtils;
@@ -28,6 +29,9 @@ public class DownloadAop {
 
 	@Autowired
 	private ImageService imageService;
+	
+	@Autowired
+	private UrlRecordService urlRecordService;
 
 	@Pointcut("execution(* com.spider.utils.download.MultithreadingDownload.fileDownload(..))")
 	public void multithreadingDownload_fileDownload() {
@@ -40,6 +44,11 @@ public class DownloadAop {
 		String httpUrl = String.valueOf(args[0]);
 		String path = String.valueOf(args[1]);
 		File file = new File(path);
+		if(urlRecordService.existUrl(httpUrl)) {
+			logger.info(httpUrl + ",已存在");
+			return;
+		} 
+		urlRecordService.insert(httpUrl);
 		Video video = videoService.findByName(file.getName());
 		if (video != null) {
 			logger.info(file.getName() + "已存在");
@@ -90,6 +99,11 @@ public class DownloadAop {
 		String httpUrl = String.valueOf(args[0]);
 		String path = String.valueOf(args[2]);
 		File file = new File(path);
+		if(urlRecordService.existUrl(httpUrl)) {
+			logger.info(httpUrl + ",已存在");
+			return;
+		} 
+		urlRecordService.insert(httpUrl);
 		try {
 			if(imageService.findByUrl(httpUrl)!=null) {
 				logger.info("{},url已存在", httpUrl);
