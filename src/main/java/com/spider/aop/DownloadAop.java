@@ -48,7 +48,6 @@ public class DownloadAop {
 			logger.info(httpUrl + ",已存在");
 			return;
 		} 
-		urlRecordService.insert(httpUrl);
 		Video video = videoService.findByName(file.getName());
 		if (video != null) {
 			logger.info(file.getName() + "已存在");
@@ -70,6 +69,7 @@ public class DownloadAop {
 					newvideo.setSource(httpUrl);
 					newvideo.setCreateDate(new Date());
 					videoService.insert(newvideo);
+					urlRecordService.insert(httpUrl);
 					logger.info("{},文件信息存储完成", newvideo.getName());
 				} else {
 					logger.info("{},md5验证失败", file.getName());
@@ -103,7 +103,6 @@ public class DownloadAop {
 			logger.info(httpUrl + ",已存在");
 			return;
 		} 
-		urlRecordService.insert(httpUrl);
 		try {
 			if(imageService.findByUrl(httpUrl)!=null) {
 				logger.info("{},url已存在", httpUrl);
@@ -137,6 +136,7 @@ public class DownloadAop {
 					e.printStackTrace();
 				}
 				imageService.insert(newImage);
+				urlRecordService.insert(httpUrl);
 				logger.info("{},文件信息存储完成", newImage.getName());
 			} else {
 				logger.info("{},md5验证失败", file.getName());
