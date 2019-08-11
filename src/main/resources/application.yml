@@ -52,6 +52,14 @@ longteng:
    rank: http://www.longteng12345.com/top/allvisit/@{page}.html
    savePath: F:\longteng   
    thread: 30 
+
+avMovie:
+   home: http://av.movie/
+   savePath: D:\avMovie\
+   uncensored: http://av.movie/c/uncensored/@{page}
+   videoUrl: http://av.movie/v/@{code}
+   videoListUrl: http://av.movie/c/@{type}/@{page}
+   playApi: http://api.av.movie/video/players   
       
 proxy:
    host: 127.0.0.1

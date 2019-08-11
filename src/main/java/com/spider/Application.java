@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import com.spider.utils.FileUtils;
 import com.spider.utils.ImageUtils;
+import com.spider.web.AvMovie;
 import com.spider.web.Eporner;
 import com.spider.web.Hanime;
 import com.spider.web.Longteng;
