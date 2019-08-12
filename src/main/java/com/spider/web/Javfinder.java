@@ -93,7 +93,7 @@ public class Javfinder {
 				Map<String, String> map = this.getVideoUrl(str);
 				String fileUrl = map.get("videoUrl");
 				String date = simpleDateFormat.format(new Date());
-				String name=map.get("name").replace(":", "");
+				String name = map.get("name").replace(":", "");
 				String realPath = savePath + "\\" + path + "\\" + date + "\\" + name + ".mp4";
 				multithreadingDownload.fileDownload(fileUrl, realPath, null, proxy, thread);
 			} catch (Exception e) {
@@ -106,10 +106,10 @@ public class Javfinder {
 		int page = 1;
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		while (true) {
-			String url = categoryTemplate.replace("@{page}", String.valueOf(page)).replace("@{category}", category);
-			List<String> list = this.getVideoInfoUrlList(url);
-			a: for (String str : list) {
-				try {
+			try {
+				String url = categoryTemplate.replace("@{page}", String.valueOf(page)).replace("@{category}", category);
+				List<String> list = this.getVideoInfoUrlList(url);
+				a: for (String str : list) {
 					Map<String, String> map = this.getVideoUrl(str);
 					String fileUrl = map.get("videoUrl");
 					String date = simpleDateFormat.format(new Date());
@@ -123,9 +123,9 @@ public class Javfinder {
 						String path = savePath + "\\" + category + "\\" + date + "\\" + map.get("name") + ".mp4";
 						multithreadingDownload.fileDownload(fileUrl, path, null, proxy, thread);
 					}
-				} catch (Exception e) {
-					e.printStackTrace();
 				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 			page++;
 		}
