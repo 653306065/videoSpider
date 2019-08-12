@@ -140,14 +140,18 @@ public class Eporner {
 	public void downloadByCategory(String category) {
 		int page = 0;
 		while (true) {
-			List<String> list = getDetailsList(category, page);
-			for (String url : list) {
-				try {
-					Map<String, String> map = getvideo(url);
-					videoDownload(map, category);
-				} catch (Exception e) {
-					e.getStackTrace();
+			try {
+				List<String> list = getDetailsList(category, page);
+				for (String url : list) {
+					try {
+						Map<String, String> map = getvideo(url);
+						videoDownload(map, category);
+					} catch (Exception e) {
+						e.getStackTrace();
+					}
 				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 			page++;
 		}

@@ -11,6 +11,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,8 @@ import com.spider.utils.download.MultithreadingDownload;
 
 @Service
 public class Javfinder {
+
+	private Logger logger = LoggerFactory.getLogger(Javfinder.class);
 
 	@Value("${javfinder.home}")
 	private String home;
@@ -70,11 +74,14 @@ public class Javfinder {
 		String dataVideo = iframeDocument.getElementsByClass("active").get(0).attr("data-video");
 		String code = dataVideo.split("/")[dataVideo.split("/").length - 1];
 		String apiUrl = "https://embed.media/api/source/" + code;
+		logger.info("apiUrl:{}", apiUrl);
 		String json = OKHttpUtils.post(apiUrl, proxy);
 		JSONObject jsonObject = JSON.parseObject(json);
 		if (jsonObject.getBooleanValue("success")) {
 			JSONArray jsonArray = jsonObject.getJSONArray("data");
 			String file = jsonArray.getJSONObject(jsonArray.size() - 1).getString("file");
+			String videoUrl = OKHttpUtils.getRedirectUrl(file, proxy);
+			logger.info("videoUrl:{}", videoUrl);
 			info.put("videoUrl", OKHttpUtils.getRedirectUrl(file, proxy));
 		}
 		info.put("name", name);
@@ -108,8 +115,10 @@ public class Javfinder {
 		while (true) {
 			try {
 				String url = categoryTemplate.replace("@{page}", String.valueOf(page)).replace("@{category}", category);
+				logger.info("videoInfoUrl:{}", url);
 				List<String> list = this.getVideoInfoUrlList(url);
 				a: for (String str : list) {
+					logger.info("videoPageUrl:{}", str);
 					Map<String, String> map = this.getVideoUrl(str);
 					String fileUrl = map.get("videoUrl");
 					String date = simpleDateFormat.format(new Date());
@@ -119,10 +128,8 @@ public class Javfinder {
 							continue a;
 						}
 					}
-					if (name.indexOf("1Pondo") != -1 || name.indexOf("Caribbeancom") != -1) {
-						String path = savePath + "\\" + category + "\\" + date + "\\" + map.get("name") + ".mp4";
-						multithreadingDownload.fileDownload(fileUrl, path, null, proxy, thread);
-					}
+					String path = savePath + "\\" + category + "\\" + date + "\\" + map.get("name") + ".mp4";
+					multithreadingDownload.fileDownload(fileUrl, path, null, proxy, thread);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
