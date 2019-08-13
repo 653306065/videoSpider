@@ -172,10 +172,9 @@ public class OKHttpUtils {
 
 	public static String post(String url, Proxy proxy) {
 		try {
-			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy)
-					.build();
+			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy).build();
 			RequestBody requestBody = new FormBody.Builder().build();
-			Request request = new Request.Builder().post(requestBody).url(url).build();
+			Request request = new Request.Builder().addHeader("Connection", "close").post(requestBody).url(url).build();
 			Response response = httpClient.newCall(request).execute();
 			if (response.isSuccessful()) {
 				String html = response.body().string();
