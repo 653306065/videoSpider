@@ -125,6 +125,7 @@ public class Javfinder {
 					String name = map.get("name");
 					for (String code : ignoreCode.split(",")) {
 						if (name.indexOf(code) != -1) {
+							logger.info("continue:"+fileUrl);
 							continue a;
 						}
 					}
@@ -134,7 +135,7 @@ public class Javfinder {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			page++;
+			page--;
 		}
 	}
 }
