@@ -64,7 +64,7 @@ public class Eporner {
 		Map<String, String> map = new HashMap<String, String>();
 		String html = OKHttpUtils.get(url, proxy);
 		Document document = Jsoup.parse(html);
-		String name = document.getElementById("undervideomenu").getElementsByTag("h1").get(0).text();
+		String name = document.getElementById("video-info").getElementsByTag("h1").get(0).text();
 		Element moviexxx = document.getElementById("moviexxx");
 		String js = moviexxx.getElementsByTag("script").get(0).toString();
 		String vid = js.split("vid:")[1].split("'")[1];
@@ -138,7 +138,7 @@ public class Eporner {
 	}
 
 	public void downloadByCategory(String category) {
-		int page = 0;
+		int page = 1;
 		while (true) {
 			try {
 				List<String> list = getDetailsList(category, page);
