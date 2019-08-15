@@ -4,6 +4,9 @@ import java.net.Proxy;
 import com.spider.service.AvsoxService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -18,10 +21,11 @@ import com.spider.entity.AvInfo;
 import com.spider.utils.DateUtil;
 import com.spider.utils.JsoupUtil;
 import com.spider.utils.OKHttpUtils;
+
 @Service
 public class Avsox {
-	
-	private Logger logger=LoggerFactory.getLogger(Avsox.class);
+
+	private Logger logger = LoggerFactory.getLogger(Avsox.class);
 
 	@Autowired
 	private Proxy proxy;
@@ -73,7 +77,7 @@ public class Avsox {
 		int minute = Integer.valueOf(ptags.get(2).text().replace("分钟", "").replace("长度", "").replace(":", "").trim());
 		String maker = ptags.get(4).getElementsByTag("a").text();
 		String cover = document.getElementsByClass("bigImage").get(0).attr("href");
-		Elements tags = ptags.get(ptags.size()-1).getElementsByTag("span");
+		Elements tags = ptags.get(ptags.size() - 1).getElementsByTag("span");
 		String tagstr = "";
 		for (Element element : tags) {
 			tagstr = tagstr + "," + element.getElementsByTag("a").get(0).text();
@@ -101,19 +105,37 @@ public class Avsox {
 		while (true) {
 			try {
 				List<String> list = getActressesList(String.valueOf(page));
-				logger.info("ActressesList:{}",JSON.toJSONString(list));
+				logger.info("ActressesList:{}", JSON.toJSONString(list));
 				if (list.size() == 0) {
 					break;
 				}
 				for (String url : list) {
 					List<String> avList = getActressesAvList(url);
-					logger.info("ActressesAvList:{}",JSON.toJSONString(list));
+					logger.info("ActressesAvList:{}", JSON.toJSONString(list));
+					ExecutorService executorService = Executors.newFixedThreadPool(list.size());
 					for (String avUrl : avList) {
-						logger.info("AvUrl:{}",avUrl);
-						AvInfo info = getAvInfo(avUrl);
-						logger.info("AvInfo:{}",JSON.toJSONString(info));
-						if (avsoxService.findByCode(info.getCode()) == null) {
-							avsoxService.insert(info);
+						try {
+							executorService.execute(new Runnable() {
+								@Override
+								public void run() {
+									logger.info("AvUrl:{}", avUrl);
+									AvInfo info = getAvInfo(avUrl);
+									logger.info("AvInfo:{}", JSON.toJSONString(info));
+									if (avsoxService.findByCode(info.getCode()) == null) {
+										avsoxService.insert(info);
+									}
+								}
+							});
+
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+					executorService.shutdown();
+					while (true) {
+						if (executorService.isTerminated()) {
+							logger.info("线程池执行结束");
+							break;
 						}
 					}
 				}
