@@ -48,7 +48,6 @@ public class DownloadAop {
 			logger.info(httpUrl + ",已存在");
 			return;
 		} 
-		urlRecordService.insert(httpUrl);
 		Video video = videoService.findByName(file.getName());
 		if (video != null) {
 			logger.info(file.getName() + "已存在");
@@ -57,6 +56,7 @@ public class DownloadAop {
 			try {
 				logger.info("{},文件名验证通过", file.getName());
 				joinPoint.proceed();
+				urlRecordService.insert(httpUrl);
 				File videoFile = new File(path);
 				Video newvideo = new Video();
 				String md5 = FileUtils.getMD5(videoFile);
@@ -103,13 +103,13 @@ public class DownloadAop {
 			logger.info(httpUrl + ",已存在");
 			return;
 		}
-		urlRecordService.insert(httpUrl);
 		try {
 			if(imageService.findByUrl(httpUrl)!=null) {
 				logger.info("{},url已存在", httpUrl);
 				return;
 			}
 			joinPoint.proceed();
+			urlRecordService.insert(httpUrl);
 			File imageFile = new File(path);
 			Image newImage = new Image();
 			if (!imageFile.exists()) {

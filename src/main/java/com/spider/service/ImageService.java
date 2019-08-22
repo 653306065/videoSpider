@@ -1,5 +1,7 @@
 package com.spider.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -21,6 +23,10 @@ public class ImageService {
 
 	public Image insert(Image video) {
 		return mongoTemplate.insert(video);
+	}
+	
+	public List<Image> findAll(){
+		return mongoTemplate.findAll(Image.class);
 	}
 
 	public Image findByMd5(String md5) {
