@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.spider.service.UrlRecordService;
 import com.spider.utils.OKHttpUtils;
 import com.spider.utils.download.MultithreadingDownload;
 
@@ -50,15 +51,23 @@ public class Javfinder {
 
 	@Value("${javfinder.ignoreCode}")
 	private String ignoreCode;
+	
+	@Autowired
+    private UrlRecordService urlRecordService;
 
-	public List<String> getVideoInfoUrlList(String url) {
-		List<String> list = new ArrayList<String>();
+	public List<Map<String,String>> getVideoInfoUrlList(String url) {
+		
+		List<Map<String,String>> list = new ArrayList<>();
 		String html = OKHttpUtils.get(url, proxy);
 		Document document = Jsoup.parse(html);
 		Elements elements = document.getElementsByClass("main-thumb");
 		for (Element element : elements) {
+			Map<String,String> map=new HashMap<String, String>();
 			String videoUrl = home + element.attr("href");
-			list.add(videoUrl);
+			String name=element.attr("title");
+			map.put("name", name);
+			map.put("url", videoUrl);
+			list.add(map);
 		}
 		return list;
 	}
@@ -93,11 +102,11 @@ public class Javfinder {
 	}
 
 	public void downloadThisUrl(String url, String path) {
-		List<String> list = this.getVideoInfoUrlList(url);
+		List<Map<String,String>> list = this.getVideoInfoUrlList(url);
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		for (String str : list) {
+		for (Map<String,String> videoMap : list) {
 			try {
-				Map<String, String> map = this.getVideoUrl(str);
+				Map<String, String> map = this.getVideoUrl(videoMap.get("url"));
 				String fileUrl = map.get("videoUrl");
 				String date = simpleDateFormat.format(new Date());
 				String name = map.get("name").replace(":", "");
@@ -116,26 +125,33 @@ public class Javfinder {
 			try {
 				String url = categoryTemplate.replace("@{page}", String.valueOf(page)).replace("@{category}", category);
 				logger.info("videoInfoUrl:{}", url);
-				List<String> list = this.getVideoInfoUrlList(url);
-				a: for (String str : list) {
-					logger.info("videoPageUrl:{}", str);
-					Map<String, String> map = this.getVideoUrl(str);
-					String fileUrl = map.get("videoUrl");
-					String date = simpleDateFormat.format(new Date());
-					String name = map.get("name");
+				List<Map<String,String>> list = this.getVideoInfoUrlList(url);
+				a: for (Map<String,String> vidoeMap : list) {
+					String name=vidoeMap.get("name");
+					String str=vidoeMap.get("url");
+					if(urlRecordService.existUrl(vidoeMap.get("url"))) {
+						continue;
+					}
 					for (String code : ignoreCode.split(",")) {
 						if (name.indexOf(code) != -1) {
-							logger.info("continue:"+fileUrl);
+							urlRecordService.insert(str);
+							logger.info("continue:"+str);
 							continue a;
 						}
 					}
+					logger.info("videoPageUrl:{}", str);
+					Map<String, String> map = this.getVideoUrl(str);
+					String fileUrl = map.get("videoUrl");
+					logger.info("fileUrl:"+fileUrl);
+					String date = simpleDateFormat.format(new Date());
 					String path = savePath + "\\" + category + "\\" + date + "\\" + map.get("name") + ".mp4";
 					multithreadingDownload.fileDownload(fileUrl, path, null, proxy, thread);
+					urlRecordService.insert(str);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			page--;
+			page++;
 		}
 	}
 }
