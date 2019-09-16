@@ -15,8 +15,7 @@ public class OKHttpUtils {
 
 	public static String get(String url, Proxy proxy) {
 		try {
-			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy)
-					.build();
+			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).readTimeout(60, TimeUnit.SECONDS).proxy(proxy).build();
 			Request request = new Request.Builder().get().url(url).build();
 			Response response = httpClient.newCall(request).execute();
 			if (response.isSuccessful()) {
@@ -33,7 +32,7 @@ public class OKHttpUtils {
 
 	public static String get(String url, Map<String, String> header, Proxy proxy) {
 		try {
-			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy)
+			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).readTimeout(60, TimeUnit.SECONDS).proxy(proxy)
 					.build();
 			Request.Builder builder = new Request.Builder();
 			for (Map.Entry<String, String> entry : header.entrySet()) {
@@ -55,7 +54,7 @@ public class OKHttpUtils {
 
 	public static String getRedirectUrl(String url, Proxy proxy) {
 		try {
-			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy)
+			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).readTimeout(60, TimeUnit.SECONDS).proxy(proxy)
 					.build();
 			Request request = new Request.Builder().get().url(url).build();
 			Response response = httpClient.newCall(request).execute();
@@ -73,7 +72,7 @@ public class OKHttpUtils {
 
 	public static InputStream getInputStream(String url, Proxy proxy) {
 		try {
-			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy)
+			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).readTimeout(60, TimeUnit.SECONDS).proxy(proxy)
 					.build();
 			Request request = new Request.Builder().get().url(url).build();
 			Response response = httpClient.newCall(request).execute();
@@ -89,7 +88,7 @@ public class OKHttpUtils {
 
 	public static Response getResponse(String url, Map<String, String> header, Proxy proxy) {
 		try {
-			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy)
+			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).readTimeout(60, TimeUnit.SECONDS).proxy(proxy)
 					.build();
 			Request.Builder builder = new Request.Builder();
 			if (header != null) {
@@ -108,7 +107,7 @@ public class OKHttpUtils {
 
 	public static InputStream getInputStream(String url, Map<String, String> header, Proxy proxy) {
 		try {
-			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy)
+			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).readTimeout(60, TimeUnit.SECONDS).proxy(proxy)
 					.build();
 			Request.Builder builder = new Request.Builder();
 			if (header != null) {
@@ -130,7 +129,7 @@ public class OKHttpUtils {
 
 	public static byte[] getBytes(String url, Proxy proxy) {
 		try {
-			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy)
+			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).readTimeout(60, TimeUnit.SECONDS).proxy(proxy)
 					.build();
 			Request request = new Request.Builder().get().url(url).build();
 			Response response = httpClient.newCall(request).execute();
@@ -148,7 +147,7 @@ public class OKHttpUtils {
 
 	public static byte[] getBytes(String url, Map<String, String> header, Proxy proxy) {
 		try {
-			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy)
+			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).readTimeout(60, TimeUnit.SECONDS).proxy(proxy)
 					.build();
 			Request.Builder builder = new Request.Builder();
 			if (header != null) {
@@ -172,7 +171,7 @@ public class OKHttpUtils {
 
 	public static String post(String url, Proxy proxy) {
 		try {
-			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy).build();
+			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).readTimeout(60,TimeUnit.SECONDS).proxy(proxy).build();
 			RequestBody requestBody = new FormBody.Builder().build();
 			Request request = new Request.Builder().addHeader("Connection", "close").post(requestBody).url(url).build();
 			Response response = httpClient.newCall(request).execute();
@@ -190,7 +189,7 @@ public class OKHttpUtils {
 
 	public static String postJson(String url, Map<String, String> header, String json, Proxy proxy) {
 		try {
-			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy).build();
+			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).proxy(proxy).readTimeout(60, TimeUnit.SECONDS).build();
 			RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json);
 			Request.Builder requestBuilder = new Request.Builder();
 			if (header != null) {

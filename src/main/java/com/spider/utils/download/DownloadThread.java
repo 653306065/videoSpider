@@ -27,6 +27,8 @@ public class DownloadThread extends Thread {
 	private long endByte;
 
 	private File file;
+	
+	private volatile long pieceDownloadByte=0;
 
 	public DownloadThread(String httpUrl, Map<String, String> header, Proxy proxy, long startByte, long endByte,
 			File file) {
@@ -52,6 +54,7 @@ public class DownloadThread extends Thread {
 			while (true) {
 				int i = in.read(bytes);
 				MultithreadingDownload.downloadByte = MultithreadingDownload.downloadByte + i;
+				pieceDownloadByte=pieceDownloadByte+i;
 				if (i == -1) {
 					break;
 				} else {
@@ -64,6 +67,7 @@ public class DownloadThread extends Thread {
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.info(Thread.currentThread().getName() + ",下载异常");
+			MultithreadingDownload.downloadByte=MultithreadingDownload.downloadByte-pieceDownloadByte;
 			new DownloadThread(this.httpUrl, this.header, this.proxy, this.startByte, this.endByte, this.file).run();
 		}
 
