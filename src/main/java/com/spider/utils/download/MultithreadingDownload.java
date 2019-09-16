@@ -51,8 +51,7 @@ public class MultithreadingDownload {
 					if (i == threadNum) {
 						endByte = info.getContentLength();
 					}
-					DownloadThread thread = new DownloadThread(HttpUrl, header, proxy, startByte,
-							endByte, file);
+					DownloadThread thread = new DownloadThread(HttpUrl, header, proxy, startByte,endByte, file);
 					executorService.execute(thread);
 				}
 				executorService.shutdown();
@@ -63,8 +62,9 @@ public class MultithreadingDownload {
 					}
 					double percentage = (MultithreadingDownload.downloadByte * 1.0) / (info.getContentLength() * 1.0) * 100.0;
 					cpb.show((int) Math.floor(percentage));
+					System.out.print("("+percentage+"%)");
 					//logger.info("----已下载:" + String.valueOf(percentage) + "%-----");
-					Thread.sleep(1000 * 2);
+					Thread.sleep(500);
 				}
 				downloadByte = 0;
 				logger.info("----" + path + ",下载完成----");
