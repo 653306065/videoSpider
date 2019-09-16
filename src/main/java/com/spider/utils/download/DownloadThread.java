@@ -63,10 +63,10 @@ public class DownloadThread extends Thread {
 			}
 			raf.close();
 			in.close();
-			logger.info(Thread.currentThread().getName() + ",下载完成");
+			//logger.info(Thread.currentThread().getName() + ",下载完成");
 		} catch (Exception e) {
 			e.printStackTrace();
-			logger.info(Thread.currentThread().getName() + ",下载异常");
+			//logger.info(Thread.currentThread().getName() + ",下载异常");
 			MultithreadingDownload.downloadByte=MultithreadingDownload.downloadByte-pieceDownloadByte;
 			new DownloadThread(this.httpUrl, this.header, this.proxy, this.startByte, this.endByte, this.file).run();
 		}

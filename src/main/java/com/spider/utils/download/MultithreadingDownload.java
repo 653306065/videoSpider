@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
+import com.spider.utils.ConsoleProgressBar;
 import com.spider.utils.OKHttpUtils;
 import okhttp3.Response;
 
@@ -55,12 +56,14 @@ public class MultithreadingDownload {
 					executorService.execute(thread);
 				}
 				executorService.shutdown();
+				ConsoleProgressBar cpb = new ConsoleProgressBar(100, '#');
 				while (true) {
 					if (executorService.isTerminated()) {
 						break;
 					}
 					double percentage = (MultithreadingDownload.downloadByte * 1.0) / (info.getContentLength() * 1.0) * 100.0;
-					logger.info("----已下载:" + String.valueOf(percentage) + "%-----");
+					cpb.show((int) Math.floor(percentage));
+					//logger.info("----已下载:" + String.valueOf(percentage) + "%-----");
 					Thread.sleep(1000 * 2);
 				}
 				downloadByte = 0;
