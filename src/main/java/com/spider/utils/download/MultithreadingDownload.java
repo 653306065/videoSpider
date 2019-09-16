@@ -57,14 +57,17 @@ public class MultithreadingDownload {
 				executorService.shutdown();
 				ConsoleProgressBar cpb = new ConsoleProgressBar(100, '#');
 				while (true) {
+					double percentage = (MultithreadingDownload.downloadByte * 1.0) / (info.getContentLength() * 1.0) * 100.0;
+					cpb.show((int) Math.floor(percentage));
+					if(String.valueOf(percentage).length()>5) {
+						System.out.print("("+String.valueOf(percentage).substring(0, 5)+"%)");
+					}else {
+						System.out.print("("+String.valueOf(percentage)+"%)");
+					}
+					Thread.sleep(100);
 					if (executorService.isTerminated()) {
 						break;
 					}
-					double percentage = (MultithreadingDownload.downloadByte * 1.0) / (info.getContentLength() * 1.0) * 100.0;
-					cpb.show((int) Math.floor(percentage));
-					System.out.print("("+percentage+"%)");
-					//logger.info("----已下载:" + String.valueOf(percentage) + "%-----");
-					Thread.sleep(500);
 				}
 				downloadByte = 0;
 				logger.info("----" + path + ",下载完成----");
