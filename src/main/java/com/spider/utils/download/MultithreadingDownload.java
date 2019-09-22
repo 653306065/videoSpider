@@ -64,7 +64,7 @@ public class MultithreadingDownload {
 					}else {
 						System.out.print("("+String.valueOf(percentage)+"%)");
 					}
-					Thread.sleep(100);
+					Thread.sleep(2000);
 					if (executorService.isTerminated()) {
 						break;
 					}

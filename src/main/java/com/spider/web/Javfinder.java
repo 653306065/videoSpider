@@ -52,6 +52,9 @@ public class Javfinder {
 	@Value("${javfinder.ignoreCode}")
 	private String ignoreCode;
 	
+	@Value("${javfinder.category.Hot}")
+	private String hot;
+	
 	@Autowired
     private UrlRecordService urlRecordService;
 
@@ -100,6 +103,10 @@ public class Javfinder {
 	public void downloadUncensored() {
 		downloadByCategory("uncensored");
 	}
+	
+	public void downloadHotUncensored() {
+		downloadHot("uncensored");
+	}
 
 	public void downloadThisUrl(String url, String path) {
 		List<Map<String,String>> list = this.getVideoInfoUrlList(url);
@@ -115,6 +122,36 @@ public class Javfinder {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		}
+	}
+	
+	
+	public void downloadHot(String category) {
+		int page = 1;
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		while (true) {
+			try {
+				String url = hot.replace("@{page}", String.valueOf(page)).replace("@{category}", category);
+				logger.info("videoInfoUrl:{}", url);
+				List<Map<String,String>> list = this.getVideoInfoUrlList(url);
+				a: for (Map<String,String> vidoeMap : list) {
+					String str=vidoeMap.get("url");
+					if(urlRecordService.existUrl(vidoeMap.get("url"))) {
+						continue;
+					}
+					logger.info("videoPageUrl:{}", str);
+					Map<String, String> map = this.getVideoUrl(str);
+					String fileUrl = map.get("videoUrl");
+					logger.info("fileUrl:"+fileUrl);
+					String date = simpleDateFormat.format(new Date());
+					String path = savePath + "\\hot\\" + category + "\\" + date + "\\" + map.get("name") + ".mp4";
+					multithreadingDownload.fileDownload(fileUrl, path, null, proxy, thread);
+					urlRecordService.insert(str);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			page++;
 		}
 	}
 
