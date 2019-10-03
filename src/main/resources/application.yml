@@ -7,12 +7,13 @@ eporner:
    
 javfinder:
    home: https://www3.javfinder.is
-   savePath: C:\javfinder 
+   savePath: D:\javfinder 
    category:
       Uncensored: https://www3.javfinder.is/category/uncensored/page-@{page}.html
+      Hot: https://javfinder.is/category/@{category}/hot/page-@{page}.html
    categoryTemplate: https://www3.javfinder.is/category/@{category}/page-@{page}.html 
-   thread: 30
-   ignoreCode: FC2,XXX-AV,Heydouga,Tokyo Hot,Pacopacomama,H0930,C0930
+   thread: 50
+   ignoreCode: FC2,XXX-AV,Heydouga,Tokyo Hot,Pacopacomama,H0930,C0930,H4610,10Musume
    
 pixiv:
    home: https://www.pixiv.net
@@ -59,7 +60,17 @@ avMovie:
    uncensored: http://av.movie/c/uncensored/@{page}
    videoUrl: http://av.movie/v/@{code}
    videoListUrl: http://av.movie/c/@{type}/@{page}
-   playApi: http://api.av.movie/video/players   
+   playApi: http://api.av.movie/video/players
+   
+
+pornhub:
+   home: https://www.pornhub.com
+   savePath: D:\pornhub\
+   searchUrl: https://www.pornhub.com/video/search?search=@{key}&hd=1&page=@{page}
+   categories: 
+      - hentai
+   categoriesUrl: https://www.pornhub.com/categories/@{categories}
+   thread: 20   
       
 proxy:
    host: 127.0.0.1
