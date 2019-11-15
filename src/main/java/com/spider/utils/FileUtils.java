@@ -49,7 +49,7 @@ public class FileUtils {
 		}
 	}
 
-	public static List<File> fileList = new ArrayList<File>();
+	
 
 	public static List<File> getPathFileList(String path, List<File> list) {
 		File files = new File(path);
@@ -210,11 +210,11 @@ public class FileUtils {
 		}
 	}
 
-	public static List<String> readTxt(String path) {
+	public static List<String> readTxt(String path,String charset) {
 		List<String> list = new ArrayList<>();
 		try {
 			FileInputStream fileInputStream = new FileInputStream(path);
-			InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
+			InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream,charset);
 			BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 			while (true) {
 				String line = bufferedReader.readLine();
@@ -256,5 +256,45 @@ public class FileUtils {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public static void main(String[] args) {
+		List<File> list=getPathFileList("D:\\BaiduNetdiskDownload\\book", new ArrayList<File>());
+		List<String> strList=readTxt("D:\\BaiduNetdiskDownload\\key.txt","GBK");
+		List<String> lineList=new ArrayList<String>();
+		for(File text:list) {
+			try {
+				FileInputStream fileInputStream = new FileInputStream(text);
+				InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream,"GBK");
+				BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+			
+				a: while (true) {
+					String line = bufferedReader.readLine();
+					if (line == null) {
+						break;
+					}
+					for(String key:strList) {
+						if(line.indexOf(key)!=-1) {
+							bufferedReader.close();
+							text.renameTo(new File("D:\\BaiduNetdiskDownload\\true\\"+text.getName()));
+							lineList.add(text.getName());
+							lineList.add(key);
+							lineList.add("--------------------------------------------------");
+							if(line.length()>1000) {
+								line=line.substring(0, 1000);
+							}
+							lineList.add(line);
+							lineList.add("--------------------------------------------------");
+							lineList.add("                                                  ");
+							break a;
+						}
+					}
+				}
+				bufferedReader.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		saveTxt("D:\\BaiduNetdiskDownload\\keyLine.txt", lineList);
 	}
 }
