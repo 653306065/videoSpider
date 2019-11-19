@@ -264,32 +264,49 @@ public class FileUtils {
 		List<String> lineList=new ArrayList<String>();
 		for(File text:list) {
 			try {
+				System.out.println(text.getName());
 				FileInputStream fileInputStream = new FileInputStream(text);
-				InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream,"GBK");
+				InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream,"GBK");//GBK UTF-8 GB2312 GB13000 GB18030 BIG5
 				BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-			
-				a: while (true) {
+				int hit=0;
+				List<String> bookLine=new ArrayList<String>();
+				bookLine.add(text.getName());
+				while (true) {
 					String line = bufferedReader.readLine();
-					if (line == null) {
+					if(line!=null) {
+						line=line.replace(" ", "");
+					}else {
+						bookLine.clear();
 						break;
 					}
+					List<String> bookList=new ArrayList<String>();
+					bookList.add(text.getName());
 					for(String key:strList) {
 						if(line.indexOf(key)!=-1) {
-							bufferedReader.close();
-							text.renameTo(new File("D:\\BaiduNetdiskDownload\\true\\"+text.getName()));
-							lineList.add(text.getName());
-							lineList.add(key);
-							lineList.add("--------------------------------------------------");
+							bookLine.add(key);
+							bookLine.add(line);
+							bookLine.add("                              ");
+							hit++;
+							System.out.println(hit);
 							if(line.length()>1000) {
-								line=line.substring(0, 1000);
+								String str=line.substring(0, 1000);
+								System.out.println(str);
+							}else {
+								System.out.println(line);
 							}
-							lineList.add(line);
-							lineList.add("--------------------------------------------------");
-							lineList.add("                                                  ");
-							break a;
+							//break;
 						}
 					}
+					if(hit>=3) {
+						bookLine.add("------------------------------");
+						bookLine.add("                              ");
+						bufferedReader.close();
+						text.renameTo(new File("D:\\BaiduNetdiskDownload\\true\\"+text.getName()));
+						lineList.addAll(bookLine);
+						break;
+				    }
 				}
+				System.out.println("------------------------------");
 				bufferedReader.close();
 			} catch (Exception e) {
 				e.printStackTrace();
