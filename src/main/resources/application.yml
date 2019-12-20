@@ -12,7 +12,7 @@ javfinder:
       Uncensored: https://www3.javfinder.is/category/uncensored/page-@{page}.html
       Hot: https://javfinder.is/category/@{category}/hot/page-@{page}.html
    categoryTemplate: https://www3.javfinder.is/category/@{category}/page-@{page}.html 
-   thread: 50
+   thread: 25
    ignoreCode: FC2,XXX-AV,Heydouga,Tokyo Hot,Pacopacomama,H0930,C0930,H4610,10Musume
    
 pixiv:
@@ -26,7 +26,7 @@ pixiv:
 
 hanime:
    home: https://hanime.tv/
-   savePath: F:\hanime
+   savePath: D:\hanime
    imageApi: https://hanime.tv/api/v3/community_uploads?channel_name__in[]=@{type}&__offset=@{offset}&__order=created_at,DESC
    thread: 24
    videoListApi: https://search.hanime.tv
@@ -71,10 +71,18 @@ pornhub:
       - hentai
    categoriesUrl: https://www.pornhub.com/categories/@{categories}
    thread: 20   
+
+youtube:
+   home: https://www.findyoutube.net/
+   api: https://www.findyoutube.net/result
+   savePath: D:\youtube\
+   thread: 20
       
 proxy:
    host: 127.0.0.1
    port: 1080     
+
+FFmpegPath: C:\\ffmpeg\\bin\\
    
 spring:
    data:
