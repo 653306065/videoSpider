@@ -1,6 +1,6 @@
 eporner:
    home: https://www.eporner.com
-   savePath: E:\eporner\
+   savePath: C:\eporner\
    category:
       UHD: https://www.eporner.com/category/4k-porn/
    thread: 40  
@@ -26,7 +26,7 @@ pixiv:
 
 hanime:
    home: https://hanime.tv/
-   savePath: D:\hanime
+   savePath: F:\hanime
    imageApi: https://hanime.tv/api/v3/community_uploads?channel_name__in[]=@{type}&__offset=@{offset}&__order=created_at,DESC
    thread: 24
    videoListApi: https://search.hanime.tv
@@ -75,8 +75,8 @@ pornhub:
 youtube:
    home: https://www.findyoutube.net/
    api: https://www.findyoutube.net/result
-   savePath: D:\youtube\
-   thread: 20
+   savePath: F:\youtube\
+   thread: 100
       
 proxy:
    host: 127.0.0.1

@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import com.spider.utils.download.MultithreadingDownload;
+import com.spider.utils.FFmpegUtil;
 import com.spider.utils.JsoupUtil;
 import com.spider.utils.OKHttpUtils;
 
@@ -35,7 +36,7 @@ public class Youtube {
 
 	@Autowired
 	private Proxy proxy;
-	
+
 	@Autowired
 	MultithreadingDownload multithreadingDownload;
 
@@ -45,7 +46,7 @@ public class Youtube {
 		return csrf_token;
 	}
 
-	public Map<String,String> getVideoUrlList(String url) {
+	public Map<String, String> getVideoUrlList(String url) {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("url", url);
 		params.put("csrf_token", getApiToken());
@@ -57,14 +58,17 @@ public class Youtube {
 		Elements trs = tbody.getElementsByTag("tr");
 		String audioUrl = "";
 		String videoUrl = "";
-		String videoName=document.getElementsByTag("h3").get(0).ownText();
+		String title = document.getElementsByTag("h3").get(0).ownText();
 		List<Float> sizeList = new ArrayList<Float>();
 		Map<Float, String> sizeUrlMap = new HashMap<Float, String>();
+		Map<String, String> result = new HashMap<String, String>();
+		Map<Float, String> sizeNameMap = new HashMap<Float, String>();
 		for (Element tr : trs) {
 			String name = tr.getElementsByTag("td").get(0).ownText();
 			String size = tr.getElementsByTag("td").get(1).ownText();
 			String fileUrl = tr.getElementsByTag("td").get(2).getElementsByTag("a").get(0).attr("href");
 			if (name.indexOf("audio") != -1) {
+				result.put("audioName", name);
 				audioUrl = fileUrl;
 			} else {
 				float sizeF = 0;
@@ -75,29 +79,37 @@ public class Youtube {
 					String gb = size.replace("GB", "");
 					sizeF = Float.valueOf(gb) * 1024;
 				}
+				sizeNameMap.put(sizeF, name);
 				sizeList.add(sizeF);
-				sizeUrlMap.put(sizeF,fileUrl);
-			}	
+				sizeUrlMap.put(sizeF, fileUrl);
+			}
 		}
 		Collections.sort(sizeList);
-		float max=sizeList.get(sizeList.size()-1);
-		videoUrl=sizeUrlMap.get(max);
-		Map<String,String> result=new HashMap<String, String>();
+		float max = sizeList.get(sizeList.size() - 1);
+		videoUrl = sizeUrlMap.get(max);
 		result.put("audioUrl", audioUrl);
 		result.put("videoUrl", videoUrl);
-		result.put("videoName", videoName);
-		System.out.println("videoName:"+videoName);
-		System.out.println("audioUrl:"+audioUrl);
-		System.out.println("videoUrl:"+videoUrl);
+		result.put("title", title);
+		result.put("videoName", sizeNameMap.get(max));
+		System.out.println("title:" + title);
+		System.out.println("audioUrl:" + audioUrl);
+		System.out.println("videoUrl:" + videoUrl);
 		return result;
 	}
-	
-	
-	public void downloadVideo(Map<String,String> urlMap) {
-		String name=urlMap.get("videoName");
-		String videoUrl=urlMap.get("videoUrl");
-		String audioUrl=urlMap.get("audioUrl");
-		//String savePath=this.savePath+
-		//multithreadingDownload.fileDownload(videoUrl, path, header, proxy, threadNum);
+
+	public void downloadVideo(String url) {
+		Map<String, String> urlMap = getVideoUrlList(url);
+		String title = urlMap.get("title");
+		String videoUrl = urlMap.get("videoUrl");
+		String audioUrl = urlMap.get("audioUrl");
+		String videoName = urlMap.get("videoName").trim();
+		String audioName = urlMap.get("audioName").trim();
+		String videoPath = this.savePath + title + "\\" +title+videoName;
+		String audioPath = this.savePath + title + "\\" + title+audioName;
+		String targetPath = this.savePath + title + "\\" + title + ".mp4";
+		multithreadingDownload.fileDownload(videoUrl, videoPath.trim(), null, proxy, thread);
+		multithreadingDownload.fileDownload(audioUrl, audioPath.trim(), null, proxy, thread);
+		FFmpegUtil.audioVideoSynthesis(videoPath, audioPath, targetPath.trim());
 	}
+
 }
