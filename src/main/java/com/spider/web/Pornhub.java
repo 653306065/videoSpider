@@ -39,13 +39,13 @@ public class Pornhub {
 
 	@Value("${pornhub.searchUrl}")
 	private String searchUrl;
-	
+
 	@Autowired
 	Proxy proxy;
-	
+
 	@Value("${pornhub.thread}")
 	private int thread;
-	
+
 	@Autowired
 	private MultithreadingDownload multithreadingDownload;
 
@@ -75,11 +75,21 @@ public class Pornhub {
 	public List<String> getVideoList(String url) {
 		List<String> list = new ArrayList<String>();
 		Document document = JsoupUtil.getDocumentByProxy(url);
-		Elements elements = document.getElementById("videoSearchResult").getElementsByClass("title");
-		for (Element element : elements) {
-			String href = element.getElementsByTag("a").attr("href");
-			if (href.indexOf("viewkey") != -1) {
-				list.add(home + href);
+		if (document.getElementById("videoSearchResult") != null) {
+			Elements elements = document.getElementById("videoSearchResult").getElementsByClass("title");
+			for (Element element : elements) {
+				String href = element.getElementsByTag("a").attr("href");
+				if (href.indexOf("viewkey") != -1) {
+					list.add(home + href);
+				}
+			}
+		}else {
+			Elements elements = document.getElementById("videoCategory").getElementsByClass("linkVideoThumb");
+			for (Element element : elements) {
+				String href = element.getElementsByTag("a").attr("href");
+				if (href.indexOf("viewkey") != -1) {
+					list.add(home + href);
+				}
 			}
 		}
 		return list;
@@ -90,22 +100,22 @@ public class Pornhub {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		while (true) {
 			try {
-				String url= searchUrl.replace("@{key}", key).replace("@{page}", String.valueOf(page));
+				String url = searchUrl.replace("@{key}", key).replace("@{page}", String.valueOf(page));
 				System.out.println(url);
-				List<String> list= getVideoList(url);
-				for(String str:list) {
-					Map<String,String> map= getVideoByUrl(str);
-					String httpUrl=map.get("url");
-					String name=map.get("name");
-					String quality=map.get("quality");
+				List<String> list = getVideoList(url);
+				for (String str : list) {
+					Map<String, String> map = getVideoByUrl(str);
+					String httpUrl = map.get("url");
+					String name = map.get("name");
+					String quality = map.get("quality");
 					String date = simpleDateFormat.format(new Date());
-					String path=savePath+key+File.separator+date+File.separator+name;
-					if(Integer.valueOf(quality)<720) {
+					String path = savePath + key + File.separator + date + File.separator + name;
+					if (Integer.valueOf(quality) < 720) {
 						continue;
 					}
 					multithreadingDownload.fileDownload(httpUrl, path, null, proxy, thread);
 				}
-				if(list.size()==0) {
+				if (list.size() == 0) {
 					break;
 				}
 			} catch (Exception e) {
@@ -114,17 +124,51 @@ public class Pornhub {
 			page++;
 		}
 	}
-	
+
 	public void downloadHmv() {
 		downloadSearch("hmv");
 	}
-	
+
 	public void downloadMMD() {
 		downloadSearch("mmd");
 	}
-	
+
 	public void downloadsfm() {
 		downloadSearch("sfm");
+	}
+
+	public void download3dMonster() {
+		downloadSearch("3d+monster");
+	}
+
+	public void downloadDP() {
+		String url = "https://www.pornhub.com/video?c=72&page=";
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		int i = 1;
+		while (true) {
+			try {
+				List<String> list = getVideoList(url + i);
+				for (String str : list) {
+					Map<String, String> map = getVideoByUrl(str);
+					String httpUrl = map.get("url");
+					String name = map.get("name");
+					String quality = map.get("quality");
+					String date = simpleDateFormat.format(new Date());
+					String path = savePath + "dp" + File.separator + date + File.separator + name;
+					if (Integer.valueOf(quality) < 720) {
+						continue;
+					}
+					multithreadingDownload.fileDownload(httpUrl, path, null, proxy, thread);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			i++;
+		}
+	}
+
+	public void downloadHentaiGangbang() {
+		downloadSearch("hentai gangbang");
 	}
 
 	public String getScriptJson(String js, String videoId) {

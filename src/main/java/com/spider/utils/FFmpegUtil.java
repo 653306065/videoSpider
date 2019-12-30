@@ -25,8 +25,18 @@ public class FFmpegUtil {
 			e.printStackTrace();
 		}
 	}
+	
+	public static void videoJoint(String videoPath, String targetPath) {
+		try {
+			//String  command =new File(FFmpegPath).getAbsolutePath() + "/ffmpeg -f concat -i "+videoPath+" -c copy "+targetPath;
+			Runtime.getRuntime().exec("ffmepeg");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 
 	public static void main(String[] args) {
-		audioVideoSynthesis("D:\\video.webm", "D:\\audio.weba", "D:\\a.mp4");
+		videoJoint("D:\\test", "D:\\test.mp4");
 	}
 }
