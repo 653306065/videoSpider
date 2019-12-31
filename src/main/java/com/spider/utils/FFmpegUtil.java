@@ -26,17 +26,17 @@ public class FFmpegUtil {
 		}
 	}
 	
-	public static void videoJoint(String videoPath, String targetPath) {
+	public static void videoSnapshot (String videoPath,String imagePath) {
 		try {
-			//String  command =new File(FFmpegPath).getAbsolutePath() + "/ffmpeg -f concat -i "+videoPath+" -c copy "+targetPath;
-			Runtime.getRuntime().exec("ffmepeg");
+			String  command =new File(FFmpegPath).getAbsolutePath() + "/ffmpeg -i "+ videoPath+" -r 1 -ss:00:30:00 -t 10 -q:v 2 -f image2 "+imagePath+"\\image-%d.jpeg";
+			Runtime.getRuntime().exec(command);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-
+	
 
 	public static void main(String[] args) {
-		videoJoint("D:\\test", "D:\\test.mp4");
+		videoSnapshot ("D:\\youtube\\test.mp4","D:\\youtube");
 	}
 }

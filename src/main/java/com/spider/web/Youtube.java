@@ -102,14 +102,14 @@ public class Youtube {
 		String title = urlMap.get("title");
 		String videoUrl = urlMap.get("videoUrl");
 		String audioUrl = urlMap.get("audioUrl");
-		String videoName = urlMap.get("videoName").trim();
-		String audioName = urlMap.get("audioName").trim();
-		String videoPath = this.savePath + title + "\\" +title+videoName;
-		String audioPath = this.savePath + title + "\\" + title+audioName;
-		String targetPath = this.savePath + title + "\\" + title + ".mp4";
-		multithreadingDownload.fileDownload(videoUrl, videoPath.trim(), null, proxy, thread);
-		multithreadingDownload.fileDownload(audioUrl, audioPath.trim(), null, proxy, thread);
-		FFmpegUtil.audioVideoSynthesis(videoPath, audioPath, targetPath.trim());
+		String videoName = urlMap.get("videoName").replaceAll(" ", "");
+		String audioName = urlMap.get("audioName").replaceAll(" ", "");
+		String videoPath = (this.savePath + title + "\\" + title + videoName).replaceAll(" ", "-");
+		String audioPath = (this.savePath + title + "\\" + title + audioName).replaceAll(" ", "-");
+		String targetPath = (this.savePath + title + "\\" + title + videoName + "_合成.mp4").replaceAll(" ", "-");
+		multithreadingDownload.fileDownload(videoUrl, videoPath, null, proxy, thread);
+		multithreadingDownload.fileDownload(audioUrl, audioPath, null, proxy, thread);
+		FFmpegUtil.audioVideoSynthesis(videoPath, audioPath, targetPath);
 	}
 
 }
