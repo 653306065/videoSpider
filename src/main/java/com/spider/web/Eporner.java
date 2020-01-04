@@ -1,7 +1,9 @@
 package com.spider.web;
 
 import java.net.Proxy;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +27,7 @@ public class Eporner {
 
 	@Value("${eporner.home}")
 	private String homeUrl;
-	
+
 	@Value("${eporner.category.UHD}")
 	private String UHDUrl;
 
@@ -38,10 +40,10 @@ public class Eporner {
 
 	@Value("${eporner.savePath}")
 	private String savePath;
-	
+
 	@Value("${eporner.thread}")
 	private int thread;
-	
+
 	@Autowired
 	private MultithreadingDownload multithreadingDownload;
 
@@ -118,7 +120,9 @@ public class Eporner {
 	public void videoDownload(Map<String, String> map, String category) {
 		String videoUrl = map.get("url");
 		String name = map.get("name");
-		String path = savePath + category + "\\" + name + ".mp4";
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		String date = simpleDateFormat.format(new Date());
+		String path = savePath + category + "\\" + date + "\\" + name + ".mp4";
 		multithreadingDownload.fileDownload(videoUrl, path, null, proxy, thread);
 	}
 
@@ -126,14 +130,19 @@ public class Eporner {
 		String category = "4k-porn";
 		downloadByCategory(category);
 	}
-	
+
 	public void download1080p() {
-		String category="hd-1080p";
+		String category = "hd-1080p";
 		downloadByCategory(category);
 	}
 	
+	public void downloadHentai() {
+		String category = "hentai";
+		downloadByCategory(category);
+	}
+
 	public void downloadDoublePenetration() {
-		String category="double-penetration";
+		String category = "double-penetration";
 		downloadByCategory(category);
 	}
 

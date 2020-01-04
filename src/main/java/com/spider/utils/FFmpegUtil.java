@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -57,13 +58,33 @@ public class FFmpegUtil {
 	}
 
 	public static void main(String[] args) {
-//		List<File> list=new ArrayList<E>();
-//		FileUtils.getPathFileList("C:\\eporner", list)
-//		
-//		
-//		File file=new File("D:\\javfinder\\video\\STAGE2MEDIA S2MBD-008 She got a gorgeous look hot sexy appeal and above all.mp4");
-//		MultimediaInfo MultimediaInfo=getVideoInfo(file);
-//		MultimediaInfo.getDuration();
-//		System.out.println(JSON.toJSONString(MultimediaInfo));
+		List<File> list=new ArrayList<File>();
+		//FileUtils.getPathFileList("D:\\pornhub", list);
+		FileUtils.getPathFileList("D:\\javfinder", list);
+		FileUtils.getPathFileList("D:\\eporner", list);
+		FileUtils.getPathFileList("F:\\eporner", list);
+		//FileUtils.getPathFileList("F:\\pornhub", list);
+		List<String> nameList=new ArrayList<String>();
+		for(File file:list) {
+			MultimediaInfo MultimediaInfo=getVideoInfo(file);
+            if(MultimediaInfo==null) {
+            	continue;
+            }else {
+            	long duration= MultimediaInfo.getDuration();
+            	int height= MultimediaInfo.getVideo().getSize().getHeight();
+            	int width= MultimediaInfo.getVideo().getSize().getWidth();
+            	if(duration<1000*60*15) {
+            		//file.delete();
+            		System.out.println(file.getAbsolutePath());
+            		nameList.add(file.getAbsolutePath());
+            	}
+            }  
+			//System.out.println(JSON.toJSONString(MultimediaInfo));
+		}
+		for(String name:nameList) {
+			System.out.println(name);
+		}
+		System.out.println("-----------------------");
+		System.out.println(nameList.size());
 	}
 }

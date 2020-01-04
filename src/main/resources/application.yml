@@ -3,7 +3,7 @@ eporner:
    savePath: C:\eporner\
    category:
       UHD: https://www.eporner.com/category/4k-porn/
-   thread: 40  
+   thread: 10  
    
 javfinder:
    home: https://www3.javfinder.is
@@ -76,7 +76,7 @@ youtube:
    home: https://www.findyoutube.net/
    api: https://www.findyoutube.net/result
    savePath: F:\youtube\
-   thread: 100
+   thread: 15
       
 proxy:
    host: 127.0.0.1
