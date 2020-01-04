@@ -75,8 +75,12 @@ pornhub:
 youtube:
    home: https://www.findyoutube.net/
    api: https://www.findyoutube.net/result
-   savePath: F:\youtube\
+   savePath: D:\youtube\
    thread: 15
+   googleApi:
+      key: AIzaSyA7H9oVSXwPbOyIaC2kKV1UTtoOyjRjgmw
+      playlists: https://www.googleapis.com/youtube/v3/playlists?part=snippet&channelId=@{channelId}&key=AIzaSyA7H9oVSXwPbOyIaC2kKV1UTtoOyjRjgmw&maxResults=50
+      playlistItems: https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=@{playlistId}&key=AIzaSyA7H9oVSXwPbOyIaC2kKV1UTtoOyjRjgmw&maxResults=50
       
 proxy:
    host: 127.0.0.1

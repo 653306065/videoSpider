@@ -1,12 +1,12 @@
 package com.spider.web;
 
+import java.io.File;
 import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -15,6 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import com.spider.utils.download.MultithreadingDownload;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.spider.utils.FFmpegUtil;
 import com.spider.utils.JsoupUtil;
 import com.spider.utils.OKHttpUtils;
@@ -40,10 +43,45 @@ public class Youtube {
 	@Autowired
 	MultithreadingDownload multithreadingDownload;
 
+	@Value("${youtube.googleApi.playlists}")
+	private String playlistsApi;// 获取视频播放列表
+
+	@Value("${youtube.googleApi.playlistItems}")
+	private String playlistItems;// 获取视频列表中的视频项
+
 	public String getApiToken() {
 		Document document = JsoupUtil.getDocumentByProxy(home);
 		String csrf_token = document.getElementById("csrf_token").attr("value");
 		return csrf_token;
+	}
+
+	public String getPlayList(String channelId) {
+		String realUrl = playlistsApi.replace("@{channelId}", channelId);
+		String json = OKHttpUtils.get(realUrl, proxy);
+		return json;
+	}
+
+	public List<JSONObject> getPlayListItems(String json) {
+		JSONObject jsonObject = JSON.parseObject(json);
+		JSONArray items = jsonObject.getJSONArray("items");
+		String channelTitle = "";
+		List<JSONObject> playlist = new ArrayList<JSONObject>();
+		for (int i = 0; i < items.size(); i++) {
+			JSONObject item = items.getJSONObject(i);
+			String id = item.getString("id");
+			String title = item.getJSONObject("snippet").getString("title");
+			channelTitle = item.getJSONObject("snippet").getString("channelTitle");
+			String playlistUrl = playlistItems.replace("@{playlistId}", id);
+			String playlistJson = OKHttpUtils.get(playlistUrl, proxy);
+			JSONObject playlistjJsonObject = JSON.parseObject(playlistJson);
+			JSONArray playlistItems = playlistjJsonObject.getJSONArray("items");
+			for(int index=0;index<playlistItems.size();index++) {
+				String videoId= playlistItems.getJSONObject(index).getJSONObject("snippet").getJSONObject("resourceId").getString("videoId");
+				downloadVideo(videoId);
+			}
+			playlist.add(playlistjJsonObject);
+		}
+		return playlist;
 	}
 
 	public Map<String, String> getVideoUrlList(String url) {
@@ -104,12 +142,14 @@ public class Youtube {
 		String audioUrl = urlMap.get("audioUrl");
 		String videoName = urlMap.get("videoName").replaceAll(" ", "");
 		String audioName = urlMap.get("audioName").replaceAll(" ", "");
-		String videoPath = (this.savePath + title + "\\" + title + videoName).replaceAll(" ", "-");
-		String audioPath = (this.savePath + title + "\\" + title + audioName).replaceAll(" ", "-");
-		String targetPath = (this.savePath + title + "\\" + title + videoName + "_合成.mp4").replaceAll(" ", "-");
+		String videoPath = (this.savePath + "\\" + title + videoName).replaceAll(" ", "-");
+		String audioPath = (this.savePath + "\\" + title + audioName).replaceAll(" ", "-");
+		String targetPath = (this.savePath + "\\" + title + ".mp4").replaceAll(" ", "-");
 		multithreadingDownload.fileDownload(videoUrl, videoPath, null, proxy, thread);
 		multithreadingDownload.fileDownload(audioUrl, audioPath, null, proxy, thread);
-		FFmpegUtil.audioVideoSynthesis(videoPath, audioPath, targetPath);
+		if(new File(videoPath).exists()&&new File(audioPath).exists()) {
+			FFmpegUtil.audioVideoSynthesis(videoPath, audioPath, targetPath);
+		}
 	}
 
 }

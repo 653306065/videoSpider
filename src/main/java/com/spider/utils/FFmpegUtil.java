@@ -30,7 +30,26 @@ public class FFmpegUtil {
 		try {
 			String command = new File(FFmpegPath).getAbsolutePath() + "/ffmpeg -i " + videoPath + " -i " + audioPath
 					+ " -c:v copy -c:a aac -strict experimental " + targetPath;
-			Runtime.getRuntime().exec(command);
+			Process Process = Runtime.getRuntime().exec(command);
+			new Thread() {
+				public void run() {
+					try {
+						BufferedReader br = new BufferedReader(new InputStreamReader(Process.getErrorStream()));
+						StringBuffer sb = new StringBuffer();
+						String line = "";
+						while ((line = br.readLine()) != null) {
+							sb.append(line);
+							System.out.println(line);
+						}
+						br.close();
+						Process.destroy();
+						new File(videoPath).delete();
+						new File(audioPath).delete();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}.start();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -58,30 +77,30 @@ public class FFmpegUtil {
 	}
 
 	public static void main(String[] args) {
-		List<File> list=new ArrayList<File>();
-		//FileUtils.getPathFileList("D:\\pornhub", list);
+		List<File> list = new ArrayList<File>();
+		// FileUtils.getPathFileList("D:\\pornhub", list);
 		FileUtils.getPathFileList("D:\\javfinder", list);
 		FileUtils.getPathFileList("D:\\eporner", list);
 		FileUtils.getPathFileList("F:\\eporner", list);
-		//FileUtils.getPathFileList("F:\\pornhub", list);
-		List<String> nameList=new ArrayList<String>();
-		for(File file:list) {
-			MultimediaInfo MultimediaInfo=getVideoInfo(file);
-            if(MultimediaInfo==null) {
-            	continue;
-            }else {
-            	long duration= MultimediaInfo.getDuration();
-            	int height= MultimediaInfo.getVideo().getSize().getHeight();
-            	int width= MultimediaInfo.getVideo().getSize().getWidth();
-            	if(duration<1000*60*15) {
-            		//file.delete();
-            		System.out.println(file.getAbsolutePath());
-            		nameList.add(file.getAbsolutePath());
-            	}
-            }  
-			//System.out.println(JSON.toJSONString(MultimediaInfo));
+		// FileUtils.getPathFileList("F:\\pornhub", list);
+		List<String> nameList = new ArrayList<String>();
+		for (File file : list) {
+			MultimediaInfo MultimediaInfo = getVideoInfo(file);
+			if (MultimediaInfo == null) {
+				continue;
+			} else {
+				long duration = MultimediaInfo.getDuration();
+				int height = MultimediaInfo.getVideo().getSize().getHeight();
+				int width = MultimediaInfo.getVideo().getSize().getWidth();
+				if (duration < 1000 * 60 * 15) {
+					// file.delete();
+					System.out.println(file.getAbsolutePath());
+					nameList.add(file.getAbsolutePath());
+				}
+			}
+			// System.out.println(JSON.toJSONString(MultimediaInfo));
 		}
-		for(String name:nameList) {
+		for (String name : nameList) {
 			System.out.println(name);
 		}
 		System.out.println("-----------------------");
