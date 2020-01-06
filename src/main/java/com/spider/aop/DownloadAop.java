@@ -15,8 +15,11 @@ import com.spider.entity.Video;
 import com.spider.service.ImageService;
 import com.spider.service.UrlRecordService;
 import com.spider.service.VideoService;
+import com.spider.utils.FFmpegUtil;
 import com.spider.utils.FileUtils;
 import com.spider.utils.ImageUtils;
+
+import ws.schild.jave.MultimediaInfo;
 
 @Component
 @Aspect
@@ -70,6 +73,20 @@ public class DownloadAop {
 					newvideo.setSource(httpUrl);
 					newvideo.setCreateDate(new Date());
 					videoService.insert(newvideo);
+					MultimediaInfo info= FFmpegUtil.getVideoInfo(videoFile);
+					if(info!=null) {
+						long duration = info.getDuration();
+						int height = info.getVideo().getSize().getHeight();
+						int width = info.getVideo().getSize().getWidth();
+						if (height*width<1280*720) {
+							boolean b= videoFile.delete();
+							if(b) {
+								logger.info("{}分辨率太低,删除成功",file.getName());
+							}else {
+								logger.info("{}分辨率太低,删除失败",file.getName());
+							}
+						}
+					}
 					logger.info("{},文件信息存储完成", newvideo.getName());
 				} else {
 					logger.info("{},md5验证失败", file.getName());

@@ -75,13 +75,14 @@ pornhub:
 youtube:
    home: https://www.findyoutube.net/
    api: https://www.findyoutube.net/result
-   savePath: D:\youtube\
-   thread: 15
+   savePath: F:\youtube\
+   thread: 30
    googleApi:
-      key: AIzaSyA7H9oVSXwPbOyIaC2kKV1UTtoOyjRjgmw
-      playlists: https://www.googleapis.com/youtube/v3/playlists?part=snippet&channelId=@{channelId}&key=AIzaSyA7H9oVSXwPbOyIaC2kKV1UTtoOyjRjgmw&maxResults=50
-      playlistItems: https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=@{playlistId}&key=AIzaSyA7H9oVSXwPbOyIaC2kKV1UTtoOyjRjgmw&maxResults=50
-      search: https://www.googleapis.com/youtube/v3/search?key=AIzaSyA7H9oVSXwPbOyIaC2kKV1UTtoOyjRjgmw&part=snippet&channelId=@{channelId}&maxResults=50&type=video
+      #key: AIzaSyA7H9oVSXwPbOyIaC2kKV1UTtoOyjRjgmw
+      key: AIzaSyBSLTrFguRE5p75BJ6OzhwXuiPHTTO8Ryc
+      playlists: https://www.googleapis.com/youtube/v3/playlists?part=snippet&channelId=@{channelId}&key=${youtube.googleApi.key}&maxResults=50
+      playlistItems: https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=@{playlistId}&key=${youtube.googleApi.key}&maxResults=50
+      search: https://www.googleapis.com/youtube/v3/search?key=${youtube.googleApi.key}&part=snippet&channelId=@{channelId}&maxResults=50&type=video
       
 proxy:
    host: 127.0.0.1

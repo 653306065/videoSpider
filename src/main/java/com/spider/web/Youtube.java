@@ -64,12 +64,22 @@ public class Youtube {
 		return csrf_token;
 	}
 
+	/**
+	 * 获取用户的播放列表
+	 * @param channelId
+	 * @return
+	 */
 	public String getPlayList(String channelId) {
 		String realUrl = playlistsApi.replace("@{channelId}", channelId);
 		String json = OKHttpUtils.get(realUrl, proxy);
 		return json;
 	}
 
+	/**
+	 * 获取播放列表的视频
+	 * @param channelId
+	 * @return
+	 */
 	public List<JSONObject> getPlayListItems(String json) {
 		JSONObject jsonObject = JSON.parseObject(json);
 		JSONArray items = jsonObject.getJSONArray("items");
@@ -85,8 +95,7 @@ public class Youtube {
 			JSONObject playlistjJsonObject = JSON.parseObject(playlistJson);
 			JSONArray playlistItems = playlistjJsonObject.getJSONArray("items");
 			for (int index = 0; index < playlistItems.size(); index++) {
-				String videoId = playlistItems.getJSONObject(index).getJSONObject("snippet").getJSONObject("resourceId")
-						.getString("videoId");
+				String videoId = playlistItems.getJSONObject(index).getJSONObject("snippet").getJSONObject("resourceId").getString("videoId");
 				downloadVideo(videoId);
 			}
 			playlist.add(playlistjJsonObject);
@@ -94,6 +103,11 @@ public class Youtube {
 		return playlist;
 	}
 
+	/**
+	 * 谷歌搜索api
+	 * @param channelId
+	 * @return
+	 */
 	public YuotubeChannel searchVideoList(String channelId) {
 		String realUrl = search.replace("@{channelId}", channelId);
 		String json = OKHttpUtils.get(realUrl, proxy);
@@ -203,9 +217,9 @@ public class Youtube {
 			String audioUrl = urlMap.get("audioUrl");
 			String videoName = urlMap.get("videoName").replaceAll(" ", "");
 			String audioName = urlMap.get("audioName").replaceAll(" ", "");
-			String videoPath = (this.savePath + "\\" + ChannelTitle + "\\" + title + videoName).replaceAll(" ", "_");
-			String audioPath = (this.savePath + "\\" + ChannelTitle + "\\" + title + audioName).replaceAll(" ", "_");
-			String targetPath = (this.savePath + "\\" + ChannelTitle + "\\" + title + ".mp4").replaceAll(" ", "_");
+			String videoPath = (this.savePath  + ChannelTitle + "\\" + title + videoName).replaceAll(" ", "_").replaceAll("\\|", "").replaceAll(";", "").replaceAll("&", "");
+			String audioPath = (this.savePath  + ChannelTitle + "\\" + title + audioName).replaceAll(" ", "_").replaceAll("\\|", "").replaceAll(";", "").replaceAll("&", "");
+			String targetPath = (this.savePath + ChannelTitle + "\\" + title + ".mp4").replaceAll(" ", "_").replaceAll("\\|", "").replaceAll(";", "").replaceAll("&", "");
 			multithreadingDownload.fileDownload(videoUrl, videoPath, null, proxy, thread);
 			logger.info("title:{},视频下载完成",title);
 			multithreadingDownload.fileDownload(audioUrl, audioPath, null, proxy, thread);
