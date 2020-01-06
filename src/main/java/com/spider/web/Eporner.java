@@ -140,6 +140,11 @@ public class Eporner {
 		String category = "hentai";
 		downloadByCategory(category);
 	}
+	
+	public void downloadCreampie() {
+		String category = "creampie";
+		downloadByCategory(category);
+	}
 
 	public void downloadDoublePenetration() {
 		String category = "double-penetration";
