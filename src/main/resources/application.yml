@@ -81,6 +81,7 @@ youtube:
       key: AIzaSyA7H9oVSXwPbOyIaC2kKV1UTtoOyjRjgmw
       playlists: https://www.googleapis.com/youtube/v3/playlists?part=snippet&channelId=@{channelId}&key=AIzaSyA7H9oVSXwPbOyIaC2kKV1UTtoOyjRjgmw&maxResults=50
       playlistItems: https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=@{playlistId}&key=AIzaSyA7H9oVSXwPbOyIaC2kKV1UTtoOyjRjgmw&maxResults=50
+      search: https://www.googleapis.com/youtube/v3/search?key=AIzaSyA7H9oVSXwPbOyIaC2kKV1UTtoOyjRjgmw&part=snippet&channelId=@{channelId}&maxResults=50&type=video
       
 proxy:
    host: 127.0.0.1

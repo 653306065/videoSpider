@@ -11,6 +11,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -18,12 +20,16 @@ import com.spider.utils.download.MultithreadingDownload;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.spider.entity.YuotubeChannel;
+import com.spider.entity.YuotubeChannel.YuotubeVideo;
 import com.spider.utils.FFmpegUtil;
 import com.spider.utils.JsoupUtil;
 import com.spider.utils.OKHttpUtils;
 
 @Component
 public class Youtube {
+
+	private Logger logger = LoggerFactory.getLogger(Wallhaven.class);
 
 	@Value("${youtube.savePath}")
 	private String savePath;
@@ -48,6 +54,9 @@ public class Youtube {
 
 	@Value("${youtube.googleApi.playlistItems}")
 	private String playlistItems;// 获取视频列表中的视频项
+
+	@Value("${youtube.googleApi.search}")
+	private String search;// 获取视频列表中的视频项
 
 	public String getApiToken() {
 		Document document = JsoupUtil.getDocumentByProxy(home);
@@ -75,13 +84,61 @@ public class Youtube {
 			String playlistJson = OKHttpUtils.get(playlistUrl, proxy);
 			JSONObject playlistjJsonObject = JSON.parseObject(playlistJson);
 			JSONArray playlistItems = playlistjJsonObject.getJSONArray("items");
-			for(int index=0;index<playlistItems.size();index++) {
-				String videoId= playlistItems.getJSONObject(index).getJSONObject("snippet").getJSONObject("resourceId").getString("videoId");
+			for (int index = 0; index < playlistItems.size(); index++) {
+				String videoId = playlistItems.getJSONObject(index).getJSONObject("snippet").getJSONObject("resourceId")
+						.getString("videoId");
 				downloadVideo(videoId);
 			}
 			playlist.add(playlistjJsonObject);
 		}
 		return playlist;
+	}
+
+	public YuotubeChannel searchVideoList(String channelId) {
+		String realUrl = search.replace("@{channelId}", channelId);
+		String json = OKHttpUtils.get(realUrl, proxy);
+		JSONObject jsonObject = JSON.parseObject(json);
+		YuotubeChannel yuotubeChannel = new YuotubeChannel();
+		List<YuotubeVideo> list = new ArrayList<YuotubeVideo>();
+		JSONArray items = jsonObject.getJSONArray("items");
+		for (int i = 0; i < items.size(); i++) {
+			JSONObject item = items.getJSONObject(i);
+			String videoId = item.getJSONObject("id").getString("videoId");
+			String title = item.getJSONObject("snippet").getString("title");
+			String channelTitle = item.getJSONObject("snippet").getString("channelTitle");
+			yuotubeChannel.setChannelTitle(channelTitle);
+			YuotubeVideo yuotubeVideo = new YuotubeVideo();
+			yuotubeVideo.setId(videoId);
+			yuotubeVideo.setTitle(title);
+			list.add(yuotubeVideo);
+		}
+
+		if (jsonObject.containsKey("nextPageToken")) {
+			String nextPageToken = jsonObject.getString("nextPageToken");
+			while (true) {
+				String data = OKHttpUtils.get(realUrl + "&pageToken=" + nextPageToken, proxy);
+				JSONObject dataJson = JSON.parseObject(data);
+				items = dataJson.getJSONArray("items");
+				for (int i = 0; i < items.size(); i++) {
+					JSONObject item = items.getJSONObject(i);
+					String videoId = item.getJSONObject("id").getString("videoId");
+					String title = item.getJSONObject("snippet").getString("title");
+					String channelTitle = item.getJSONObject("snippet").getString("channelTitle");
+					yuotubeChannel.setChannelTitle(channelTitle);
+					YuotubeVideo yuotubeVideo = new YuotubeVideo();
+					yuotubeVideo.setId(videoId);
+					yuotubeVideo.setTitle(title);
+					list.add(yuotubeVideo);
+				}
+				if (!dataJson.containsKey("nextPageToken")) {
+					break;
+				} else {
+					nextPageToken = dataJson.getString("nextPageToken");
+				}
+			}
+		}
+		yuotubeChannel.setVideoList(list);
+		return yuotubeChannel;
 	}
 
 	public Map<String, String> getVideoUrlList(String url) {
@@ -135,6 +192,31 @@ public class Youtube {
 		return result;
 	}
 
+	public void downloadChannel(String channelId) {
+		YuotubeChannel yuotubeChannel = searchVideoList(channelId);
+		String ChannelTitle = yuotubeChannel.getChannelTitle();
+		for (YuotubeVideo YuotubeVideo : yuotubeChannel.getVideoList()) {
+			String title = YuotubeVideo.getTitle();
+			logger.info("title:{},开始下载",title);
+			Map<String, String> urlMap = getVideoUrlList(YuotubeVideo.getId());
+			String videoUrl = urlMap.get("videoUrl");
+			String audioUrl = urlMap.get("audioUrl");
+			String videoName = urlMap.get("videoName").replaceAll(" ", "");
+			String audioName = urlMap.get("audioName").replaceAll(" ", "");
+			String videoPath = (this.savePath + "\\" + ChannelTitle + "\\" + title + videoName).replaceAll(" ", "_");
+			String audioPath = (this.savePath + "\\" + ChannelTitle + "\\" + title + audioName).replaceAll(" ", "_");
+			String targetPath = (this.savePath + "\\" + ChannelTitle + "\\" + title + ".mp4").replaceAll(" ", "_");
+			multithreadingDownload.fileDownload(videoUrl, videoPath, null, proxy, thread);
+			logger.info("title:{},视频下载完成",title);
+			multithreadingDownload.fileDownload(audioUrl, audioPath, null, proxy, thread);
+			logger.info("title:{},音频下载完成",title);
+			if (new File(videoPath).exists() && new File(audioPath).exists()) {
+				FFmpegUtil.audioVideoSynthesis(videoPath, audioPath, targetPath);
+				logger.info("title:{},音视频合并完成",title);
+			}
+		}
+	}
+
 	public void downloadVideo(String url) {
 		Map<String, String> urlMap = getVideoUrlList(url);
 		String title = urlMap.get("title");
@@ -142,12 +224,12 @@ public class Youtube {
 		String audioUrl = urlMap.get("audioUrl");
 		String videoName = urlMap.get("videoName").replaceAll(" ", "");
 		String audioName = urlMap.get("audioName").replaceAll(" ", "");
-		String videoPath = (this.savePath + "\\" + title + videoName).replaceAll(" ", "-");
-		String audioPath = (this.savePath + "\\" + title + audioName).replaceAll(" ", "-");
-		String targetPath = (this.savePath + "\\" + title + ".mp4").replaceAll(" ", "-");
+		String videoPath = (this.savePath + "\\" + title + videoName).replaceAll(" ", "_");
+		String audioPath = (this.savePath + "\\" + title + audioName).replaceAll(" ", "_");
+		String targetPath = (this.savePath + "\\" + title + ".mp4").replaceAll(" ", "_");
 		multithreadingDownload.fileDownload(videoUrl, videoPath, null, proxy, thread);
 		multithreadingDownload.fileDownload(audioUrl, audioPath, null, proxy, thread);
-		if(new File(videoPath).exists()&&new File(audioPath).exists()) {
+		if (new File(videoPath).exists() && new File(audioPath).exists()) {
 			FFmpegUtil.audioVideoSynthesis(videoPath, audioPath, targetPath);
 		}
 	}
