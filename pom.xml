@@ -96,7 +96,6 @@
 			<artifactId>google-api-services-youtube</artifactId>
 			<version>v3-rev212-1.25.0</version>
 		</dependency>
-
 	</dependencies>
 
 	<build>

@@ -1,6 +1,7 @@
 package com.spider.web;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,15 +22,17 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.api.services.youtube.YouTube;
-import com.spider.entity.YuotubeChannel;
-import com.spider.entity.YuotubeChannel.YuotubeVideo;
+import com.google.api.services.youtube.model.Playlist;
+import com.google.api.services.youtube.model.PlaylistItem;
+import com.google.api.services.youtube.model.PlaylistItemListResponse;
+import com.google.api.services.youtube.model.PlaylistListResponse;
 import com.spider.utils.FFmpegUtil;
 import com.spider.utils.JsoupUtil;
 import com.spider.utils.OKHttpUtils;
 
 @Component
 public class YoutubeSpider {
- 
+
 	private Logger logger = LoggerFactory.getLogger(Wallhaven.class);
 
 	@Value("${youtube.savePath}")
@@ -44,23 +47,17 @@ public class YoutubeSpider {
 	@Value("${youtube.api}")
 	private String api;
 
+	@Value("${youtube.googleApi.key}")
+	private String key;
+
 	@Autowired
 	private Proxy proxy;
 
 	@Autowired
 	MultithreadingDownload multithreadingDownload;
-	
+
 	@Autowired
 	YouTube youTube;
-
-	@Value("${youtube.googleApi.playlists}")
-	private String playlistsApi;// 获取视频播放列表
-
-	@Value("${youtube.googleApi.playlistItems}")
-	private String playlistItems;// 获取视频列表中的视频项
-
-	@Value("${youtube.googleApi.search}")
-	private String search;// 获取视频列表中的视频项
 
 	public String getApiToken() {
 		Document document = JsoupUtil.getDocumentByProxy(home);
@@ -74,10 +71,28 @@ public class YoutubeSpider {
 	 * @param channelId
 	 * @return
 	 */
-	public String getPlayList(String channelId) {
-		String realUrl = playlistsApi.replace("@{channelId}", channelId);
-		String json = OKHttpUtils.get(realUrl, proxy);
-		return json;
+	public List<Playlist> getPlayList(String channelId) {
+		List<Playlist> list = new ArrayList<>();
+		try {
+			PlaylistListResponse playlistItemList = youTube.playlists().list("snippet").setMaxResults(50L)
+					.setChannelId(channelId).setKey(key).execute();
+			list.addAll(playlistItemList.getItems());
+			if (playlistItemList.getNextPageToken() != null) {
+				String pageToken = playlistItemList.getNextPageToken();
+				while (true) {
+					playlistItemList = youTube.playlists().list("snippet").setPageToken(pageToken).setMaxResults(50L)
+							.setChannelId(channelId).setKey(key).execute();
+					pageToken = playlistItemList.getNextPageToken();
+					list.addAll(playlistItemList.getItems());
+					if (pageToken == null) {
+						break;
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return list;
 	}
 
 	/**
@@ -86,25 +101,28 @@ public class YoutubeSpider {
 	 * @param channelId
 	 * @return
 	 */
-	public List<JSONObject> downloadPlayListItems(String channelId) {
-		String json = getPlayList(channelId);
-		JSONObject jsonObject = JSON.parseObject(json);
-		JSONArray items = jsonObject.getJSONArray("items");
-		String channelTitle = "";
-		List<JSONObject> playlist = new ArrayList<JSONObject>();
-		for (int i = 0; i < items.size(); i++) {
-			JSONObject item = items.getJSONObject(i);
-			String id = item.getString("id");
-			String title = item.getJSONObject("snippet").getString("title");
-			channelTitle = item.getJSONObject("snippet").getString("channelTitle");
-			String playlistUrl = playlistItems.replace("@{playlistId}", id);
-			String playlistJson = OKHttpUtils.get(playlistUrl, proxy);
-			JSONObject playlistjJsonObject = JSON.parseObject(playlistJson);
-			JSONArray playlistItems = playlistjJsonObject.getJSONArray("items");
-			for (int index = 0; index < playlistItems.size(); index++) {
-				String videoId = playlistItems.getJSONObject(index).getJSONObject("snippet").getJSONObject("resourceId")
-						.getString("videoId");
+	public void downloadPlayListItems(Playlist playlist) {
+		try {
+			List<PlaylistItem> list = new ArrayList<PlaylistItem>();
+			PlaylistItemListResponse playlistItemListResponse = youTube.playlistItems().list("snippet").setKey(key).setPlaylistId(playlist.getId()).setMaxResults(50L).execute();
+			list.addAll(playlistItemListResponse.getItems());
+			if (playlistItemListResponse.getNextPageToken() != null) {
+				String pageToken = playlistItemListResponse.getNextPageToken();
+				while (true) {
+					playlistItemListResponse = youTube.playlistItems().list("snippet").setPageToken(pageToken).setKey(key).setPlaylistId(playlist.getId()).setMaxResults(50L).execute();
+					pageToken = playlistItemListResponse.getNextPageToken();
+					list.addAll(playlistItemListResponse.getItems());
+					if (pageToken == null) {
+						break;
+					}
+				}
+			}
+			for (PlaylistItem item : list) {
+				logger.info("PlaylistItem:{}",JSON.toJSONString(item));
+				String videoId = item.getSnippet().getResourceId().getVideoId();
+				String channelTitle = item.getSnippet().getChannelTitle();
 				Map<String, String> urlMap = getVideoUrlList(videoId);
+				String title = item.getSnippet().getTitle();
 				String videoUrl = urlMap.get("videoUrl");
 				String audioUrl = urlMap.get("audioUrl");
 				String videoName = urlMap.get("videoName").replaceAll(" ", "");
@@ -125,62 +143,17 @@ public class YoutubeSpider {
 				}
 				downloadVideo(videoId);
 			}
-			playlist.add(playlistjJsonObject);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		return playlist;
 	}
-
-	/**
-	 * 谷歌搜索api
-	 * 
-	 * @param channelId
-	 * @return
-	 */
-	public YuotubeChannel searchVideoList(String channelId) {
-		String realUrl = search.replace("@{channelId}", channelId);
-		String json = OKHttpUtils.get(realUrl, proxy);
-		JSONObject jsonObject = JSON.parseObject(json);
-		YuotubeChannel yuotubeChannel = new YuotubeChannel();
-		List<YuotubeVideo> list = new ArrayList<YuotubeVideo>();
-		JSONArray items = jsonObject.getJSONArray("items");
-		for (int i = 0; i < items.size(); i++) {
-			JSONObject item = items.getJSONObject(i);
-			String videoId = item.getJSONObject("id").getString("videoId");
-			String title = item.getJSONObject("snippet").getString("title");
-			String channelTitle = item.getJSONObject("snippet").getString("channelTitle");
-			yuotubeChannel.setChannelTitle(channelTitle);
-			YuotubeVideo yuotubeVideo = new YuotubeVideo();
-			yuotubeVideo.setId(videoId);
-			yuotubeVideo.setTitle(title);
-			list.add(yuotubeVideo);
+	
+	public void downloadByChannelId(String ChannelId) {
+		List<Playlist> list= getPlayList(ChannelId);
+		for(Playlist Playlist:list ) {
+			logger.info("Playlist:{}",JSON.toJSONString(list));
+			downloadPlayListItems(Playlist);
 		}
-
-		if (jsonObject.containsKey("nextPageToken")) {
-			String nextPageToken = jsonObject.getString("nextPageToken");
-			while (true) {
-				String data = OKHttpUtils.get(realUrl + "&pageToken=" + nextPageToken, proxy);
-				JSONObject dataJson = JSON.parseObject(data);
-				items = dataJson.getJSONArray("items");
-				for (int i = 0; i < items.size(); i++) {
-					JSONObject item = items.getJSONObject(i);
-					String videoId = item.getJSONObject("id").getString("videoId");
-					String title = item.getJSONObject("snippet").getString("title");
-					String channelTitle = item.getJSONObject("snippet").getString("channelTitle");
-					yuotubeChannel.setChannelTitle(channelTitle);
-					YuotubeVideo yuotubeVideo = new YuotubeVideo();
-					yuotubeVideo.setId(videoId);
-					yuotubeVideo.setTitle(title);
-					list.add(yuotubeVideo);
-				}
-				if (!dataJson.containsKey("nextPageToken")) {
-					break;
-				} else {
-					nextPageToken = dataJson.getString("nextPageToken");
-				}
-			}
-		}
-		yuotubeChannel.setVideoList(list);
-		return yuotubeChannel;
 	}
 
 	public Map<String, String> getVideoUrlList(String url) {
@@ -232,34 +205,6 @@ public class YoutubeSpider {
 		System.out.println("audioUrl:" + audioUrl);
 		System.out.println("videoUrl:" + videoUrl);
 		return result;
-	}
-
-	public void downloadChannel(String channelId) {
-		YuotubeChannel yuotubeChannel = searchVideoList(channelId);
-		String ChannelTitle = yuotubeChannel.getChannelTitle();
-		for (YuotubeVideo YuotubeVideo : yuotubeChannel.getVideoList()) {
-			String title = YuotubeVideo.getTitle();
-			logger.info("title:{},开始下载", title);
-			Map<String, String> urlMap = getVideoUrlList(YuotubeVideo.getId());
-			String videoUrl = urlMap.get("videoUrl");
-			String audioUrl = urlMap.get("audioUrl");
-			String videoName = urlMap.get("videoName").replaceAll(" ", "");
-			String audioName = urlMap.get("audioName").replaceAll(" ", "");
-			String videoPath = (this.savePath + ChannelTitle + "\\" + title + videoName).replaceAll(" ", "_")
-					.replaceAll("\\|", "").replaceAll(";", "").replaceAll("&", "");
-			String audioPath = (this.savePath + ChannelTitle + "\\" + title + audioName).replaceAll(" ", "_")
-					.replaceAll("\\|", "").replaceAll(";", "").replaceAll("&", "");
-			String targetPath = (this.savePath + ChannelTitle + "\\" + title + ".mp4").replaceAll(" ", "_")
-					.replaceAll("\\|", "").replaceAll(";", "").replaceAll("&", "");
-			multithreadingDownload.fileDownload(videoUrl, videoPath, null, proxy, thread);
-			logger.info("title:{},视频下载完成", title);
-			multithreadingDownload.fileDownload(audioUrl, audioPath, null, proxy, thread);
-			logger.info("title:{},音频下载完成", title);
-			if (new File(videoPath).exists() && new File(audioPath).exists()) {
-				FFmpegUtil.audioVideoSynthesis(videoPath, audioPath, targetPath);
-				logger.info("title:{},音视频合并完成", title);
-			}
-		}
 	}
 
 	public void downloadVideo(String url) {

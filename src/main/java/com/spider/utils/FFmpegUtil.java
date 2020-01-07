@@ -31,7 +31,7 @@ public class FFmpegUtil {
 			String command = new File(FFmpegPath).getAbsolutePath() + "/ffmpeg -i " + videoPath + " -i " + audioPath
 					+ " -c:v copy -c:a aac -strict experimental " + targetPath;
 			Process Process = Runtime.getRuntime().exec(command);
-			new Thread() {
+			Thread thread = new Thread() {
 				public void run() {
 					try {
 						BufferedReader br = new BufferedReader(new InputStreamReader(Process.getErrorStream()));
@@ -49,7 +49,9 @@ public class FFmpegUtil {
 						e.printStackTrace();
 					}
 				}
-			}.start();
+			};
+			thread.start();
+			thread.yield();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
