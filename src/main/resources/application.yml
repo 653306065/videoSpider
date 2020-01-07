@@ -75,11 +75,11 @@ pornhub:
 youtube:
    home: https://www.findyoutube.net/
    api: https://www.findyoutube.net/result
-   savePath: F:\youtube\
+   savePath: D:\youtube\
    thread: 30
    googleApi:
-      #key: AIzaSyA7H9oVSXwPbOyIaC2kKV1UTtoOyjRjgmw
-      key: AIzaSyBSLTrFguRE5p75BJ6OzhwXuiPHTTO8Ryc
+      key: AIzaSyA7H9oVSXwPbOyIaC2kKV1UTtoOyjRjgmw
+      #key: AIzaSyBSLTrFguRE5p75BJ6OzhwXuiPHTTO8Ryc
       playlists: https://www.googleapis.com/youtube/v3/playlists?part=snippet&channelId=@{channelId}&key=${youtube.googleApi.key}&maxResults=50
       playlistItems: https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=@{playlistId}&key=${youtube.googleApi.key}&maxResults=50
       search: https://www.googleapis.com/youtube/v3/search?key=${youtube.googleApi.key}&part=snippet&channelId=@{channelId}&maxResults=50&type=video

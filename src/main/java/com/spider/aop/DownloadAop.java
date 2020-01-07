@@ -74,7 +74,7 @@ public class DownloadAop {
 					newvideo.setCreateDate(new Date());
 					videoService.insert(newvideo);
 					MultimediaInfo info= FFmpegUtil.getVideoInfo(videoFile);
-					if(info!=null) {
+					if(info!=null&&info.getVideo()!=null) {
 						long duration = info.getDuration();
 						int height = info.getVideo().getSize().getHeight();
 						int width = info.getVideo().getSize().getWidth();

@@ -20,6 +20,7 @@ import com.spider.utils.download.MultithreadingDownload;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.api.services.youtube.YouTube;
 import com.spider.entity.YuotubeChannel;
 import com.spider.entity.YuotubeChannel.YuotubeVideo;
 import com.spider.utils.FFmpegUtil;
@@ -27,8 +28,8 @@ import com.spider.utils.JsoupUtil;
 import com.spider.utils.OKHttpUtils;
 
 @Component
-public class Youtube {
-
+public class YoutubeSpider {
+ 
 	private Logger logger = LoggerFactory.getLogger(Wallhaven.class);
 
 	@Value("${youtube.savePath}")
@@ -48,6 +49,9 @@ public class Youtube {
 
 	@Autowired
 	MultithreadingDownload multithreadingDownload;
+	
+	@Autowired
+	YouTube youTube;
 
 	@Value("${youtube.googleApi.playlists}")
 	private String playlistsApi;// 获取视频播放列表
@@ -66,6 +70,7 @@ public class Youtube {
 
 	/**
 	 * 获取用户的播放列表
+	 * 
 	 * @param channelId
 	 * @return
 	 */
@@ -77,10 +82,12 @@ public class Youtube {
 
 	/**
 	 * 获取播放列表的视频
+	 * 
 	 * @param channelId
 	 * @return
 	 */
-	public List<JSONObject> getPlayListItems(String json) {
+	public List<JSONObject> downloadPlayListItems(String channelId) {
+		String json = getPlayList(channelId);
 		JSONObject jsonObject = JSON.parseObject(json);
 		JSONArray items = jsonObject.getJSONArray("items");
 		String channelTitle = "";
@@ -95,7 +102,27 @@ public class Youtube {
 			JSONObject playlistjJsonObject = JSON.parseObject(playlistJson);
 			JSONArray playlistItems = playlistjJsonObject.getJSONArray("items");
 			for (int index = 0; index < playlistItems.size(); index++) {
-				String videoId = playlistItems.getJSONObject(index).getJSONObject("snippet").getJSONObject("resourceId").getString("videoId");
+				String videoId = playlistItems.getJSONObject(index).getJSONObject("snippet").getJSONObject("resourceId")
+						.getString("videoId");
+				Map<String, String> urlMap = getVideoUrlList(videoId);
+				String videoUrl = urlMap.get("videoUrl");
+				String audioUrl = urlMap.get("audioUrl");
+				String videoName = urlMap.get("videoName").replaceAll(" ", "");
+				String audioName = urlMap.get("audioName").replaceAll(" ", "");
+				String videoPath = (this.savePath + channelTitle + "\\" + title + videoName).replaceAll(" ", "_")
+						.replaceAll("\\|", "").replaceAll(";", "").replaceAll("&", "");
+				String audioPath = (this.savePath + channelTitle + "\\" + title + audioName).replaceAll(" ", "_")
+						.replaceAll("\\|", "").replaceAll(";", "").replaceAll("&", "");
+				String targetPath = (this.savePath + channelTitle + "\\" + title + ".mp4").replaceAll(" ", "_")
+						.replaceAll("\\|", "").replaceAll(";", "").replaceAll("&", "");
+				multithreadingDownload.fileDownload(videoUrl, videoPath, null, proxy, thread);
+				logger.info("title:{},视频下载完成", title);
+				multithreadingDownload.fileDownload(audioUrl, audioPath, null, proxy, thread);
+				logger.info("title:{},音频下载完成", title);
+				if (new File(videoPath).exists() && new File(audioPath).exists()) {
+					FFmpegUtil.audioVideoSynthesis(videoPath, audioPath, targetPath);
+					logger.info("title:{},音视频合并完成", title);
+				}
 				downloadVideo(videoId);
 			}
 			playlist.add(playlistjJsonObject);
@@ -105,6 +132,7 @@ public class Youtube {
 
 	/**
 	 * 谷歌搜索api
+	 * 
 	 * @param channelId
 	 * @return
 	 */
@@ -211,22 +239,25 @@ public class Youtube {
 		String ChannelTitle = yuotubeChannel.getChannelTitle();
 		for (YuotubeVideo YuotubeVideo : yuotubeChannel.getVideoList()) {
 			String title = YuotubeVideo.getTitle();
-			logger.info("title:{},开始下载",title);
+			logger.info("title:{},开始下载", title);
 			Map<String, String> urlMap = getVideoUrlList(YuotubeVideo.getId());
 			String videoUrl = urlMap.get("videoUrl");
 			String audioUrl = urlMap.get("audioUrl");
 			String videoName = urlMap.get("videoName").replaceAll(" ", "");
 			String audioName = urlMap.get("audioName").replaceAll(" ", "");
-			String videoPath = (this.savePath  + ChannelTitle + "\\" + title + videoName).replaceAll(" ", "_").replaceAll("\\|", "").replaceAll(";", "").replaceAll("&", "");
-			String audioPath = (this.savePath  + ChannelTitle + "\\" + title + audioName).replaceAll(" ", "_").replaceAll("\\|", "").replaceAll(";", "").replaceAll("&", "");
-			String targetPath = (this.savePath + ChannelTitle + "\\" + title + ".mp4").replaceAll(" ", "_").replaceAll("\\|", "").replaceAll(";", "").replaceAll("&", "");
+			String videoPath = (this.savePath + ChannelTitle + "\\" + title + videoName).replaceAll(" ", "_")
+					.replaceAll("\\|", "").replaceAll(";", "").replaceAll("&", "");
+			String audioPath = (this.savePath + ChannelTitle + "\\" + title + audioName).replaceAll(" ", "_")
+					.replaceAll("\\|", "").replaceAll(";", "").replaceAll("&", "");
+			String targetPath = (this.savePath + ChannelTitle + "\\" + title + ".mp4").replaceAll(" ", "_")
+					.replaceAll("\\|", "").replaceAll(";", "").replaceAll("&", "");
 			multithreadingDownload.fileDownload(videoUrl, videoPath, null, proxy, thread);
-			logger.info("title:{},视频下载完成",title);
+			logger.info("title:{},视频下载完成", title);
 			multithreadingDownload.fileDownload(audioUrl, audioPath, null, proxy, thread);
-			logger.info("title:{},音频下载完成",title);
+			logger.info("title:{},音频下载完成", title);
 			if (new File(videoPath).exists() && new File(audioPath).exists()) {
 				FFmpegUtil.audioVideoSynthesis(videoPath, audioPath, targetPath);
-				logger.info("title:{},音视频合并完成",title);
+				logger.info("title:{},音视频合并完成", title);
 			}
 		}
 	}

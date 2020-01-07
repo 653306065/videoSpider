@@ -13,7 +13,7 @@ import com.spider.web.Eporner;
 import com.spider.web.Hanime;
 import com.spider.web.Javfinder;
 import com.spider.web.Pornhub;
-import com.spider.web.Youtube;
+import com.spider.web.YoutubeSpider;
 
 @SpringBootApplication
 public class Application {
@@ -22,7 +22,5 @@ public class Application {
 
 	public static void main(String[] args) {
 		ConfigurableApplicationContext context = SpringApplication.run(Application.class);
-		Youtube Youtube = context.getBean(Youtube.class);
-		Youtube.downloadChannel("UCYxHQWKf3YnBu_dKENKzM9Q");
 	}
 }

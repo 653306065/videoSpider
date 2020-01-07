@@ -94,6 +94,7 @@ public class MultithreadingDownload {
 			fileInfo.setContentType(response.header("Content-Type"));
 			fileInfo.setResponseCode(response.code());
 			fileInfo.setEtag(response.header("etag"));
+			response.body().close();
 			return fileInfo;
 		} catch (Exception e) {
 			e.printStackTrace();
