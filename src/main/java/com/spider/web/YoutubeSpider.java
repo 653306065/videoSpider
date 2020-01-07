@@ -141,7 +141,6 @@ public class YoutubeSpider {
 					FFmpegUtil.audioVideoSynthesis(videoPath, audioPath, targetPath);
 					logger.info("title:{},音视频合并完成", title);
 				}
-				downloadVideo(videoId);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
