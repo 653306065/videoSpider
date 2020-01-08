@@ -7,10 +7,13 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
+import com.spider.web.YoutubeSpider;
 
 import ws.schild.jave.MultimediaInfo;
 import ws.schild.jave.MultimediaObject;
@@ -18,6 +21,8 @@ import ws.schild.jave.VideoInfo;
 
 @Component
 public class FFmpegUtil {
+
+	private static Logger logger = LoggerFactory.getLogger(FFmpegUtil.class);
 
 	public static String FFmpegPath = "C:\\ffmpeg\\bin\\";
 
@@ -31,27 +36,22 @@ public class FFmpegUtil {
 			String command = new File(FFmpegPath).getAbsolutePath() + "/ffmpeg -i " + videoPath + " -i " + audioPath
 					+ " -c:v copy -c:a aac -strict experimental " + targetPath;
 			Process Process = Runtime.getRuntime().exec(command);
-			Thread thread = new Thread() {
-				public void run() {
-					try {
-						BufferedReader br = new BufferedReader(new InputStreamReader(Process.getErrorStream()));
-						StringBuffer sb = new StringBuffer();
-						String line = "";
-						while ((line = br.readLine()) != null) {
-							sb.append(line);
-							System.out.println(line);
-						}
-						br.close();
-						Process.destroy();
-						new File(videoPath).delete();
-						new File(audioPath).delete();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+			try {
+				BufferedReader br = new BufferedReader(new InputStreamReader(Process.getErrorStream()));
+				StringBuffer sb = new StringBuffer();
+				String line = "";
+				while ((line = br.readLine()) != null) {
+					sb.append(line);
+					System.out.println(line);
 				}
-			};
-			thread.start();
-			thread.yield();
+				br.close();
+				Process.destroy();
+				new File(videoPath).delete();
+				new File(audioPath).delete();
+				logger.info("{},{},合并完成,合成路径:{}",videoPath,audioPath,targetPath);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

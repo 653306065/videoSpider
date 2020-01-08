@@ -22,6 +22,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.api.services.youtube.YouTube;
+import com.google.api.services.youtube.model.ChannelListResponse;
 import com.google.api.services.youtube.model.Playlist;
 import com.google.api.services.youtube.model.PlaylistItem;
 import com.google.api.services.youtube.model.PlaylistItemListResponse;
@@ -33,7 +34,7 @@ import com.spider.utils.OKHttpUtils;
 @Component
 public class YoutubeSpider {
 
-	private Logger logger = LoggerFactory.getLogger(Wallhaven.class);
+	private Logger logger = LoggerFactory.getLogger(YoutubeSpider.class);
 
 	@Value("${youtube.savePath}")
 	private String savePath;
@@ -104,7 +105,8 @@ public class YoutubeSpider {
 	public void downloadPlayListItems(Playlist playlist) {
 		try {
 			List<PlaylistItem> list = new ArrayList<PlaylistItem>();
-			PlaylistItemListResponse playlistItemListResponse = youTube.playlistItems().list("snippet").setKey(key).setPlaylistId(playlist.getId()).setMaxResults(50L).execute();
+			PlaylistItemListResponse playlistItemListResponse = youTube.playlistItems().list("snippet").setKey(key)
+					.setPlaylistId(playlist.getId()).setMaxResults(50L).execute();
 			list.addAll(playlistItemListResponse.getItems());
 			if (playlistItemListResponse.getNextPageToken() != null) {
 				String pageToken = playlistItemListResponse.getNextPageToken();
@@ -117,8 +119,9 @@ public class YoutubeSpider {
 					}
 				}
 			}
+			String playListTitle = playlist.getSnippet().getTitle();
 			for (PlaylistItem item : list) {
-				logger.info("PlaylistItem:{}",JSON.toJSONString(item));
+				logger.info("PlaylistItem:{}", JSON.toJSONString(item));
 				String videoId = item.getSnippet().getResourceId().getVideoId();
 				String channelTitle = item.getSnippet().getChannelTitle();
 				Map<String, String> urlMap = getVideoUrlList(videoId);
@@ -127,12 +130,13 @@ public class YoutubeSpider {
 				String audioUrl = urlMap.get("audioUrl");
 				String videoName = urlMap.get("videoName").replaceAll(" ", "");
 				String audioName = urlMap.get("audioName").replaceAll(" ", "");
-				String videoPath = (this.savePath + channelTitle + "\\" + title + videoName).replaceAll(" ", "_")
-						.replaceAll("\\|", "").replaceAll(";", "").replaceAll("&", "");
-				String audioPath = (this.savePath + channelTitle + "\\" + title + audioName).replaceAll(" ", "_")
-						.replaceAll("\\|", "").replaceAll(";", "").replaceAll("&", "");
-				String targetPath = (this.savePath + channelTitle + "\\" + title + ".mp4").replaceAll(" ", "_")
-						.replaceAll("\\|", "").replaceAll(";", "").replaceAll("&", "");
+				logger.info("vidoeTitle:{},开始下载", title);
+				String videoPath = (this.savePath + channelTitle + "\\" + playListTitle + "\\" + title + videoName)
+						.replaceAll(" ", "_").replaceAll("\\|", "").replaceAll(";", "").replaceAll("&", "");
+				String audioPath = (this.savePath + channelTitle + "\\" + playListTitle + "\\" + title + audioName)
+						.replaceAll(" ", "_").replaceAll("\\|", "").replaceAll(";", "").replaceAll("&", "");
+				String targetPath = (this.savePath + channelTitle + "\\" + playListTitle + "\\" + title + ".mp4")
+						.replaceAll(" ", "_").replaceAll("\\|", "").replaceAll(";", "").replaceAll("&", "");
 				multithreadingDownload.fileDownload(videoUrl, videoPath, null, proxy, thread);
 				logger.info("title:{},视频下载完成", title);
 				multithreadingDownload.fileDownload(audioUrl, audioPath, null, proxy, thread);
@@ -146,12 +150,27 @@ public class YoutubeSpider {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void downloadByChannelId(String ChannelId) {
-		List<Playlist> list= getPlayList(ChannelId);
-		for(Playlist Playlist:list ) {
-			logger.info("Playlist:{}",JSON.toJSONString(list));
+		List<Playlist> list = getPlayList(ChannelId);
+		for (Playlist Playlist : list) {
+			logger.info("Playlist:{}", JSON.toJSONString(list));
 			downloadPlayListItems(Playlist);
+		}
+	}
+
+	public String getUserChannelId(String user) {
+		try {
+			ChannelListResponse channelListResponse = youTube.channels().list("snippet").setForUsername(user)
+					.setKey(key).execute();
+			System.out.println(JSON.toJSONString(channelListResponse));
+			if (channelListResponse.getItems().size() > 0) {
+				return channelListResponse.getItems().get(0).getId();
+			}
+			return null;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
 		}
 	}
 
