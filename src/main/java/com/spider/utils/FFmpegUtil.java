@@ -33,8 +33,8 @@ public class FFmpegUtil {
 
 	public static void audioVideoSynthesis(String videoPath, String audioPath, String targetPath) {
 		try {
-			String command = new File(FFmpegPath).getAbsolutePath() + "/ffmpeg -i " + videoPath + " -i " + audioPath
-					+ " -c:v copy -c:a aac -strict experimental " + targetPath;
+			String command = new File(FFmpegPath).getAbsolutePath() + "/ffmpeg -i \"" + videoPath + "\" -i \"" + audioPath
+					+ "\" -c:v copy -c:a aac -strict experimental \"" + targetPath+"\"";
 			Process Process = Runtime.getRuntime().exec(command);
 			try {
 				BufferedReader br = new BufferedReader(new InputStreamReader(Process.getErrorStream()));

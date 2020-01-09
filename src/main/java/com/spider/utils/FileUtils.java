@@ -258,6 +258,16 @@ public class FileUtils {
 		}
 	}
 	
+	/**
+	 * 删除window路径中不允许的字符
+	 * @return 
+	 */
+	public static String repairPath(String path) {
+		return path.replaceAll("\\|", "").replaceAll("//", "").replaceAll("/", "")
+				.replaceAll(":", "").replaceAll("\\*", "").replaceAll("\\?", "").replaceAll("\"", "")
+				.replaceAll("<", "").replaceAll(">", "").replaceAll("|", "");
+	}
+	
 	public static void main(String[] args) {
 		List<File> list=getPathFileList("D:\\BaiduNetdiskDownload\\book", new ArrayList<File>());
 		List<String> strList=readTxt("D:\\BaiduNetdiskDownload\\key.txt","GBK");

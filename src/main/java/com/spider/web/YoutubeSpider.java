@@ -28,6 +28,7 @@ import com.google.api.services.youtube.model.PlaylistItem;
 import com.google.api.services.youtube.model.PlaylistItemListResponse;
 import com.google.api.services.youtube.model.PlaylistListResponse;
 import com.spider.utils.FFmpegUtil;
+import com.spider.utils.FileUtils;
 import com.spider.utils.JsoupUtil;
 import com.spider.utils.OKHttpUtils;
 
@@ -81,10 +82,10 @@ public class YoutubeSpider {
 			if (playlistItemList.getNextPageToken() != null) {
 				String pageToken = playlistItemList.getNextPageToken();
 				while (true) {
-					playlistItemList = youTube.playlists().list("snippet").setPageToken(pageToken).setMaxResults(50L)
+					PlaylistListResponse response  = youTube.playlists().list("snippet").setPageToken(pageToken).setMaxResults(50L)
 							.setChannelId(channelId).setKey(key).execute();
-					pageToken = playlistItemList.getNextPageToken();
-					list.addAll(playlistItemList.getItems());
+					pageToken = response.getNextPageToken();
+					list.addAll(response.getItems());
 					if (pageToken == null) {
 						break;
 					}
@@ -111,7 +112,8 @@ public class YoutubeSpider {
 			if (playlistItemListResponse.getNextPageToken() != null) {
 				String pageToken = playlistItemListResponse.getNextPageToken();
 				while (true) {
-					playlistItemListResponse = youTube.playlistItems().list("snippet").setPageToken(pageToken).setKey(key).setPlaylistId(playlist.getId()).setMaxResults(50L).execute();
+					playlistItemListResponse = youTube.playlistItems().list("snippet").setPageToken(pageToken)
+							.setKey(key).setPlaylistId(playlist.getId()).setMaxResults(50L).execute();
 					pageToken = playlistItemListResponse.getNextPageToken();
 					list.addAll(playlistItemListResponse.getItems());
 					if (pageToken == null) {
@@ -131,18 +133,18 @@ public class YoutubeSpider {
 				String videoName = urlMap.get("videoName").replaceAll(" ", "");
 				String audioName = urlMap.get("audioName").replaceAll(" ", "");
 				logger.info("vidoeTitle:{},开始下载", title);
-				String videoPath = (this.savePath + channelTitle + "\\" + playListTitle + "\\" + title + videoName)
-						.replaceAll(" ", "_").replaceAll("\\|", "").replaceAll(";", "").replaceAll("&", "");
-				String audioPath = (this.savePath + channelTitle + "\\" + playListTitle + "\\" + title + audioName)
-						.replaceAll(" ", "_").replaceAll("\\|", "").replaceAll(";", "").replaceAll("&", "");
-				String targetPath = (this.savePath + channelTitle + "\\" + playListTitle + "\\" + title + ".mp4")
-						.replaceAll(" ", "_").replaceAll("\\|", "").replaceAll(";", "").replaceAll("&", "");
+				String videoPath = this.savePath +FileUtils.repairPath(channelTitle) + "\\" +FileUtils.repairPath(playListTitle)+ FileUtils.repairPath(playListTitle) + "\\" +FileUtils.repairPath(title) +FileUtils.repairPath(videoName);
+				String audioPath = this.savePath +FileUtils.repairPath(channelTitle) + "\\" +FileUtils.repairPath(playListTitle)+ FileUtils.repairPath(playListTitle) + "\\" +FileUtils.repairPath(title) +FileUtils.repairPath(audioName);
+				String targetPath = this.savePath +FileUtils.repairPath(channelTitle) + "\\" +FileUtils.repairPath(playListTitle)+ FileUtils.repairPath(playListTitle) + "\\" +FileUtils.repairPath(title) +".mp4";
 				multithreadingDownload.fileDownload(videoUrl, videoPath, null, proxy, thread);
 				logger.info("title:{},视频下载完成", title);
 				multithreadingDownload.fileDownload(audioUrl, audioPath, null, proxy, thread);
 				logger.info("title:{},音频下载完成", title);
 				if (new File(videoPath).exists() && new File(audioPath).exists()) {
 					FFmpegUtil.audioVideoSynthesis(videoPath, audioPath, targetPath);
+					File targetFile = new File(targetPath);
+					targetFile.renameTo(new File(
+							targetFile.getParentFile().getPath() + "\\" + targetFile.getName().replaceAll("_", "")));
 					logger.info("title:{},音视频合并完成", title);
 				}
 			}
