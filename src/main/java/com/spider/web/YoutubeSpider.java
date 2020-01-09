@@ -19,8 +19,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import com.spider.utils.download.MultithreadingDownload;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.ChannelListResponse;
 import com.google.api.services.youtube.model.Playlist;
@@ -82,8 +80,8 @@ public class YoutubeSpider {
 			if (playlistItemList.getNextPageToken() != null) {
 				String pageToken = playlistItemList.getNextPageToken();
 				while (true) {
-					PlaylistListResponse response  = youTube.playlists().list("snippet").setPageToken(pageToken).setMaxResults(50L)
-							.setChannelId(channelId).setKey(key).execute();
+					PlaylistListResponse response = youTube.playlists().list("snippet").setPageToken(pageToken)
+							.setMaxResults(50L).setChannelId(channelId).setKey(key).execute();
 					pageToken = response.getNextPageToken();
 					list.addAll(response.getItems());
 					if (pageToken == null) {
@@ -130,21 +128,23 @@ public class YoutubeSpider {
 				String title = item.getSnippet().getTitle();
 				String videoUrl = urlMap.get("videoUrl");
 				String audioUrl = urlMap.get("audioUrl");
-				String videoName = urlMap.get("videoName").replaceAll(" ", "");
-				String audioName = urlMap.get("audioName").replaceAll(" ", "");
+				String videoName = urlMap.get("videoName");
+				String audioName = urlMap.get("audioName");
 				logger.info("vidoeTitle:{},开始下载", title);
-				String videoPath = this.savePath +FileUtils.repairPath(channelTitle) + "\\" +FileUtils.repairPath(playListTitle)+ FileUtils.repairPath(playListTitle) + "\\" +FileUtils.repairPath(title) +FileUtils.repairPath(videoName);
-				String audioPath = this.savePath +FileUtils.repairPath(channelTitle) + "\\" +FileUtils.repairPath(playListTitle)+ FileUtils.repairPath(playListTitle) + "\\" +FileUtils.repairPath(title) +FileUtils.repairPath(audioName);
-				String targetPath = this.savePath +FileUtils.repairPath(channelTitle) + "\\" +FileUtils.repairPath(playListTitle)+ FileUtils.repairPath(playListTitle) + "\\" +FileUtils.repairPath(title) +".mp4";
+				String videoPath = this.savePath + FileUtils.repairPath(channelTitle) + "\\"
+						+ FileUtils.repairPath(playListTitle) + "\\" + FileUtils.repairPath(title) + " "
+						+ FileUtils.repairPath(videoName);
+				String audioPath = this.savePath + FileUtils.repairPath(channelTitle) + "\\"
+						+ FileUtils.repairPath(playListTitle) + "\\" + FileUtils.repairPath(title) + " "
+						+ FileUtils.repairPath(audioName);
+				String targetPath = this.savePath + FileUtils.repairPath(channelTitle) + "\\"
+						+ FileUtils.repairPath(playListTitle) + "\\" + FileUtils.repairPath(title) + ".mp4";
 				multithreadingDownload.fileDownload(videoUrl, videoPath, null, proxy, thread);
 				logger.info("title:{},视频下载完成", title);
 				multithreadingDownload.fileDownload(audioUrl, audioPath, null, proxy, thread);
 				logger.info("title:{},音频下载完成", title);
 				if (new File(videoPath).exists() && new File(audioPath).exists()) {
 					FFmpegUtil.audioVideoSynthesis(videoPath, audioPath, targetPath);
-					File targetFile = new File(targetPath);
-					targetFile.renameTo(new File(
-							targetFile.getParentFile().getPath() + "\\" + targetFile.getName().replaceAll("_", "")));
 					logger.info("title:{},音视频合并完成", title);
 				}
 			}
