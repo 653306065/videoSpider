@@ -2,22 +2,16 @@ package com.spider.utils;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import com.alibaba.fastjson.JSON;
-import com.spider.web.YoutubeSpider;
-
 import ws.schild.jave.MultimediaInfo;
 import ws.schild.jave.MultimediaObject;
-import ws.schild.jave.VideoInfo;
+
 
 @Component
 public class FFmpegUtil {
