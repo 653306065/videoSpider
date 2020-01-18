@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.seimicrawler.xpath.JXDocument;
 
 import com.spider.utils.SpringContentUtil;
 
@@ -29,12 +28,5 @@ public class JsoupUtil {
 		String html=OKHttpUtils.get(url, header, proxy);
 		Document document=Jsoup.parse(html);
 		return document;
-	}
-	
-	public static JXDocument getJXDocumentByProxy(String url,Map<String,String> header) {
-		String html=OKHttpUtils.get(url, header, proxy);
-		Document document=Jsoup.parse(html);
-		JXDocument  JXDocument =new JXDocument (document.children());
-		return JXDocument;
 	}
 }
