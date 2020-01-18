@@ -21,7 +21,7 @@ public class ImageUtils {
 			ret = src.getWidth(null); // 得到源图宽
 			is.close();
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return ret;
 	}
@@ -36,7 +36,7 @@ public class ImageUtils {
 			ret = src.getHeight(null); // 得到源图高
 			is.close();
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return ret;
 	}

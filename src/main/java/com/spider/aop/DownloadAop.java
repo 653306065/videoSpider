@@ -150,6 +150,11 @@ public class DownloadAop {
 					width = ImageUtils.getImgWidth(imageFile);
 					newImage.setHeight(height);
 					newImage.setWidth(width);
+					if(height*width<1280*720&&(height!=-1||width!=-1)) {						
+						imageFile.delete();
+						logger.info("{}分辨率太低,删除成功",file.getName());
+
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
