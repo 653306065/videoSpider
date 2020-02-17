@@ -7,7 +7,7 @@ eporner:
    
 javfinder:
    home: https://www3.javfinder.is
-   savePath: F:\javfinder 
+   savePath: D:\javfinder 
    category:
       Uncensored: https://www3.javfinder.is/category/uncensored/page-@{page}.html
       Hot: https://javfinder.is/category/@{category}/hot/page-@{page}.html
@@ -70,7 +70,7 @@ pornhub:
    categories: 
       - hentai
    categoriesUrl: https://www.pornhub.com/categories/@{categories}
-   thread: 20   
+   thread: 30   
 
 youtube:
    home: https://www.findyoutube.net/

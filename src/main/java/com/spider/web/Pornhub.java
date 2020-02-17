@@ -104,16 +104,21 @@ public class Pornhub {
 				System.out.println(url);
 				List<String> list = getVideoList(url);
 				for (String str : list) {
-					Map<String, String> map = getVideoByUrl(str);
-					String httpUrl = map.get("url");
-					String name = map.get("name");
-					String quality = map.get("quality");
-					String date = simpleDateFormat.format(new Date());
-					String path = savePath + key + File.separator + date + File.separator + name;
-					if (Integer.valueOf(quality) < 720) {
-						continue;
+					try {
+						Map<String, String> map = getVideoByUrl(str);
+						String httpUrl = map.get("url");
+						String name = map.get("name");
+						String quality = map.get("quality");
+						String date = simpleDateFormat.format(new Date());
+						String path = savePath + key + File.separator + date + File.separator + name;
+						if (Integer.valueOf(quality) < 720) {
+							continue;
+						}
+						multithreadingDownload.fileDownload(httpUrl, path, null, proxy, thread);
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
-					multithreadingDownload.fileDownload(httpUrl, path, null, proxy, thread);
+					
 				}
 				if (list.size() == 0) {
 					break;

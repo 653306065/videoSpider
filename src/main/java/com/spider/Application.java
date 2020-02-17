@@ -22,8 +22,7 @@ public class Application {
 
 	public static void main(String[] args) {
 		ConfigurableApplicationContext context = SpringApplication.run(Application.class);
-		YoutubeSpider YoutubeSpider=context.getBean(YoutubeSpider.class);
-		String ChannelId= YoutubeSpider.getUserChannelId("aroundtheworld4k"); 
-		YoutubeSpider.downloadByChannelId(ChannelId);
+		Javfinder Javfinder=context.getBean(Javfinder.class);
+		Javfinder.downloadUncensored();
 	}
 }
