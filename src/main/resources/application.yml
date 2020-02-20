@@ -52,7 +52,14 @@ longteng:
    home: http://www.longteng12345.com
    rank: http://www.longteng12345.com/top/allvisit/@{page}.html
    savePath: F:\longteng   
-   thread: 30 
+   thread: 30
+   
+javhihi:
+   #home: https://www1.javhihi.com/
+   home: https://www1.javbuz.com/
+   movie: ${javhihi.home}movie?sort=published&page=@{page}&ajax=1
+   savePath: D:\javbuz\
+   thread: 20   
 
 avMovie:
    home: http://av.movie/

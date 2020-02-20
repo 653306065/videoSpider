@@ -12,6 +12,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.spider.web.Eporner;
 import com.spider.web.Hanime;
 import com.spider.web.Javfinder;
+import com.spider.web.Javhihi;
 import com.spider.web.Pornhub;
 import com.spider.web.YoutubeSpider;
 
@@ -22,7 +23,7 @@ public class Application {
 
 	public static void main(String[] args) {
 		ConfigurableApplicationContext context = SpringApplication.run(Application.class);
-		Javfinder Javfinder=context.getBean(Javfinder.class);
-		Javfinder.downloadUncensored();
+		Javhihi Javhihi=context.getBean(Javhihi.class);
+		Javhihi.downloadVideo();
 	}
 }
