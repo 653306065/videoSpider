@@ -156,7 +156,7 @@ public class Javfinder {
 	}
 
 	public void downloadByCategory(String category) {
-		int page = 750;
+		int page = 1;
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		while (true) {
 			try {
@@ -188,7 +188,7 @@ public class Javfinder {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			page--;
+			page++;
 		}
 	}
 }

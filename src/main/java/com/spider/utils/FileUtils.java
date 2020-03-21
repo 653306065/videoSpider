@@ -2,6 +2,10 @@ package com.spider.utils;
 
 import java.io.BufferedInputStream;
 import org.apache.commons.codec.binary.Hex;
+import org.springframework.util.DigestUtils;
+
+import com.alibaba.fastjson.JSON;
+
 import java.security.MessageDigest;
 import java.io.BufferedReader;
 import java.io.File;
@@ -11,9 +15,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class FileUtils {
 
@@ -49,8 +61,6 @@ public class FileUtils {
 		}
 	}
 
-	
-
 	public static List<File> getPathFileList(String path, List<File> list) {
 		File files = new File(path);
 		if (!files.exists() || !files.isDirectory() || files.listFiles().length == 0) {
@@ -66,17 +76,17 @@ public class FileUtils {
 		}
 		return list;
 	}
-	
-	public static List<File> getPathFileListBySuffix(String path, List<File> list,String suffix) {
+
+	public static List<File> getPathFileListBySuffix(String path, List<File> list, String suffix) {
 		File files = new File(path);
 		if (!files.exists() || !files.isDirectory() || files.listFiles().length == 0) {
 			return null;
 		} else {
 			for (File file : files.listFiles()) {
 				if (file.isDirectory()) {
-					getPathFileListBySuffix(file.getAbsolutePath(), list,suffix);
+					getPathFileListBySuffix(file.getAbsolutePath(), list, suffix);
 				} else {
-					if(file.getName().endsWith(suffix)) {
+					if (file.getName().endsWith(suffix)) {
 						list.add(file);
 					}
 				}
@@ -84,7 +94,6 @@ public class FileUtils {
 		}
 		return list;
 	}
-	
 
 	public static void changeFileMd5(File oldFile, File newFile) throws Exception {
 		InputStream in = new FileInputStream(oldFile);
@@ -210,11 +219,11 @@ public class FileUtils {
 		}
 	}
 
-	public static List<String> readTxt(String path,String charset) {
+	public static List<String> readTxt(String path, String charset) {
 		List<String> list = new ArrayList<>();
 		try {
 			FileInputStream fileInputStream = new FileInputStream(path);
-			InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream,charset);
+			InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, charset);
 			BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 			while (true) {
 				String line = bufferedReader.readLine();
@@ -233,12 +242,28 @@ public class FileUtils {
 
 	}
 
+	public static String getFileMD5String(File file) {
+		try {
+			MessageDigest MD5 = MessageDigest.getInstance("MD5");
+			FileInputStream in = new FileInputStream(file);
+			FileChannel ch = in.getChannel();
+			MappedByteBuffer byteBuffer = ch.map(FileChannel.MapMode.READ_ONLY, 0, file.length());
+			MD5.update(byteBuffer);
+			in.close();
+			return String.valueOf(Hex.encodeHex(MD5.digest()));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;	
+		}
+	}
+
+
 	public static String getMD5(File file) {
 		FileInputStream fileInputStream = null;
 		try {
 			MessageDigest MD5 = MessageDigest.getInstance("MD5");
 			fileInputStream = new FileInputStream(file);
-			byte[] buffer = new byte[8192];
+			byte[] buffer = new byte[1024*1024*1024/2];
 			int length;
 			while ((length = fileInputStream.read(buffer)) != -1) {
 				MD5.update(buffer, 0, length);
@@ -257,71 +282,55 @@ public class FileUtils {
 			}
 		}
 	}
-	
+
 	/**
 	 * 删除window路径中不允许的字符
-	 * @return 
+	 * 
+	 * @return
 	 */
 	public static String repairPath(String path) {
-		return path.replaceAll("\\|", "").replaceAll("//", "").replaceAll("/", "")
-				.replaceAll(":", "").replaceAll("\\*", "").replaceAll("\\?", "").replaceAll("\"", "")
-				.replaceAll("<", "").replaceAll(">", "").replaceAll("|", "");
+		return path.replaceAll("\\|", "").replaceAll("//", "").replaceAll("/", "").replaceAll(":", "")
+				.replaceAll("\\*", "").replaceAll("\\?", "").replaceAll("\"", "").replaceAll("<", "")
+				.replaceAll(">", "").replaceAll("|", "");
 	}
-	
+
 	public static void main(String[] args) {
-		List<File> list=getPathFileList("D:\\BaiduNetdiskDownload\\book", new ArrayList<File>());
-		List<String> strList=readTxt("D:\\BaiduNetdiskDownload\\key.txt","GBK");
-		List<String> lineList=new ArrayList<String>();
-		for(File text:list) {
-			try {
-				System.out.println(text.getName());
-				FileInputStream fileInputStream = new FileInputStream(text);
-				InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream,"GBK");//GBK UTF-8 GB2312 GB13000 GB18030 BIG5
-				BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-				int hit=0;
-				List<String> bookLine=new ArrayList<String>();
-				bookLine.add(text.getName());
-				while (true) {
-					String line = bufferedReader.readLine();
-					if(line!=null) {
-						line=line.replace(" ", "");
-					}else {
-						bookLine.clear();
-						break;
-					}
-					List<String> bookList=new ArrayList<String>();
-					bookList.add(text.getName());
-					for(String key:strList) {
-						if(line.indexOf(key)!=-1) {
-							bookLine.add(key);
-							bookLine.add(line);
-							bookLine.add("                              ");
-							hit++;
-							System.out.println(hit);
-							if(line.length()>1000) {
-								String str=line.substring(0, 1000);
-								System.out.println(str);
-							}else {
-								System.out.println(line);
-							}
-							//break;
-						}
-					}
-					if(hit>=3) {
-						bookLine.add("------------------------------");
-						bookLine.add("                              ");
-						bufferedReader.close();
-						text.renameTo(new File("D:\\BaiduNetdiskDownload\\true\\"+text.getName()));
-						lineList.addAll(bookLine);
-						break;
-				    }
-				}
-				System.out.println("------------------------------");
-				bufferedReader.close();
-			} catch (Exception e) {
-				e.printStackTrace();
+		List<File> list = new ArrayList<>();
+//		getPathFileList("F:\\eporner", list);
+//		getPathFileList("F:\\javfinder", list);
+//		getPathFileList("F:\\pornhub", list);
+//		getPathFileList("D:\\eporner", list);
+//		getPathFileList("D:\\javfinder", list);
+//		getPathFileList("D:\\javhihi", list);
+//		getPathFileList("D:\\pornhub", list);
+		getPathFileList("D:\\里番", list);
+//		getPathFileList("E:\\Amorz-video", list);
+//		getPathFileList("E:\\spider", list);
+		getPathFileList("E:\\里番", list);
+		Map<String, List<String>> nameMap = new ConcurrentHashMap<>();
+		for (File file : list) {
+			String name=file.getName();
+			if(nameMap.containsKey(name)) {
+				nameMap.get(name).add(file.getAbsolutePath());
+			}else {
+				List<String> nameList=new ArrayList<String>();
+				nameList.add(file.getAbsolutePath());
+				nameMap.put(name,nameList);
 			}
 		}
-		saveTxt("D:\\BaiduNetdiskDownload\\keyLine.txt", lineList);
+		for(String key:nameMap.keySet()) {
+		   if(nameMap.get(key).size()>1) {
+			   System.out.println(key);
+			   System.out.println(JSON.toJSONString(nameMap.get(key)));
+			   int i=0;
+			   for(String filePath:nameMap.get(key)) {
+				     if(i==nameMap.get(key).size()-1) {
+				    	 break;
+				     }
+				     new File(filePath).delete();
+			   }
+		   }	
+		}
+
 	}
 }

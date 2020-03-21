@@ -57,7 +57,9 @@ longteng:
 javhihi:
    #home: https://www1.javhihi.com/
    home: https://www1.javbuz.com/
+   #home: https://xart.letfap.com/
    movie: ${javhihi.home}movie?sort=published&page=@{page}&ajax=1
+   #savePath: D:\javhihi\
    savePath: D:\javbuz\
    thread: 20   
 
@@ -93,7 +95,7 @@ youtube:
       
 proxy:
    host: 127.0.0.1
-   port: 1080     
+   port: 10808     
 
 FFmpegPath: C:\\ffmpeg\\bin\\
    

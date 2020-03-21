@@ -17,7 +17,7 @@ public class ProxyConf {
 	
 	@Bean
     public Proxy getProxy() {
-		Proxy proxy=new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host,port));
+		Proxy proxy=new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(host,port));
 		return proxy;
 	}
 }

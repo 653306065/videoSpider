@@ -15,6 +15,7 @@ import org.jsoup.nodes.Element;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.spider.utils.FileUtils;
 import com.spider.utils.JsoupUtil;
 import com.spider.utils.OKHttpUtils;
 import com.spider.utils.download.MultithreadingDownload;
@@ -50,7 +51,7 @@ public class Javhihi {
 		for (int i = 0; i < movies.size(); i++) {
 			try {
 				JSONObject movie = movies.getJSONObject(i);
-				String name = movie.getString("name");
+				String name = FileUtils.repairPath(movie.getString("name"));
 				String movieUrl = home + movie.getString("url");
 				Document document = JsoupUtil.getDocumentByProxy(movieUrl);
 				Element element = document.getElementsByClass("dropdown-toggle").get(0);
@@ -68,7 +69,7 @@ public class Javhihi {
 					String data = simpleDateFormat.format(new Date());
 					String path = savePath + data + "\\" + name + ".mp4";
 					System.out.println(realUrl);
-					Map<String, String> header = new HashMap();
+					Map<String, String> header = new HashMap<>();
 					header.put("user-agent",
 							"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.106 Safari/537.36 Edg/80.0.361.54");
 					header.put("referer", realUrl);
