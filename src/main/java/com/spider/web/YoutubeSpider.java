@@ -25,6 +25,9 @@ import com.google.api.services.youtube.model.Playlist;
 import com.google.api.services.youtube.model.PlaylistItem;
 import com.google.api.services.youtube.model.PlaylistItemListResponse;
 import com.google.api.services.youtube.model.PlaylistListResponse;
+import com.google.api.services.youtube.model.SearchListResponse;
+import com.google.api.services.youtube.model.SearchResult;
+import com.google.api.services.youtube.model.SearchResultSnippet;
 import com.spider.utils.FFmpegUtil;
 import com.spider.utils.FileUtils;
 import com.spider.utils.JsoupUtil;
@@ -143,8 +146,12 @@ public class YoutubeSpider {
 				logger.info("title:{},视频下载完成", title);
 				multithreadingDownload.fileDownload(audioUrl, audioPath, null, proxy, thread);
 				logger.info("title:{},音频下载完成", title);
-				if (new File(videoPath).exists() && new File(audioPath).exists()) {
+				File videoFile = new File(videoPath);
+				File audioFile = new File(videoPath);
+				if (videoFile.exists() && audioFile.exists()) {
 					FFmpegUtil.audioVideoSynthesis(videoPath, audioPath, targetPath);
+					videoFile.delete();
+					audioFile.delete();
 					logger.info("title:{},音视频合并完成", title);
 				}
 			}
@@ -173,6 +180,19 @@ public class YoutubeSpider {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
+		}
+	}
+
+	public void searchPlayByChannelId(String channelId) {
+		try {
+			SearchListResponse searchListResponse = youTube.search().list("snippet").setChannelId(channelId).setKey(key)
+					.setMaxResults(50l).setType("video").execute();
+			List<SearchResult> searchResult = searchListResponse.getItems();
+			for(SearchResult result:searchResult) {
+				String videoId= result.getId().getVideoId();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 

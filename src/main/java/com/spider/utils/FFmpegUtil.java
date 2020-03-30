@@ -40,8 +40,6 @@ public class FFmpegUtil {
 				}
 				br.close();
 				Process.destroy();
-				new File(videoPath).delete();
-				new File(audioPath).delete();
 				logger.info("{},{},合并完成,合成路径:{}",videoPath,audioPath,targetPath);
 			} catch (Exception e) {
 				e.printStackTrace();
