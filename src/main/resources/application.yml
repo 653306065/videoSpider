@@ -85,7 +85,7 @@ youtube:
    home: https://www.findyoutube.net/
    api: https://www.findyoutube.net/result
    savePath: D:\youtube\
-   thread: 30
+   thread: 10
    googleApi:
       #key: AIzaSyA7H9oVSXwPbOyIaC2kKV1UTtoOyjRjgmw
       key: AIzaSyBSLTrFguRE5p75BJ6OzhwXuiPHTTO8Ryc

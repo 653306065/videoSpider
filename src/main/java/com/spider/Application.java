@@ -25,7 +25,6 @@ public class Application {
 		ConfigurableApplicationContext context = SpringApplication.run(Application.class);
 		//https://www.youtube.com/watch?v=zCLOJ9j1k2Y
 		YoutubeSpider YoutubeSpider=context.getBean(YoutubeSpider.class);
-		String channelId= YoutubeSpider.getUserChannelId("Timestorm Films");
-		YoutubeSpider.downloadByChannelId(channelId);
+		YoutubeSpider.downloadByChannelId("UCAfjft9lL5fMFf6PEUfksPg");
 	}
 }

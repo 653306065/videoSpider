@@ -6,6 +6,7 @@ import java.io.RandomAccessFile;
 import java.net.Proxy;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,15 +30,18 @@ public class DownloadThread extends Thread {
 	private File file;
 	
 	private volatile long pieceDownloadByte=0;
+	
+	private AtomicLong downloadByte;
 
 	public DownloadThread(String httpUrl, Map<String, String> header, Proxy proxy, long startByte, long endByte,
-			File file) {
+			File file,AtomicLong downloadByte) {
 		this.httpUrl = httpUrl;
 		this.header = header;
 		this.proxy = proxy;
 		this.startByte = startByte;
 		this.endByte = endByte;
 		this.file = file;
+		this.downloadByte=downloadByte;
 	}
 
 	public void run() {
@@ -53,7 +57,7 @@ public class DownloadThread extends Thread {
 			raf.seek(startByte);
 			while (true) {
 				int i = in.read(bytes);
-				MultithreadingDownload.downloadByte = MultithreadingDownload.downloadByte + i;
+				downloadByte.addAndGet(i);
 				pieceDownloadByte=pieceDownloadByte+i;
 				if (i == -1) {
 					break;
@@ -67,8 +71,8 @@ public class DownloadThread extends Thread {
 		} catch (Exception e) {
 			e.printStackTrace();
 			//logger.info(Thread.currentThread().getName() + ",下载异常");
-			MultithreadingDownload.downloadByte=MultithreadingDownload.downloadByte-pieceDownloadByte;
-			new DownloadThread(this.httpUrl, this.header, this.proxy, this.startByte, this.endByte, this.file).run();
+			downloadByte.addAndGet(0-pieceDownloadByte);
+			new DownloadThread(this.httpUrl, this.header, this.proxy, this.startByte, this.endByte, this.file,downloadByte).run();
 		}
 
 	}

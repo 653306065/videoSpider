@@ -6,9 +6,11 @@ import java.net.Proxy;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
@@ -17,9 +19,12 @@ import com.spider.utils.OKHttpUtils;
 import okhttp3.Response;
 
 @Component
+@Scope("prototype")
 public class MultithreadingDownload {
+	
+	public AtomicLong downloadByte=new AtomicLong(0);
 
-	public static volatile long downloadByte = 0;
+	//public static volatile long downloadByte = 0;
 	
 	private Logger logger =LoggerFactory.getLogger(MultithreadingDownload.class);
 
@@ -51,13 +56,13 @@ public class MultithreadingDownload {
 					if (i == threadNum) {
 						endByte = info.getContentLength();
 					}
-					DownloadThread thread = new DownloadThread(HttpUrl, header, proxy, startByte,endByte, file);
+					DownloadThread thread = new DownloadThread(HttpUrl, header, proxy, startByte,endByte, file,downloadByte);
 					executorService.execute(thread);
 				}
 				executorService.shutdown();
 				ConsoleProgressBar cpb = new ConsoleProgressBar(100, '#');
 				while (true) {
-					double percentage = (MultithreadingDownload.downloadByte * 1.0) / (info.getContentLength() * 1.0) * 100.0;
+					double percentage = (downloadByte.longValue() * 1.0) / (info.getContentLength() * 1.0) * 100.0;
 					cpb.show((int) Math.floor(percentage));
 					if(String.valueOf(percentage).length()>5) {
 						System.out.print("("+String.valueOf(percentage).substring(0, 5)+"%)");
@@ -69,14 +74,14 @@ public class MultithreadingDownload {
 						break;
 					}
 				}
-				downloadByte = 0;
+				downloadByte.set(0);
 				logger.info("----" + path + ",下载完成----");
 				long endTime = System.currentTimeMillis();
 				logger.info("耗时:" + (endTime - startTime) / 1000 / 60.0 + "分钟");
 				raf.close();
 			}
 		} catch (Exception e) {
-			downloadByte = 0;
+			downloadByte.set(0);
 			logger.info("----下载异常----");
 			new File(path).delete();
 			e.printStackTrace();
