@@ -16,10 +16,10 @@ import com.google.api.services.youtube.YouTube;
 @Component
 public class BeanConf {
 
-	@Value("${proxy.host}")
+	@Value("${proxy.http.host}")
 	private String host;
 
-	@Value("${proxy.port}")
+	@Value("${proxy.http.port}")
 	private int port;
 
 	@Bean
