@@ -55,13 +55,13 @@ longteng:
    thread: 30
    
 javhihi:
-   #home: https://www1.javhihi.com/
-   home: https://www1.javbuz.com/
+   home: https://www1.javhihi.com/
+   #home: https://www1.javbuz.com/
    #home: https://xart.letfap.com/
    movie: ${javhihi.home}movie?sort=published&page=@{page}&ajax=1
-   #savePath: D:\javhihi\
-   savePath: D:\javbuz\
-   thread: 20   
+   savePath: D:\javhihi\
+   #savePath: D:\javbuz\
+   thread: 10   
 
 avMovie:
    home: http://av.movie/
@@ -74,18 +74,18 @@ avMovie:
 
 pornhub:
    home: https://www.pornhub.com
-   savePath: D:\pornhub\
+   savePath: G:\pornhub\
    searchUrl: https://www.pornhub.com/video/search?search=@{key}&hd=1&page=@{page}
    categories: 
       - hentai
    categoriesUrl: https://www.pornhub.com/categories/@{categories}
-   thread: 30   
+   thread: 15   
 
 youtube:
    home: https://www.findyoutube.net/
    api: https://www.findyoutube.net/result
-   savePath: D:\youtube\
-   thread: 10
+   savePath: F:\youtube\
+   thread: 5
    googleApi:
       #key: AIzaSyA7H9oVSXwPbOyIaC2kKV1UTtoOyjRjgmw
       key: AIzaSyBSLTrFguRE5p75BJ6OzhwXuiPHTTO8Ryc

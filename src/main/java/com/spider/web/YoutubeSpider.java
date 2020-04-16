@@ -147,7 +147,7 @@ public class YoutubeSpider {
 				multithreadingDownload.fileDownload(audioUrl, audioPath, null, proxy, thread);
 				logger.info("title:{},音频下载完成", title);
 				File videoFile = new File(videoPath);
-				File audioFile = new File(videoPath);
+				File audioFile = new File(audioPath);
 				if (videoFile.exists() && audioFile.exists()) {
 					FFmpegUtil.audioVideoSynthesis(videoPath, audioPath, targetPath);
 					videoFile.delete();
@@ -183,17 +183,60 @@ public class YoutubeSpider {
 		}
 	}
 
-	public void searchPlayByChannelId(String channelId) {
+	public void searchVideoIdListByChannelId(String channelId) {
 		try {
+			List<SearchResult> resultList = new ArrayList<SearchResult>();
 			SearchListResponse searchListResponse = youTube.search().list("snippet").setChannelId(channelId).setKey(key)
 					.setMaxResults(50l).setType("video").execute();
-			List<SearchResult> searchResult = searchListResponse.getItems();
-			for(SearchResult result:searchResult) {
-				String videoId= result.getId().getVideoId();
+			resultList.addAll(searchListResponse.getItems());
+			if (searchListResponse.getNextPageToken() == null) {
+				String pageToken = searchListResponse.getNextPageToken();
+				while (true) {
+					searchListResponse = youTube.search().list("snippet").setChannelId(channelId).setKey(key)
+							.setPageToken(pageToken).setMaxResults(50l).setType("video").execute();
+					resultList.addAll(searchListResponse.getItems());
+					if (pageToken == null) {
+						break;
+					}
+				}
+			}
+			for (SearchResult SearchResult : resultList) {
+				try {
+					String channelTitle = FileUtils.repairPath(SearchResult.getSnippet().getChannelTitle());
+					Map<String, String> urlMap = getVideoUrlList(SearchResult.getId().getVideoId());
+					String videoUrl = urlMap.get("videoUrl");
+					String audioUrl = urlMap.get("audioUrl");
+					String videoName = urlMap.get("videoName");
+					String audioName = urlMap.get("audioName");
+					String title = SearchResult.getSnippet().getTitle();
+					String videoPath = this.savePath + channelTitle + "\\" + "\\" + FileUtils.repairPath(title) + " "
+							+ FileUtils.repairPath(videoName);
+					String audioPath = this.savePath + channelTitle + "\\" + "\\" + FileUtils.repairPath(title) + " "
+							+ FileUtils.repairPath(audioName);
+					String targetPath = this.savePath + channelTitle + "\\" + "\\" + FileUtils.repairPath(title)
+							+ ".mp4";
+					multithreadingDownload.fileDownload(videoUrl, videoPath, null, proxy, thread);
+					logger.info("title:{},视频下载完成", title);
+					multithreadingDownload.fileDownload(audioUrl, audioPath, null, proxy, thread);
+					logger.info("title:{},音频下载完成", title);
+					File videoFile = new File(videoPath);
+					File audioFile = new File(audioPath);
+					if (videoFile.exists() && audioFile.exists()) {
+						FFmpegUtil.audioVideoSynthesis(videoPath, audioPath, targetPath);
+						videoFile.delete();
+						audioFile.delete();
+						logger.info("文件删除成功");
+						logger.info("title:{},音视频合并完成", title);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+
 		}
+
 	}
 
 	public Map<String, String> getVideoUrlList(String url) {

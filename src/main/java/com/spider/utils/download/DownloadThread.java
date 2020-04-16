@@ -70,6 +70,9 @@ public class DownloadThread extends Thread {
 			//logger.info(Thread.currentThread().getName() + ",下载完成");
 		} catch (Exception e) {
 			e.printStackTrace();
+//			if("\\n not found: limit=0 content=…".endsWith(e.getLocalizedMessage())||"unexpected end of stream".endsWith(e.getLocalizedMessage())  ) {
+//				return;
+//			}
 			//logger.info(Thread.currentThread().getName() + ",下载异常");
 			downloadByte.addAndGet(0-pieceDownloadByte);
 			new DownloadThread(this.httpUrl, this.header, this.proxy, this.startByte, this.endByte, this.file,downloadByte).run();
