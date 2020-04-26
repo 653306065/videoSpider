@@ -63,7 +63,7 @@ public class Wallhaven {
 			executorService.execute(new Runnable() {
 				@Override
 				public void run() {
-					String name = UUID.randomUUID().toString().replace("-", "")+imageUrl.split("-")[1];
+					String name = System.currentTimeMillis()+"_"+imageUrl.split("-")[1];
 					String save = savePath + path + name;
 					imageDownload.downloadFile(imageUrl, null, save, proxy);
 				}
@@ -111,6 +111,15 @@ public class Wallhaven {
 		downloadImage(categories, purity, atleast, path);
 	}
 	
+	public void downloadNSFWAnime4K() {
+		String categories="010";
+		String purity="001";
+		String atleast = "3840x2160";
+		String path="//NSFW//Anime//4K//";
+		downloadImage(categories, purity, atleast, path);
+	}
+	
+	
 	public void downloadNSFWPeople4K() {
 		String categories="001";
 		String purity="001";
@@ -118,6 +127,23 @@ public class Wallhaven {
 		String path="//NSFW//People//4K//";
 		downloadImage(categories, purity, atleast, path);
 	}
+	
+	public void download4K() {
+		String categories="111";
+		String purity="110";
+		String atleast = "3840x2160";
+		String path="//4K//";
+		downloadImage(categories, purity, atleast, path);
+	}
+	
+	public void downloadNSFW4K() {
+		String categories="111";
+		String purity="001";
+		String atleast = "3840x2160";
+		String path="//NSFW4K//";
+		downloadImage(categories, purity, atleast, path);
+	}
+	
 	
 	public void downloadNSFWPeople2K() {
 		String categories="001";

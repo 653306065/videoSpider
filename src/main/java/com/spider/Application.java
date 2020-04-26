@@ -14,6 +14,7 @@ import com.spider.web.Hanime;
 import com.spider.web.Javfinder;
 import com.spider.web.Javhihi;
 import com.spider.web.Pornhub;
+import com.spider.web.Wallhaven;
 import com.spider.web.YoutubeSpider;
 
 @SpringBootApplication
@@ -24,7 +25,7 @@ public class Application {
 	public static void main(String[] args) {
 		ConfigurableApplicationContext context = SpringApplication.run(Application.class);
 		//https://www.youtube.com/watch?v=zCLOJ9j1k2Y
-		YoutubeSpider YoutubeSpider=context.getBean(YoutubeSpider.class);
-		YoutubeSpider.downloadByChannelId("UCYjB6uufPeHSwuHs8wovLjg");
+		Javhihi Javhihi=context.getBean(Javhihi.class);
+		Javhihi.downloadVideo();
 	}
 }

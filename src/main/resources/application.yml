@@ -59,7 +59,7 @@ javhihi:
    #home: https://www1.javbuz.com/
    #home: https://xart.letfap.com/
    movie: ${javhihi.home}movie?sort=published&page=@{page}&ajax=1
-   savePath: D:\javhihi\
+   savePath: E:\javhihi\
    #savePath: D:\javbuz\
    thread: 10   
 
@@ -96,7 +96,7 @@ youtube:
 proxy:
    socks:
       host: 127.0.0.1
-      port: 10808
+      port: 1080
    http:
       host: 127.0.0.1
       port: 10809        

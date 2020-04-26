@@ -3,16 +3,15 @@ package com.spider.utils.download;
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.net.Proxy;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
 import com.alibaba.fastjson.JSON;
 import com.spider.utils.ConsoleProgressBar;
 import com.spider.utils.OKHttpUtils;
@@ -21,15 +20,16 @@ import okhttp3.Response;
 @Component
 @Scope("prototype")
 public class MultithreadingDownload {
-	
-	public AtomicLong downloadByte=new AtomicLong(0);
 
-	//public static volatile long downloadByte = 0;
-	
-	private Logger logger =LoggerFactory.getLogger(MultithreadingDownload.class);
+	public AtomicLong downloadByte = new AtomicLong(0);
 
-	public void fileDownload(String HttpUrl,String path, Map<String, String> header,
-			Proxy proxy, int threadNum) {
+	private Logger logger = LoggerFactory.getLogger(MultithreadingDownload.class);
+
+	private volatile Map<String,Boolean>  isStop = new HashMap<String,Boolean>() {{
+		put("isStop", false);
+	}};
+
+	public void fileDownload(String HttpUrl, String path, Map<String, String> header, Proxy proxy, int threadNum) {
 		try {
 			long startTime = System.currentTimeMillis();
 			File file = new File(path);
@@ -39,12 +39,12 @@ public class MultithreadingDownload {
 			} else {
 				file.getParentFile().mkdirs();
 			}
-			DownloadFileInfo info = getDownloadFileInfo(HttpUrl,header, proxy);
+			DownloadFileInfo info = getDownloadFileInfo(HttpUrl, header, proxy);
 			if (!String.valueOf(info.getResponseCode()).startsWith("20")) {
 				logger.info("----获取下载信息错误：responseCode=" + info.getResponseCode() + "----");
 				return;
 			} else {
-				logger.info(path+",开始下载,url:" + HttpUrl);
+				logger.info(path + ",开始下载,url:" + HttpUrl);
 				logger.info(JSON.toJSONString(info) + ",大小" + (info.getContentLength() / 1024.0 / 1024.0) + "m");
 				long size = info.getContentLength() / threadNum;
 				RandomAccessFile raf = new RandomAccessFile(file, "rw");
@@ -56,7 +56,9 @@ public class MultithreadingDownload {
 					if (i == threadNum) {
 						endByte = info.getContentLength();
 					}
-					DownloadThread thread = new DownloadThread(HttpUrl, header, proxy, startByte,endByte, file,downloadByte);
+					DownloadThread thread = new DownloadThread(HttpUrl, header, proxy, startByte, endByte, file,
+							downloadByte, isStop);
+					thread.setName("下载线程" + i);
 					executorService.execute(thread);
 				}
 				executorService.shutdown();
@@ -64,10 +66,10 @@ public class MultithreadingDownload {
 				while (true) {
 					double percentage = (downloadByte.longValue() * 1.0) / (info.getContentLength() * 1.0) * 100.0;
 					cpb.show((int) Math.floor(percentage));
-					if(String.valueOf(percentage).length()>5) {
-						System.out.print("("+String.valueOf(percentage).substring(0, 5)+"%)");
-					}else {
-						System.out.print("("+String.valueOf(percentage)+"%)");
+					if (String.valueOf(percentage).length() > 5) {
+						System.out.print("(" + String.valueOf(percentage).substring(0, 5) + "%)");
+					} else {
+						System.out.print("(" + String.valueOf(percentage) + "%)");
 					}
 					Thread.sleep(2000);
 					if (executorService.isTerminated()) {
@@ -75,10 +77,13 @@ public class MultithreadingDownload {
 					}
 				}
 				downloadByte.set(0);
-				logger.info("----" + path + ",下载完成----");
-				long endTime = System.currentTimeMillis();
-				logger.info("耗时:" + (endTime - startTime) / 1000 / 60.0 + "分钟");
+				if (!isStop.get("isStop")) {
+					logger.info("----" + path + ",下载完成----");
+					long endTime = System.currentTimeMillis();
+					logger.info("耗时:" + (endTime - startTime) / 1000 / 60.0 + "分钟");
+				} 
 				raf.close();
+				isStop.put("isStop", false);
 			}
 		} catch (Exception e) {
 			downloadByte.set(0);
@@ -91,9 +96,9 @@ public class MultithreadingDownload {
 
 	private DownloadFileInfo getDownloadFileInfo(String HttpUrl, Map<String, String> header, Proxy proxy) {
 		try {
-			Response response= OKHttpUtils.getResponse(HttpUrl, header, proxy);
-			DownloadFileInfo fileInfo=new DownloadFileInfo();
-			if(response.header("Content-Length")!=null) {
+			Response response = OKHttpUtils.getResponse(HttpUrl, header, proxy);
+			DownloadFileInfo fileInfo = new DownloadFileInfo();
+			if (response.header("Content-Length") != null) {
 				fileInfo.setContentLength(Long.valueOf(response.header("Content-Length")));
 			}
 			fileInfo.setContentType(response.header("Content-Type"));

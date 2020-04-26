@@ -88,7 +88,7 @@ public class Javhihi {
 	}
 
 	public void downloadVideo() {
-		int i = 1;
+		int i = 70;
 		while (true) {
 			getMoive(i);
 			i++;

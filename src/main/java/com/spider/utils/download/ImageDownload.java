@@ -34,6 +34,7 @@ public class ImageDownload {
 			outputStream.write(bytes);
 			outputStream.flush();
 			outputStream.close();
+			logger.info("{},下载成功",url);
 			return new File(savePath);
 		} catch (Exception e) {
 			return null;
