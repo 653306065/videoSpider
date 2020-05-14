@@ -66,7 +66,7 @@ public class Javfinder {
 		Elements elements = document.getElementsByClass("main-thumb");
 		for (Element element : elements) {
 			Map<String,String> map=new HashMap<String, String>();
-			String videoUrl = home + element.attr("href");
+			String videoUrl = element.attr("href");
 			String name=element.attr("title");
 			map.put("name", name);
 			map.put("url", videoUrl);
@@ -80,12 +80,15 @@ public class Javfinder {
 		String html = OKHttpUtils.get(url, proxy);
 		Document document = Jsoup.parse(html);
 		String name = document.getElementsByClass("wrap-meta").get(0).getElementsByTag("h1").text();
-		String iframeUrl = home + document.getElementById("avcms_player").attr("src");
+		String iframeUrl = document.getElementById("avcms_player").attr("src");
 		String iframeHtml = OKHttpUtils.get(iframeUrl, proxy);
 		Document iframeDocument = Jsoup.parse(iframeHtml);
-		String dataVideo = iframeDocument.getElementsByClass("active").get(0).attr("data-video");
-		String code = dataVideo.split("/")[dataVideo.split("/").length - 1];
-		String apiUrl = "https://embed.media/api/source/" + code;
+		String dataVideo = iframeDocument.getElementById("redirector").attr("data-key");
+		
+		
+		
+		String code = dataVideo.split("https://playfinder.xyz/v/")[1].split("#")[0];
+		String apiUrl = "https://playfinder.xyz/api/source/" + code;
 		logger.info("apiUrl:{}", apiUrl);
 		String json = OKHttpUtils.post(apiUrl, proxy);
 		JSONObject jsonObject = JSON.parseObject(json);

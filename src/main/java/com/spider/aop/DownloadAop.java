@@ -86,6 +86,14 @@ public class DownloadAop {
 								logger.info("{}分辨率太低,删除失败",file.getName());
 							}
 						}
+					}else if(info==null||info.getVideo()==null||info.getAudio()==null){
+						logger.info("文件不是视频，或者没有音频", file.getName());
+						boolean b= videoFile.delete();
+						if(b) {
+							logger.info("{},删除成功",file.getName());
+						}else {
+							logger.info("{},删除失败",file.getName());
+						}
 					}
 					logger.info("{},文件信息存储完成", newvideo.getName());
 				} else {

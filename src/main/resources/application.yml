@@ -6,12 +6,12 @@ eporner:
    thread: 10  
    
 javfinder:
-   home: https://www3.javfinder.is
+   home: https://javfinder.la
    savePath: D:\javfinder 
    category:
-      Uncensored: https://www3.javfinder.is/category/uncensored/page-@{page}.html
-      Hot: https://javfinder.is/category/@{category}/hot/page-@{page}.html
-   categoryTemplate: https://www3.javfinder.is/category/@{category}/page-@{page}.html 
+      Uncensored: https://javfinder.la/category/uncensored/page-@{page}.html
+      Hot: https://javfinder.la/category/@{category}/hot/page-@{page}.html
+   categoryTemplate: https://javfinder.la/category/@{category}/page-@{page}.html 
    thread: 100
    ignoreCode: FC2,XXX-AV,Heydouga,Tokyo Hot,Pacopacomama,H0930,C0930,H4610,10Musume
    
@@ -59,8 +59,9 @@ javhihi:
    #home: https://www1.javbuz.com/
    #home: https://xart.letfap.com/
    movie: ${javhihi.home}movie?sort=published&page=@{page}&ajax=1
-   savePath: E:\javhihi\
+   savePath: D:\javhihi\
    #savePath: D:\javbuz\
+   #savePath: D:\xart.letfap\
    thread: 10   
 
 avMovie:
@@ -96,7 +97,7 @@ youtube:
 proxy:
    socks:
       host: 127.0.0.1
-      port: 1080
+      port: 10808
    http:
       host: 127.0.0.1
       port: 10809        
