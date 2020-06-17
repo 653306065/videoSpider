@@ -75,8 +75,9 @@ avMovie:
 
 pornhub:
    home: https://www.pornhub.com
-   savePath: G:\pornhub\
+   savePath: D:\pornhub\
    searchUrl: https://www.pornhub.com/video/search?search=@{key}&hd=1&page=@{page}
+   channels: https://pornhub.com/channels/@{channelName}/videos?o=da&page=@{page}
    categories: 
       - hentai
    categoriesUrl: https://www.pornhub.com/categories/@{categories}

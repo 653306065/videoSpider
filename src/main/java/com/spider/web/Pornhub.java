@@ -46,6 +46,9 @@ public class Pornhub {
 
 	@Value("${pornhub.thread}")
 	private int thread;
+	
+	@Value("${pornhub.channels}")
+	private String channelsTemplate;
 
 	@Autowired
 	private MultithreadingDownload multithreadingDownload;
@@ -94,6 +97,48 @@ public class Pornhub {
 			}
 		}
 		return list;
+	}
+	
+	public List<String>  getChannelsVideoList(String url){
+		List<String> list = new ArrayList<String>();
+		Document document = JsoupUtil.getDocumentByProxy(url);
+		Element element= document.getElementById("showAllChanelVideos");
+		Elements elements= element.getElementsByClass("videoPreviewBg");
+		for(Element e:elements) {
+			 String href=home+ e.attr("href");
+			 list.add(href);
+		}
+		return list;
+	}
+	
+	public void downloadChannels(String channels) {
+		int page=20;
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		while(true) {
+			String url=channelsTemplate.replace("@{channelName}", channels).replace("@{page}", String.valueOf(page));
+			System.out.println(url);
+			List<String> list= getChannelsVideoList(url);
+			list.stream().forEach(value-> {
+				try {
+					Map<String,String> map= getVideoByUrl(value);
+					String httpUrl = map.get("url");
+					String name = FileUtils.repairPath( map.get("name"));
+					String quality = map.get("quality");
+					String date = simpleDateFormat.format(new Date());
+					String path = savePath + channels + File.separator + date + File.separator + name;
+					if (Integer.valueOf(quality) < 720) {
+						return;
+					}
+					multithreadingDownload.fileDownload(httpUrl, path, null, proxy, thread);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			});
+			if(list.size()==0) {
+				break;
+			}
+			page++;
+		}
 	}
 
 	public void downloadSearch(String key) {
