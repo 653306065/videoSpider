@@ -253,17 +253,16 @@ public class FileUtils {
 			return String.valueOf(Hex.encodeHex(MD5.digest()));
 		} catch (Exception e) {
 			e.printStackTrace();
-			return null;	
+			return null;
 		}
 	}
-
 
 	public static String getMD5(File file) {
 		FileInputStream fileInputStream = null;
 		try {
 			MessageDigest MD5 = MessageDigest.getInstance("MD5");
 			fileInputStream = new FileInputStream(file);
-			byte[] buffer = new byte[1024*1024*1024/2];
+			byte[] buffer = new byte[1024 * 1024 * 1024 / 2];
 			int length;
 			while ((length = fileInputStream.read(buffer)) != -1) {
 				MD5.update(buffer, 0, length);
@@ -295,42 +294,30 @@ public class FileUtils {
 	}
 
 	public static void main(String[] args) {
-		List<File> list = new ArrayList<>();
-//		getPathFileList("F:\\eporner", list);
-//		getPathFileList("F:\\javfinder", list);
-//		getPathFileList("F:\\pornhub", list);
-//		getPathFileList("D:\\eporner", list);
-//		getPathFileList("D:\\javfinder", list);
-//		getPathFileList("D:\\javhihi", list);
-//		getPathFileList("D:\\pornhub", list);
-		getPathFileList("D:\\里番", list);
-//		getPathFileList("E:\\Amorz-video", list);
-//		getPathFileList("E:\\spider", list);
-		getPathFileList("E:\\里番", list);
-		Map<String, List<String>> nameMap = new ConcurrentHashMap<>();
+		List<String> keys = readTxt("E:\\key1.txt", "UTF-8");
+		List<File> list = new ArrayList<File>();
+		getPathFileList("E:\\母子", list);
+		getPathFileList("E:\\黄书", list);
 		for (File file : list) {
-			String name=file.getName();
-			if(nameMap.containsKey(name)) {
-				nameMap.get(name).add(file.getAbsolutePath());
-			}else {
-				List<String> nameList=new ArrayList<String>();
-				nameList.add(file.getAbsolutePath());
-				nameMap.put(name,nameList);
+			int time = 0;
+			List<String> text = readTxt(file.getAbsolutePath(), "UTF-8");
+			text.addAll(readTxt(file.getAbsolutePath(), "GBK"));
+			text.addAll(readTxt(file.getAbsolutePath(), "GB2312"));
+			text.addAll(readTxt(file.getAbsolutePath(), "BIG5"));
+			A:for (String str : text) {
+				for (String key : keys) {
+					if (str.indexOf(key) != -1) {
+						time++;
+						System.out.println(str);
+					}
+					if (time > 20) {
+						System.out.println(file.getAbsolutePath());
+						file.renameTo(new File("E:\\test\\"+file.getName()));
+						break A;
+					}
+				}
 			}
 		}
-		for(String key:nameMap.keySet()) {
-		   if(nameMap.get(key).size()>1) {
-			   System.out.println(key);
-			   System.out.println(JSON.toJSONString(nameMap.get(key)));
-			   int i=0;
-			   for(String filePath:nameMap.get(key)) {
-				     if(i==nameMap.get(key).size()-1) {
-				    	 break;
-				     }
-				     new File(filePath).delete();
-			   }
-		   }	
-		}
-
+		//System.out.println(JSON.toJSONString(keys));
 	}
 }

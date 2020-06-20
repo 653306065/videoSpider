@@ -31,7 +31,7 @@ public class Application {
 
 	public static void main(String[] args) {
 		ConfigurableApplicationContext context = SpringApplication.run(Application.class);
-		Pornhub Pornhub=context.getBean(Pornhub.class);
-		Pornhub.downloadChannels("javhd");
+		Javhihi Javhihi=context.getBean(Javhihi.class);
+		Javhihi.downloadVideo();
 	}
 }

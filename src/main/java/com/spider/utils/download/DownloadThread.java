@@ -79,7 +79,8 @@ public class DownloadThread extends Thread {
 			e.printStackTrace();
 			if (e.getLocalizedMessage().endsWith("\\n not found: limit=0 content=…")
 					|| e.getLocalizedMessage().endsWith("unexpected end of stream")
-					|| e.getLocalizedMessage().endsWith("stream was reset: INTERNAL_ERROR")) {
+					|| e.getLocalizedMessage().endsWith("stream was reset: INTERNAL_ERROR")
+					|| e.getLocalizedMessage().endsWith("stream was reset: PROTOCOL_ERROR")) {
 				isStop.put("isStop", true);
 				return;
 			}
