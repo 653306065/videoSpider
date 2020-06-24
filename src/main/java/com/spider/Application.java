@@ -34,14 +34,6 @@ public class Application {
 	public static void main(String[] args) {
 		ConfigurableApplicationContext context = SpringApplication.run(Application.class);
 		By114 By114=context.getBean(By114.class);
-		int i=1;
-		while(true) {
-			List<By114BT> list=By114.getBTInfo("52", String.valueOf(i));
-			for(By114BT bt:list) {
-				By114.saveBTInfo(bt);
-			}
-			i++;
-		}
-		
+		By114.downloadBt();
 	}
 }

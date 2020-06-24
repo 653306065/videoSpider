@@ -10,9 +10,12 @@ import java.util.Objects;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
 import com.alibaba.fastjson.JSON;
 import com.spider.entity.By114BT;
 import com.spider.utils.FileUtils;
@@ -22,6 +25,8 @@ import com.spider.service.By114BTService;
 
 @Service
 public class By114 {
+	
+	private Logger logger=LoggerFactory.getLogger(By114.class);
 
 	@Value("${by114.template}")
 	private String template;
@@ -52,7 +57,7 @@ public class By114 {
 					by114BT.setUrlName(name.text());
 				}
 				if ("52".equals(type)) {
-					by114BT.setType("52");
+					by114BT.setType("亚洲无码");
 				}
 				String contentPublishDate = tb.getElementsByClass("by").get(1).getElementsByTag("span").attr("title");
 				by114BT.setUrl(infoUrl);
@@ -65,6 +70,7 @@ public class By114 {
 
 	public void saveBTInfo(By114BT bt) {
 		if(!Objects.isNull( by114BTService.findByUrl(bt.getUrl()))) {
+			logger.info(JSON.toJSONString(bt)+",已存在");
 			return;
 		}
 		Document document = JsoupUtil.getDocument(bt.getUrl());
@@ -149,6 +155,7 @@ public class By114 {
 			bt.setTorrentUrl(url);
 		}
 		by114BTService.save(bt);
+		logger.info(bt.getTitle()+",保存完成");
 	}
 	
 	public void  downloadBt() {
@@ -156,6 +163,7 @@ public class By114 {
 		while(true) {
 		    try {
 		    	List<By114BT> list=getBTInfo("52", String.valueOf(i));
+		    	logger.info("list:{}",JSON.toJSONString(list));
 				for(By114BT bt:list) {
 					saveBTInfo(bt);
 				}
