@@ -2,6 +2,7 @@ package com.spider.web;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +71,7 @@ public class By114 {
 
 	public void saveBTInfo(By114BT bt) {
 		if(!Objects.isNull( by114BTService.findByUrl(bt.getUrl()))) {
-			logger.info(JSON.toJSONString(bt)+",已存在");
+			logger.info(bt.getUrlName()+",已存在");
 			return;
 		}
 		Document document = JsoupUtil.getDocument(bt.getUrl());
@@ -154,6 +155,7 @@ public class By114 {
 			bt.setTorrentPath(path);
 			bt.setTorrentUrl(url);
 		}
+		bt.setCreateData(new Date());
 		by114BTService.save(bt);
 		logger.info(bt.getTitle()+",保存完成");
 	}
