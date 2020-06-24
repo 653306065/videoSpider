@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -128,9 +131,9 @@ public class By114 {
 		for (Element img : elements) {
 			String url = img.attr("src");
 			byte[] bytes = OKHttpUtils.getBytes(url);
-			String path = savePath + "img" + File.separator + title + "_" + index + ".jpg";
+			String path = savePath + "img" + File.separator +FileUtils.repairPath(title) + "_" + index + ".jpg";
 			if (bt.getMagnet() != null) {
-				path = savePath + "img" + File.separator + bt.getMagnet() + "_" + index + ".jpg";
+				path = savePath + "img" + File.separator +FileUtils.repairPath(title)+"_"+ bt.getMagnet() + "_" + index + ".jpg";
 			}
 			FileUtils.byteToFile(bytes, path);
 			imgList.add(bytes);
@@ -148,7 +151,7 @@ public class By114 {
 			String url=home+a.attr("href");
 			String name=a.text();
 			byte[] bytes= OKHttpUtils.getBytes(url);
-			String path=savePath+"torrent"+File.separator+name;
+			String path=savePath+"torrent"+File.separator+FileUtils.repairPath(bt.getTitle())+".torrent";
 			FileUtils.byteToFile(bytes, path);
 			bt.setTorrent(bytes);
 			bt.setTorrentName(name);
@@ -165,12 +168,25 @@ public class By114 {
 		while(true) {
 		    try {
 		    	List<By114BT> list=getBTInfo("52", String.valueOf(i));
+		    	ExecutorService executorService=Executors.newFixedThreadPool(list.size());
 		    	logger.info("list:{}",JSON.toJSONString(list));
 				for(By114BT bt:list) {
-					saveBTInfo(bt);
+					executorService.execute(new Runnable() {
+						@Override
+						public void run() {
+							saveBTInfo(bt);
+						}
+					});
 				}
 				if(list.size()==0) {
 					break;
+				}
+				executorService.shutdown();
+				while(true) {
+					if(executorService.isShutdown()) {
+						//executorService.awaitTermination(10,TimeUnit.SECONDS);
+						break;
+					}
 				}
 				i++;
 			} catch (Exception e) {
