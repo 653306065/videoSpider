@@ -257,6 +257,23 @@ public class FileUtils {
 		}
 	}
 
+	public static void byteToFile(byte[] bytes, String path) {
+		try {
+			// 根据绝对路径初始化文件
+			File localFile = new File(path);
+			if (!localFile.exists()) {
+				localFile.getParentFile().mkdirs();
+				localFile.createNewFile();
+			}
+			// 输出流
+			OutputStream os = new FileOutputStream(localFile);
+			os.write(bytes);
+			os.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	public static String getMD5(File file) {
 		FileInputStream fileInputStream = null;
 		try {
@@ -304,7 +321,7 @@ public class FileUtils {
 			text.addAll(readTxt(file.getAbsolutePath(), "GBK"));
 			text.addAll(readTxt(file.getAbsolutePath(), "GB2312"));
 			text.addAll(readTxt(file.getAbsolutePath(), "BIG5"));
-			A:for (String str : text) {
+			A: for (String str : text) {
 				for (String key : keys) {
 					if (str.indexOf(key) != -1) {
 						time++;
@@ -312,12 +329,12 @@ public class FileUtils {
 					}
 					if (time > 20) {
 						System.out.println(file.getAbsolutePath());
-						file.renameTo(new File("E:\\test\\"+file.getName()));
+						file.renameTo(new File("E:\\test\\" + file.getName()));
 						break A;
 					}
 				}
 			}
 		}
-		//System.out.println(JSON.toJSONString(keys));
+		// System.out.println(JSON.toJSONString(keys));
 	}
 }

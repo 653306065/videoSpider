@@ -11,8 +11,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.spider.entity.By114BT;
 import com.spider.utils.FFmpegUtil;
 import com.spider.utils.FileUtils;
+import com.spider.web.By114;
 import com.spider.web.Eporner;
 import com.spider.web.Hanime;
 import com.spider.web.Javfinder;
@@ -31,7 +33,15 @@ public class Application {
 
 	public static void main(String[] args) {
 		ConfigurableApplicationContext context = SpringApplication.run(Application.class);
-		Javhihi Javhihi=context.getBean(Javhihi.class);
-		Javhihi.downloadVideo();
+		By114 By114=context.getBean(By114.class);
+		int i=1;
+		while(true) {
+			List<By114BT> list=By114.getBTInfo("52", String.valueOf(i));
+			for(By114BT bt:list) {
+				By114.saveBTInfo(bt);
+			}
+			i++;
+		}
+		
 	}
 }

@@ -94,8 +94,14 @@ youtube:
       playlists: https://www.googleapis.com/youtube/v3/playlists?part=snippet&channelId=@{channelId}&key=${youtube.googleApi.key}&maxResults=50
       playlistItems: https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=@{playlistId}&key=${youtube.googleApi.key}&maxResults=50
       search: https://www.googleapis.com/youtube/v3/search?key=${youtube.googleApi.key}&part=snippet&channelId=@{channelId}&maxResults=50&type=video
+
+by114:
+   home: https://www.by114.pw/
+   template: https://www.by114.pw/forum-@{type}-@{page}.html
+   savePath: C:\by114\
       
 proxy:
+   enabled: false
    socks:
       host: 127.0.0.1
       port: 10808

@@ -23,6 +23,10 @@ public class ProxyConf {
 
 	@Value("${proxy.http.port}")
 	private int httpPort;
+	
+	@Value("${proxy.enabled}")
+	private boolean enabled;
+
 
 	@Bean
 	public Proxy getProxy() {
@@ -32,8 +36,10 @@ public class ProxyConf {
 
 	@PostConstruct
 	public void GlobalProxy() {
-		System.setProperty("java.net.useSystemProxies", "true");
-		System.setProperty("http.proxyHost", httpHost);
-		System.setProperty("http.proxyPort", String.valueOf(httpPort));
+		if(enabled) {
+			System.setProperty("java.net.useSystemProxies", "true");
+			System.setProperty("http.proxyHost", httpHost);
+			System.setProperty("http.proxyPort", String.valueOf(httpPort));
+		}
 	}
 }

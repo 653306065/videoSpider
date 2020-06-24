@@ -145,6 +145,24 @@ public class OKHttpUtils {
 			return null;
 		}
 	}
+	
+	public static byte[] getBytes(String url) {
+		try {
+			OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(30, TimeUnit.SECONDS)
+					.readTimeout(30, TimeUnit.SECONDS).build();
+			Request request = new Request.Builder().get().url(url).build();
+			Response response = httpClient.newCall(request).execute();
+			if (response.isSuccessful()) {
+				byte[] bytes = response.body().bytes();
+				response.body().close();
+				return bytes;
+			}
+			return null;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 
 	public static byte[] getBytes(String url, Map<String, String> header, Proxy proxy) {
 		try {
