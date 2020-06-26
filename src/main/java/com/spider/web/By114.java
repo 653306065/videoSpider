@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson.JSON;
 import com.spider.entity.By114BT;
@@ -63,7 +64,14 @@ public class By114 {
 				if ("52".equals(type)) {
 					by114BT.setType("亚洲无码");
 				}
-				String contentPublishDate = tb.getElementsByClass("by").get(1).getElementsByTag("span").attr("title");
+                String contentPublishDate="";
+				if(tb.getElementsByClass("by").get(1).getElementsByTag("span")!=null) {
+					contentPublishDate = tb.getElementsByClass("by").get(1).getElementsByTag("span").attr("title");
+				}
+				if(tb.getElementsByClass("by").get(1).getElementsByTag("a")!=null) {
+					String text=tb.getElementsByClass("by").get(1).getElementsByTag("a").text();
+					contentPublishDate=text;
+				}
 				by114BT.setUrl(infoUrl);
 				by114BT.setContentPublishDate(contentPublishDate);
 				list.add(by114BT);
@@ -73,7 +81,11 @@ public class By114 {
 	}
 
 	public void saveBTInfo(By114BT bt) {
-		if(!Objects.isNull( by114BTService.findByUrl(bt.getUrl()))) {
+		if(by114BTService.count("url", bt.getUrl())!=0) {
+			logger.info(bt.getUrl()+",已存在");
+			return;
+		}
+		if(by114BTService.count("urlName",bt.getUrlName())!=0) {
 			logger.info(bt.getUrlName()+",已存在");
 			return;
 		}
@@ -131,32 +143,39 @@ public class By114 {
 		for (Element img : elements) {
 			String url = img.attr("src");
 			byte[] bytes = OKHttpUtils.getBytes(url);
-			String path = savePath + "img" + File.separator +FileUtils.repairPath(title) + "_" + index + ".jpg";
-			if (bt.getMagnet() != null) {
-				path = savePath + "img" + File.separator +FileUtils.repairPath(title)+"_"+ bt.getMagnet() + "_" + index + ".jpg";
+			if(bytes!=null) {
+				String path = savePath + "img" + File.separator +FileUtils.repairPath(title) + "_" + index + ".jpg";
+				if (bt.getMagnet() != null) {
+					path = savePath + "img" + File.separator +FileUtils.repairPath(title)+"_"+ bt.getMagnet() + "_" + index + ".jpg";
+				}
+				FileUtils.byteToFile(bytes, path);
+				imgList.add(bytes);
+				imgPath.add(path);
+				imgurl.add(url);
+				index++;
 			}
-			FileUtils.byteToFile(bytes, path);
-			imgList.add(bytes);
-			imgPath.add(path);
-			imgurl.add(url);
-			index++;
 		}
 		bt.setImages(imgList);
 		bt.setImagesPath(imgPath);
 		bt.setImagesUrl(imgurl);
-		
 		Elements element= document.getElementsByClass("attnm");
 		if(element!=null&&element.size()>0) {
 			Element a=element.get(0).getElementsByTag("a").get(0);
 			String url=home+a.attr("href");
 			String name=a.text();
 			byte[] bytes= OKHttpUtils.getBytes(url);
-			String path=savePath+"torrent"+File.separator+FileUtils.repairPath(bt.getTitle())+".torrent";
-			FileUtils.byteToFile(bytes, path);
-			bt.setTorrent(bytes);
-			bt.setTorrentName(name);
-			bt.setTorrentPath(path);
-			bt.setTorrentUrl(url);
+			if(bytes!=null) {
+				String path=savePath+"torrent"+File.separator+FileUtils.repairPath(bt.getTitle())+".torrent";
+				FileUtils.byteToFile(bytes, path);
+				bt.setTorrent(bytes);
+				bt.setTorrentName(name);
+				bt.setTorrentPath(path);
+				bt.setTorrentUrl(url);
+			}
+		}
+		if(StringUtils.isEmpty(bt.getMagnet())&&Objects.isNull(bt.getTorrent())) {
+			logger.info(bt.getTitle()+",磁力和种子都为空");
+			return;
 		}
 		bt.setCreateData(new Date());
 		by114BTService.save(bt);
@@ -164,12 +183,12 @@ public class By114 {
 	}
 	
 	public void  downloadBt() {
-		int i=1;
+		int i=1200;
 		while(true) {
 		    try {
 		    	List<By114BT> list=getBTInfo("52", String.valueOf(i));
-		    	ExecutorService executorService=Executors.newFixedThreadPool(list.size());
-		    	logger.info("list:{}",JSON.toJSONString(list));
+		    	ExecutorService executorService=Executors.newFixedThreadPool(8);
+		    	//logger.info("list:{}",JSON.toJSONString(list));
 				for(By114BT bt:list) {
 					executorService.execute(new Runnable() {
 						@Override

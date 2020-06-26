@@ -133,12 +133,6 @@
 			<version>3.6</version>
 		</dependency>
 
-		<dependency>
-			<groupId>com.github.atomashpolskiy</groupId>
-			<artifactId>bt-http-tracker-client</artifactId>
-			<version>1.9</version>
-		</dependency>
-
 		<!-- xml 解析 -->
 		<dependency>
 			<groupId>org.dom4j</groupId>
@@ -152,7 +146,6 @@
 			<artifactId>guava</artifactId>
 			<version>28.2-jre</version>
 		</dependency>
-
 	</dependencies>
 
 	<build>

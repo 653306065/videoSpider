@@ -98,7 +98,7 @@ youtube:
 by114:
    home: https://www.by114.pw/
    template: https://www.by114.pw/forum-@{type}-@{page}.html
-   savePath: C:\by114\
+   savePath: D:\by114\
       
 proxy:
    enabled: false
