@@ -7,104 +7,104 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "image")
 public class Image {
 
-	private String id;
+    private String id;
 
-	private String name;
+    private String name;
 
-	private long size;
+    private long size;
 
-	private String sizeStr;
+    private String sizeStr;
 
-	private String source;
+    private String source;
 
-	private String savePath;
+    private String savePath;
 
-	private String md5;
+    private String md5;
 
-	private Date createDate;
-	
-	private Integer width;
-	
-	private Integer height;
-	
-	public Integer getWidth() {
-		return width;
-	}
+    private Date createDate;
 
-	public void setWidth(Integer width) {
-		this.width = width;
-	}
+    private Integer width;
 
-	public Integer getHeight() {
-		return height;
-	}
+    private Integer height;
 
-	public void setHeight(Integer height) {
-		this.height = height;
-	}
+    public Integer getWidth() {
+        return width;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public void setWidth(Integer width) {
+        this.width = width;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public Integer getHeight() {
+        return height;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public void setHeight(Integer height) {
+        this.height = height;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public long getSize() {
-		return size;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public void setSize(long size) {
-		this.size = size;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getSizeStr() {
-		return sizeStr;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setSizeStr(String sizeStr) {
-		this.sizeStr = sizeStr;
-	}
+    public long getSize() {
+        return size;
+    }
 
-	public String getSource() {
-		return source;
-	}
+    public void setSize(long size) {
+        this.size = size;
+    }
 
-	public void setSource(String source) {
-		this.source = source;
-	}
+    public String getSizeStr() {
+        return sizeStr;
+    }
 
-	public String getSavePath() {
-		return savePath;
-	}
+    public void setSizeStr(String sizeStr) {
+        this.sizeStr = sizeStr;
+    }
 
-	public void setSavePath(String savePath) {
-		this.savePath = savePath;
-	}
+    public String getSource() {
+        return source;
+    }
 
-	public String getMd5() {
-		return md5;
-	}
+    public void setSource(String source) {
+        this.source = source;
+    }
 
-	public void setMd5(String md5) {
-		this.md5 = md5;
-	}
+    public String getSavePath() {
+        return savePath;
+    }
 
-	public Date getCreateDate() {
-		return createDate;
-	}
+    public void setSavePath(String savePath) {
+        this.savePath = savePath;
+    }
 
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
-	}
-	
+    public String getMd5() {
+        return md5;
+    }
+
+    public void setMd5(String md5) {
+        this.md5 = md5;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
 }

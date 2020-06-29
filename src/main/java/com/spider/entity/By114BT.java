@@ -7,265 +7,265 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "by114BT")
 public class By114BT {
-	
-	private String id;
 
-	private String urlName;
-	
-	private String url;
-	
-	private String type;
-	
-	private String title;
-	
-	private String videoName;
-	
-	private String subtitle;
-	
-	private String mosaic;
-	
-	private String magnet;
-	
-	private String BtDeadline;
-	
-	private String content;
-	
-	private String contentHtml;
-	
-	private String videoFormat; 
-	
-	private String actorName;
-	
-	private String videoSize;
-	
-	private List<byte[]> images;
-	
-	private List<String> imagesPath;
-	
-	private List<String> imagesUrl;
-	
-	private byte[] torrent;
-	
-	private String torrentPath;
-	
-	private String torrentUrl;
-	
-	private  String torrentName;
-	
-	private String videoPublishDate;
-	
-	private String contentPublishDate;
-	
-	private Date createData;
-	
-	private String pageHtml;
-	
-	public String getPageHtml() {
-		return pageHtml;
-	}
+    private String id;
 
-	public void setPageHtml(String pageHtml) {
-		this.pageHtml = pageHtml;
-	}
+    private String urlName;
 
-	public List<String> getImagesUrl() {
-		return imagesUrl;
-	}
+    private String url;
 
-	public void setImagesUrl(List<String> imagesUrl) {
-		this.imagesUrl = imagesUrl;
-	}
+    private String type;
 
-	public List<String> getImagesPath() {
-		return imagesPath;
-	}
+    private String title;
 
-	public void setImagesPath(List<String> imagesPath) {
-		this.imagesPath = imagesPath;
-	}
+    private String videoName;
 
-	public String getTorrentPath() {
-		return torrentPath;
-	}
+    private String subtitle;
 
-	public void setTorrentPath(String torrentPath) {
-		this.torrentPath = torrentPath;
-	}
+    private String mosaic;
 
-	public String getTorrentUrl() {
-		return torrentUrl;
-	}
+    private String magnet;
 
-	public void setTorrentUrl(String torrentUrl) {
-		this.torrentUrl = torrentUrl;
-	}
+    private String BtDeadline;
 
-	public Date getCreateData() {
-		return createData;
-	}
+    private String content;
 
-	public void setCreateData(Date createData) {
-		this.createData = createData;
-	}
+    private String contentHtml;
 
-	public String getVideoPublishDate() {
-		return videoPublishDate;
-	}
+    private String videoFormat;
 
-	public void setVideoPublishDate(String videoPublishDate) {
-		this.videoPublishDate = videoPublishDate;
-	}
+    private String actorName;
 
-	public String getContentPublishDate() {
-		return contentPublishDate;
-	}
+    private String videoSize;
 
-	public void setContentPublishDate(String contentPublishDate) {
-		this.contentPublishDate = contentPublishDate;
-	}
+    private List<byte[]> images;
 
-	public String getId() {
-		return id;
-	}
+    private List<String> imagesPath;
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    private List<String> imagesUrl;
 
-	public String getUrlName() {
-		return urlName;
-	}
+    private byte[] torrent;
 
-	public void setUrlName(String urlName) {
-		this.urlName = urlName;
-	}
+    private String torrentPath;
 
-	public String getUrl() {
-		return url;
-	}
+    private String torrentUrl;
 
-	public void setUrl(String url) {
-		this.url = url;
-	}
+    private String torrentName;
 
-	public String getType() {
-		return type;
-	}
+    private String videoPublishDate;
 
-	public void setType(String type) {
-		this.type = type;
-	}
+    private String contentPublishDate;
 
-	public String getTitle() {
-		return title;
-	}
+    private Date createData;
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    private String pageHtml;
 
-	public String getVideoName() {
-		return videoName;
-	}
+    public String getPageHtml() {
+        return pageHtml;
+    }
 
-	public void setVideoName(String videoName) {
-		this.videoName = videoName;
-	}
+    public void setPageHtml(String pageHtml) {
+        this.pageHtml = pageHtml;
+    }
 
-	public String getSubtitle() {
-		return subtitle;
-	}
+    public List<String> getImagesUrl() {
+        return imagesUrl;
+    }
 
-	public void setSubtitle(String subtitle) {
-		this.subtitle = subtitle;
-	}
+    public void setImagesUrl(List<String> imagesUrl) {
+        this.imagesUrl = imagesUrl;
+    }
 
-	public String getMosaic() {
-		return mosaic;
-	}
+    public List<String> getImagesPath() {
+        return imagesPath;
+    }
 
-	public void setMosaic(String mosaic) {
-		this.mosaic = mosaic;
-	}
+    public void setImagesPath(List<String> imagesPath) {
+        this.imagesPath = imagesPath;
+    }
 
-	public String getMagnet() {
-		return magnet;
-	}
+    public String getTorrentPath() {
+        return torrentPath;
+    }
 
-	public void setMagnet(String magnet) {
-		this.magnet = magnet;
-	}
+    public void setTorrentPath(String torrentPath) {
+        this.torrentPath = torrentPath;
+    }
 
-	public String getBtDeadline() {
-		return BtDeadline;
-	}
+    public String getTorrentUrl() {
+        return torrentUrl;
+    }
 
-	public void setBtDeadline(String btDeadline) {
-		BtDeadline = btDeadline;
-	}
+    public void setTorrentUrl(String torrentUrl) {
+        this.torrentUrl = torrentUrl;
+    }
 
-	public String getContent() {
-		return content;
-	}
+    public Date getCreateData() {
+        return createData;
+    }
 
-	public void setContent(String content) {
-		this.content = content;
-	}
+    public void setCreateData(Date createData) {
+        this.createData = createData;
+    }
 
-	public String getVideoFormat() {
-		return videoFormat;
-	}
+    public String getVideoPublishDate() {
+        return videoPublishDate;
+    }
 
-	public void setVideoFormat(String videoFormat) {
-		this.videoFormat = videoFormat;
-	}
+    public void setVideoPublishDate(String videoPublishDate) {
+        this.videoPublishDate = videoPublishDate;
+    }
 
-	public String getActorName() {
-		return actorName;
-	}
+    public String getContentPublishDate() {
+        return contentPublishDate;
+    }
 
-	public void setActorName(String actorName) {
-		this.actorName = actorName;
-	}
+    public void setContentPublishDate(String contentPublishDate) {
+        this.contentPublishDate = contentPublishDate;
+    }
 
-	public String getVideoSize() {
-		return videoSize;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public void setVideoSize(String videoSize) {
-		this.videoSize = videoSize;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public List<byte[]> getImages() {
-		return images;
-	}
+    public String getUrlName() {
+        return urlName;
+    }
 
-	public void setImages(List<byte[]> images) {
-		this.images = images;
-	}
+    public void setUrlName(String urlName) {
+        this.urlName = urlName;
+    }
 
-	public byte[] getTorrent() {
-		return torrent;
-	}
+    public String getUrl() {
+        return url;
+    }
 
-	public void setTorrent(byte[] torrent) {
-		this.torrent = torrent;
-	}
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
-	public String getTorrentName() {
-		return torrentName;
-	}
+    public String getType() {
+        return type;
+    }
 
-	public void setTorrentName(String torrentName) {
-		this.torrentName = torrentName;
-	}
+    public void setType(String type) {
+        this.type = type;
+    }
 
-	public String getContentHtml() {
-		return contentHtml;
-	}
+    public String getTitle() {
+        return title;
+    }
 
-	public void setContentHtml(String contentHtml) {
-		this.contentHtml = contentHtml;
-	}
-	
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getVideoName() {
+        return videoName;
+    }
+
+    public void setVideoName(String videoName) {
+        this.videoName = videoName;
+    }
+
+    public String getSubtitle() {
+        return subtitle;
+    }
+
+    public void setSubtitle(String subtitle) {
+        this.subtitle = subtitle;
+    }
+
+    public String getMosaic() {
+        return mosaic;
+    }
+
+    public void setMosaic(String mosaic) {
+        this.mosaic = mosaic;
+    }
+
+    public String getMagnet() {
+        return magnet;
+    }
+
+    public void setMagnet(String magnet) {
+        this.magnet = magnet;
+    }
+
+    public String getBtDeadline() {
+        return BtDeadline;
+    }
+
+    public void setBtDeadline(String btDeadline) {
+        BtDeadline = btDeadline;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getVideoFormat() {
+        return videoFormat;
+    }
+
+    public void setVideoFormat(String videoFormat) {
+        this.videoFormat = videoFormat;
+    }
+
+    public String getActorName() {
+        return actorName;
+    }
+
+    public void setActorName(String actorName) {
+        this.actorName = actorName;
+    }
+
+    public String getVideoSize() {
+        return videoSize;
+    }
+
+    public void setVideoSize(String videoSize) {
+        this.videoSize = videoSize;
+    }
+
+    public List<byte[]> getImages() {
+        return images;
+    }
+
+    public void setImages(List<byte[]> images) {
+        this.images = images;
+    }
+
+    public byte[] getTorrent() {
+        return torrent;
+    }
+
+    public void setTorrent(byte[] torrent) {
+        this.torrent = torrent;
+    }
+
+    public String getTorrentName() {
+        return torrentName;
+    }
+
+    public void setTorrentName(String torrentName) {
+        this.torrentName = torrentName;
+    }
+
+    public String getContentHtml() {
+        return contentHtml;
+    }
+
+    public void setContentHtml(String contentHtml) {
+        this.contentHtml = contentHtml;
+    }
+
 }

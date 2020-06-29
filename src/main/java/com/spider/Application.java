@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -29,12 +30,12 @@ import ws.schild.jave.VideoInfo;
 @SpringBootApplication
 public class Application {
 
-	static Logger logger = LoggerFactory.getLogger(Application.class);
+    static Logger logger = LoggerFactory.getLogger(Application.class);
 
-	public static void main(String[] args) {
-		ConfigurableApplicationContext context = SpringApplication.run(Application.class);
-		By114 By114=context.getBean(By114.class);
-		By114.clearFile();
-		//By114.downloadBt();
-	}
+    public static void main(String[] args) {
+        ConfigurableApplicationContext context = SpringApplication.run(Application.class);
+        By114 By114 = context.getBean(By114.class);
+        //By114.clearFile();
+        //By114.downloadBt();
+    }
 }

@@ -12,34 +12,34 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProxyConf {
 
-	@Value("${proxy.socks.host}")
-	private String socksHost;
+    @Value("${proxy.socks.host}")
+    private String socksHost;
 
-	@Value("${proxy.socks.port}")
-	private int socksPort;
+    @Value("${proxy.socks.port}")
+    private int socksPort;
 
-	@Value("${proxy.http.host}")
-	private String httpHost;
+    @Value("${proxy.http.host}")
+    private String httpHost;
 
-	@Value("${proxy.http.port}")
-	private int httpPort;
-	
-	@Value("${proxy.enabled}")
-	private boolean enabled;
+    @Value("${proxy.http.port}")
+    private int httpPort;
+
+    @Value("${proxy.enabled}")
+    private boolean enabled;
 
 
-	@Bean
-	public Proxy getProxy() {
-		Proxy proxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(socksHost, socksPort));
-		return proxy;
-	}
+    @Bean
+    public Proxy getProxy() {
+        Proxy proxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(socksHost, socksPort));
+        return proxy;
+    }
 
-	@PostConstruct
-	public void GlobalProxy() {
-		if(enabled) {
-			System.setProperty("java.net.useSystemProxies", "true");
-			System.setProperty("http.proxyHost", httpHost);
-			System.setProperty("http.proxyPort", String.valueOf(httpPort));
-		}
-	}
+    @PostConstruct
+    public void GlobalProxy() {
+        if (enabled) {
+            System.setProperty("java.net.useSystemProxies", "true");
+            System.setProperty("http.proxyHost", httpHost);
+            System.setProperty("http.proxyPort", String.valueOf(httpPort));
+        }
+    }
 }

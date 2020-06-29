@@ -16,20 +16,20 @@ import com.google.api.services.youtube.YouTube;
 @Component
 public class BeanConf {
 
-	@Value("${proxy.http.host}")
-	private String host;
+    @Value("${proxy.http.host}")
+    private String host;
 
-	@Value("${proxy.http.port}")
-	private int port;
+    @Value("${proxy.http.port}")
+    private int port;
 
-	@Bean
-	public YouTube createYouTube() {
-		ApacheHttpTransport apacheHttpTransport = new ApacheHttpTransport.Builder().setProxy(new HttpHost(host, port)).build();
-		YouTube Youtube = new YouTube.Builder(apacheHttpTransport, new JacksonFactory(), new HttpRequestInitializer() {
-			public void initialize(HttpRequest request) throws IOException {
+    @Bean
+    public YouTube createYouTube() {
+        ApacheHttpTransport apacheHttpTransport = new ApacheHttpTransport.Builder().setProxy(new HttpHost(host, port)).build();
+        YouTube Youtube = new YouTube.Builder(apacheHttpTransport, new JacksonFactory(), new HttpRequestInitializer() {
+            public void initialize(HttpRequest request) throws IOException {
 
-			}
-		}).build();
-		return Youtube;
-	}
+            }
+        }).build();
+        return Youtube;
+    }
 }

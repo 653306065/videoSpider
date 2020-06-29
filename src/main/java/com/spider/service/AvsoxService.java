@@ -11,16 +11,16 @@ import com.spider.entity.AvInfo;
 @Service
 public class AvsoxService {
 
-	@Autowired
-	private MongoTemplate mongoTemplate;
-	
-	public void insert(AvInfo info) {
-		mongoTemplate.insert(info);
-	}
-	
-	public AvInfo findByCode(String code) {
-		Query query=new Query(Criteria.where("code").is(code));
-		return mongoTemplate.findOne(query, AvInfo.class);
-	}
+    @Autowired
+    private MongoTemplate mongoTemplate;
+
+    public void insert(AvInfo info) {
+        mongoTemplate.insert(info);
+    }
+
+    public AvInfo findByCode(String code) {
+        Query query = new Query(Criteria.where("code").is(code));
+        return mongoTemplate.findOne(query, AvInfo.class);
+    }
 
 }

@@ -7,33 +7,33 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "urlRecord")
 public class UrlRecord {
 
-	private String id;
-	
-	private String url;
-	
-	private Date date;
+    private String id;
 
-	public String getUrl() {
-		return url;
-	}
+    private String url;
 
-	public void setUrl(String url) {
-		this.url = url;
-	}
+    private Date date;
 
-	public Date getDate() {
-		return date;
-	}
+    public String getUrl() {
+        return url;
+    }
 
-	public void setDate(Date date) {
-		this.date = date;
-	}
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public Date getDate() {
+        return date;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 }

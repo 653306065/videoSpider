@@ -8,15 +8,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class SpringContentUtil implements ApplicationContextAware {
 
-	private static ApplicationContext applicationContext;
+    private static ApplicationContext applicationContext;
 
-	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		SpringContentUtil.applicationContext = applicationContext;
-	}
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        SpringContentUtil.applicationContext = applicationContext;
+    }
 
-	public static <T> T getBean(Class<T> t) {
-		return applicationContext.getBean(t);
-	}
+    public static <T> T getBean(Class<T> t) {
+        return applicationContext.getBean(t);
+    }
 
 }
