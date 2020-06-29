@@ -34,6 +34,7 @@ public class Application {
 	public static void main(String[] args) {
 		ConfigurableApplicationContext context = SpringApplication.run(Application.class);
 		By114 By114=context.getBean(By114.class);
-		By114.downloadBt();
+		By114.clearFile();
+		//By114.downloadBt();
 	}
 }

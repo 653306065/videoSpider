@@ -2,6 +2,7 @@ package com.spider.web;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -30,8 +31,8 @@ import com.spider.service.By114BTService;
 
 @Service
 public class By114 {
-	
-	private Logger logger=LoggerFactory.getLogger(By114.class);
+
+	private Logger logger = LoggerFactory.getLogger(By114.class);
 
 	@Value("${by114.template}")
 	private String template;
@@ -41,7 +42,7 @@ public class By114 {
 
 	@Value("${by114.savePath}")
 	private String savePath;
-	
+
 	@Autowired
 	private By114BTService by114BTService;
 
@@ -64,13 +65,13 @@ public class By114 {
 				if ("52".equals(type)) {
 					by114BT.setType("亚洲无码");
 				}
-                String contentPublishDate="";
-				if(tb.getElementsByClass("by").get(1).getElementsByTag("span")!=null) {
+				String contentPublishDate = "";
+				if (tb.getElementsByClass("by").get(1).getElementsByTag("span") != null) {
 					contentPublishDate = tb.getElementsByClass("by").get(1).getElementsByTag("span").attr("title");
 				}
-				if(tb.getElementsByClass("by").get(1).getElementsByTag("a")!=null) {
-					String text=tb.getElementsByClass("by").get(1).getElementsByTag("a").text();
-					contentPublishDate=text;
+				if (tb.getElementsByClass("by").get(1).getElementsByTag("a") != null) {
+					String text = tb.getElementsByClass("by").get(1).getElementsByTag("a").text();
+					contentPublishDate = text;
 				}
 				by114BT.setUrl(infoUrl);
 				by114BT.setContentPublishDate(contentPublishDate);
@@ -81,12 +82,12 @@ public class By114 {
 	}
 
 	public void saveBTInfo(By114BT bt) {
-		if(by114BTService.count("url", bt.getUrl())!=0) {
-			logger.info(bt.getUrl()+",已存在");
+		if (by114BTService.count("url", bt.getUrl()) != 0) {
+			logger.info(bt.getUrl() + ",已存在");
 			return;
 		}
-		if(by114BTService.count("urlName",bt.getUrlName())!=0) {
-			logger.info(bt.getUrlName()+",已存在");
+		if (by114BTService.count("urlName", bt.getUrlName()) != 0) {
+			logger.info(bt.getUrlName() + ",已存在");
 			return;
 		}
 		Document document = JsoupUtil.getDocument(bt.getUrl());
@@ -138,15 +139,16 @@ public class By114 {
 		List<byte[]> imgList = new ArrayList<byte[]>();
 		Elements elements = tf.getElementsByTag("img");
 		int index = 0;
-		List<String> imgPath=new ArrayList<String>();
-		List<String> imgurl=new ArrayList<String>();
+		List<String> imgPath = new ArrayList<String>();
+		List<String> imgurl = new ArrayList<String>();
 		for (Element img : elements) {
 			String url = img.attr("src");
 			byte[] bytes = OKHttpUtils.getBytes(url);
-			if(bytes!=null) {
-				String path = savePath + "img" + File.separator +FileUtils.repairPath(title) + "_" + index + ".jpg";
+			if (bytes != null) {
+				String path = savePath + "img" + File.separator + FileUtils.repairPath(title) + "_" + index + ".jpg";
 				if (bt.getMagnet() != null) {
-					path = savePath + "img" + File.separator +FileUtils.repairPath(title)+"_"+ bt.getMagnet() + "_" + index + ".jpg";
+					path = savePath + "img" + File.separator + FileUtils.repairPath(title) + "_" + bt.getMagnet() + "_"
+							+ index + ".jpg";
 				}
 				FileUtils.byteToFile(bytes, path);
 				imgList.add(bytes);
@@ -158,14 +160,14 @@ public class By114 {
 		bt.setImages(imgList);
 		bt.setImagesPath(imgPath);
 		bt.setImagesUrl(imgurl);
-		Elements element= document.getElementsByClass("attnm");
-		if(element!=null&&element.size()>0) {
-			Element a=element.get(0).getElementsByTag("a").get(0);
-			String url=home+a.attr("href");
-			String name=a.text();
-			byte[] bytes= OKHttpUtils.getBytes(url);
-			if(bytes!=null) {
-				String path=savePath+"torrent"+File.separator+FileUtils.repairPath(bt.getTitle())+".torrent";
+		Elements element = document.getElementsByClass("attnm");
+		if (element != null && element.size() > 0) {
+			Element a = element.get(0).getElementsByTag("a").get(0);
+			String url = home + a.attr("href");
+			String name = a.text();
+			byte[] bytes = OKHttpUtils.getBytes(url);
+			if (bytes != null) {
+				String path = savePath + "torrent" + File.separator + FileUtils.repairPath(bt.getTitle()) + ".torrent";
 				FileUtils.byteToFile(bytes, path);
 				bt.setTorrent(bytes);
 				bt.setTorrentName(name);
@@ -173,23 +175,59 @@ public class By114 {
 				bt.setTorrentUrl(url);
 			}
 		}
-		if(StringUtils.isEmpty(bt.getMagnet())&&Objects.isNull(bt.getTorrent())) {
-			logger.info(bt.getTitle()+",磁力和种子都为空");
+		if (StringUtils.isEmpty(bt.getMagnet()) && Objects.isNull(bt.getTorrent())) {
+			logger.info(bt.getTitle() + ",磁力和种子都为空");
 			return;
 		}
 		bt.setCreateData(new Date());
 		by114BTService.save(bt);
-		logger.info(bt.getTitle()+",保存完成");
+		logger.info(bt.getTitle() + ",保存完成");
 	}
-	
-	public void  downloadBt() {
-		int i=1200;
-		while(true) {
-		    try {
-		    	List<By114BT> list=getBTInfo("52", String.valueOf(i));
-		    	ExecutorService executorService=Executors.newFixedThreadPool(8);
-		    	//logger.info("list:{}",JSON.toJSONString(list));
-				for(By114BT bt:list) {
+
+	public void clearFile() {
+		File file = new File("D:\\BT");
+		File[] list = file.listFiles();
+		for (File f : list) {
+			if (f.isDirectory()) {
+				File[] files = f.listFiles();
+				for (File btFile : files) {
+					if (btFile.isDirectory()) {
+						File[] fileArr = btFile.listFiles();
+						List<File> fileList = new ArrayList<File>();
+						for (File d : fileArr) {
+							if (!d.isDirectory()) {
+								fileList.add(d);
+							} else {
+								FileUtils.deleteDir(d.getAbsolutePath());
+							}
+						}
+						fileList.sort(new Comparator<File>() {
+							@Override
+							public int compare(File o1, File o2) {
+								return (int) (o2.length() - o1.length());
+							}
+						});
+						for(int i=1;i<fileList.size();i++) {
+							fileList.get(i).delete();
+						}
+					}
+				}
+			}
+		}
+	}
+
+	public void deleteFile() {
+
+	}
+
+	public void downloadBt() {
+		int i = 1200;
+		while (true) {
+			try {
+				List<By114BT> list = getBTInfo("52", String.valueOf(i));
+				ExecutorService executorService = Executors.newFixedThreadPool(8);
+				// logger.info("list:{}",JSON.toJSONString(list));
+				for (By114BT bt : list) {
 					executorService.execute(new Runnable() {
 						@Override
 						public void run() {
@@ -197,13 +235,13 @@ public class By114 {
 						}
 					});
 				}
-				if(list.size()==0) {
+				if (list.size() == 0) {
 					break;
 				}
 				executorService.shutdown();
-				while(true) {
-					if(executorService.isShutdown()) {
-						//executorService.awaitTermination(10,TimeUnit.SECONDS);
+				while (true) {
+					if (executorService.isShutdown()) {
+						// executorService.awaitTermination(10,TimeUnit.SECONDS);
 						break;
 					}
 				}

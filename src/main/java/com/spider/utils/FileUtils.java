@@ -298,6 +298,29 @@ public class FileUtils {
 			}
 		}
 	}
+	
+	public static void deleteDir(String dirPath)
+	{
+		File file = new File(dirPath);
+		if(file.isFile())
+		{
+			file.delete();
+		}else
+		{
+			File[] files = file.listFiles();
+			if(files == null)
+			{
+				file.delete();
+			}else
+			{
+				for (int i = 0; i < files.length; i++) 
+				{
+					deleteDir(files[i].getAbsolutePath());
+				}
+				file.delete();
+			}
+		}
+	}
 
 	/**
 	 * 删除window路径中不允许的字符
