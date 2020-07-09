@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import com.spider.entity.Video;
 
 @Service
-public class VideoService {
+public class VideoService extends BaseService<Video>{
 
     @Autowired
     private MongoTemplate mongoTemplate;

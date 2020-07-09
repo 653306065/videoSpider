@@ -1,6 +1,7 @@
 package com.spider.service;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -20,5 +21,9 @@ public abstract class BaseService<T> {
 
     public long count(String key, String value) {
         return mongoTemplate.count(new Query(Criteria.where(key).is(value)), clasz);
+    }
+
+    public List<T> findAll(){
+        return mongoTemplate.findAll(clasz);
     }
 }
