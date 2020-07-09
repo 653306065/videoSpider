@@ -47,6 +47,7 @@ public class DownloadThread extends Thread {
         this.isStop = isStop;
     }
 
+    @Override
     public void run() {
         try {
             Map<String, String> newheader = new HashMap<String, String>();

@@ -188,13 +188,13 @@ public class YoutubeSpider {
         try {
             List<SearchResult> resultList = new ArrayList<SearchResult>();
             SearchListResponse searchListResponse = youTube.search().list("snippet").setChannelId(channelId).setKey(key)
-                    .setMaxResults(50l).setType("video").execute();
+                    .setMaxResults(50L).setType("video").execute();
             resultList.addAll(searchListResponse.getItems());
             if (searchListResponse.getNextPageToken() == null) {
                 String pageToken = searchListResponse.getNextPageToken();
                 while (true) {
                     searchListResponse = youTube.search().list("snippet").setChannelId(channelId).setKey(key)
-                            .setPageToken(pageToken).setMaxResults(50l).setType("video").execute();
+                            .setPageToken(pageToken).setMaxResults(50L).setType("video").execute();
                     resultList.addAll(searchListResponse.getItems());
                     if (pageToken == null) {
                         break;

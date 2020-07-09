@@ -26,6 +26,7 @@ public class BeanConf {
     public YouTube createYouTube() {
         ApacheHttpTransport apacheHttpTransport = new ApacheHttpTransport.Builder().setProxy(new HttpHost(host, port)).build();
         YouTube Youtube = new YouTube.Builder(apacheHttpTransport, new JacksonFactory(), new HttpRequestInitializer() {
+            @Override
             public void initialize(HttpRequest request) throws IOException {
 
             }

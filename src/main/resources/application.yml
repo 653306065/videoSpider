@@ -75,7 +75,7 @@ avMovie:
 
 pornhub:
    home: https://www.pornhub.com
-   savePath: D:\pornhub\
+   savePath: C:\pornhub\
    searchUrl: https://www.pornhub.com/video/search?search=@{key}&hd=1&page=@{page}
    channels: https://pornhub.com/channels/@{channelName}/videos?o=da&page=@{page}
    categories: 
@@ -98,7 +98,12 @@ youtube:
 by114:
    home: https://www.by114.pw/
    template: https://www.by114.pw/forum-@{type}-@{page}.html
-   savePath: D:\by114\
+   savePath: C:\by114\
+
+proxyrarbg:
+   home: https://proxyrarbg.org/torrents.php
+   template: https://proxyrarbg.org/torrents.php?category=@{category}&page=@{page}
+   savePath: C:\proxyrarbg\
       
 proxy:
    enabled: false
@@ -115,3 +120,6 @@ spring:
    data:
       mongodb:
          uri: mongodb://127.0.0.1:27017/file
+   redis:
+      host: 127.0.0.1
+      port: 6379

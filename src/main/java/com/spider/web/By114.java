@@ -221,7 +221,7 @@ public class By114 {
     }
 
     public void downloadBt() {
-        int i = 1200;
+        int i = 1;
         while (true) {
             try {
                 List<By114BT> list = getBTInfo("52", String.valueOf(i));
