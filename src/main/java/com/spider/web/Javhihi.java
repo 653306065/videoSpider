@@ -88,10 +88,10 @@ public class Javhihi {
     }
 
     public void downloadVideo() {
-        int i = 120;
+        int i = 1;
         while (true) {
             getMoive(i);
-            i--;
+            i++;
         }
     }
 

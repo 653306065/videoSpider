@@ -69,7 +69,7 @@ public class Eporner {
         Document document = Jsoup.parse(html);
         String name = document.getElementById("video-info").getElementsByTag("h1").get(0).text();
         Element moviexxx = document.getElementById("moviexxx");
-        String js = moviexxx.getElementsByTag("script").get(0).toString();
+        String js = moviexxx.getElementsByTag("script").get(2).toString();
         String vid = js.split("vid:")[1].split("'")[1];
         String hash = getHashCode(js.split("hash:")[1].split("'")[1]);
         logger.info("name:{},vid:{},hash:{}", name, vid, hash);
@@ -162,7 +162,7 @@ public class Eporner {
                         Map<String, String> map = getvideo(url);
                         videoDownload(map, category);
                     } catch (Exception e) {
-                        e.getStackTrace();
+                        e.printStackTrace();
                     }
                 }
             } catch (Exception e) {
