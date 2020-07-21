@@ -11,6 +11,7 @@ import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
+import com.spider.utils.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -24,7 +25,7 @@ import com.spider.utils.OKHttpUtils;
 import com.spider.utils.download.MultithreadingDownload;
 
 @Service
-public class Eporner {
+public class Eporner extends BaseWeb{
 
     @Value("${eporner.home}")
     private String homeUrl;
@@ -36,19 +37,17 @@ public class Eporner {
 
     String apiUrl = "https://www.eporner.com/xhr/video/${vid}?hash=${hash}&device=generic&domain=www.eporner.com&fallback=false&embed=false&supportedFormats=mp4&tech=Html5&_=1550911326158";
 
-    @Autowired
-    Proxy proxy;
-
     @Value("${eporner.savePath}")
     private String savePath;
 
     @Value("${eporner.thread}")
     private int thread;
 
+    @Value("${eporner.enableProxy}")
+    private boolean enableProxy;
+
     @Autowired
     private MultithreadingDownload multithreadingDownload;
-
-    public org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(Eporner.class);
 
     public List<String> getDetailsList(String category, int page) {
         String realUrl = categoryTemplate.replace("${category}", category).replace("${page}", String.valueOf(page));
@@ -120,7 +119,7 @@ public class Eporner {
 
     public void videoDownload(Map<String, String> map, String category) {
         String videoUrl = map.get("url");
-        String name = map.get("name");
+        String name = FileUtils.repairPath(map.get("name"));
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String date = simpleDateFormat.format(new Date());
         String path = savePath + category + "\\" + date + "\\" + name + ".mp4";
@@ -189,4 +188,8 @@ public class Eporner {
         }
     }
 
+    @Override
+    public boolean enableProxy() {
+        return enableProxy;
+    }
 }

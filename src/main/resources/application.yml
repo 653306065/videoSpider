@@ -3,7 +3,8 @@ eporner:
    savePath: C:\eporner\
    category:
       UHD: https://www.eporner.com/category/4k-porn/
-   thread: 10  
+   thread: 10
+   enableProxy: true
    
 javfinder:
    home: https://javfinder.la
