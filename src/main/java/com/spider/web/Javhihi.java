@@ -67,8 +67,24 @@ public class Javhihi extends BaseWeb {
                 JSONObject apiJsonObject = JSON.parseObject(apiJson);
                 if (apiJsonObject.getBoolean("success")) {
                     Video video = new Video();
+
+                    video.setSourceUrl(movieUrl);
+
+                    //video.setPubDate(new Date(movie.getString("published")));
+                    video.setCategories(movie.getJSONArray("categories").toJavaList(String.class));
+                    video.setStarNames(movie.getJSONArray("pornstars").toJavaList(String.class));
+                    video.setTags(movie.getJSONArray("tags").toJavaList(String.class));
                     video.setName(movie.getString("name")+".mp4");
 
+                    if(Objects.nonNull(videoService.findByName(video.getName()))){
+                        logger.info(video.getName() + "已存在");
+                        continue;
+                    }
+
+                    if(Objects.nonNull(video.getSourceUrl())&&Objects.nonNull(videoService.findBySourceUrl(video.getSourceUrl()))){
+                        logger.info(video.getName() + "已存在");
+                        continue;
+                    }
 
                     JSONArray jsonArray = apiJsonObject.getJSONArray("data");
                     JSONObject fileJson = jsonArray.getJSONObject(jsonArray.size() - 1);
@@ -87,31 +103,7 @@ public class Javhihi extends BaseWeb {
                     header.put("Accept-Encoding", "gzip, deflate");
                     header.put("Connection", "keep-alive");
                     video.setVideoUrl(realUrl);
-                    video.setSourceUrl(movieUrl);
                     video.setSavePath(path);
-                    //video.setPubDate(new Date(movie.getString("published")));
-                    video.setCategories(movie.getJSONArray("categories").toJavaList(String.class));
-                    video.setStarNames(movie.getJSONArray("pornstars").toJavaList(String.class));
-                    video.setTags(movie.getJSONArray("tags").toJavaList(String.class));
-
-                    if(Objects.nonNull(videoService.findByName(video.getName()))){
-                        logger.info(video.getName() + "已存在");
-                        continue;
-                    }
-                    if(Objects.nonNull(video.getMd5())&&Objects.nonNull(videoService.findByMd5(video.getMd5()))){
-                        logger.info(video.getName() + "已存在");
-                        continue;
-                    }
-
-                    if(Objects.nonNull(video.getVideoUrl())&&Objects.nonNull(videoService.findByVideoUrl(video.getVideoUrl()))){
-                        logger.info(video.getName() + "已存在");
-                        continue;
-                    }
-
-                    if(Objects.nonNull(video.getSourceUrl())&&Objects.nonNull(videoService.findBySourceUrl(video.getSourceUrl()))){
-                        logger.info(video.getName() + "已存在");
-                        continue;
-                    }
                     MultithreadingDownload.videoDownload(video, header, proxy, thread, defaultSegmentSize);
                 }
             } catch (Exception e) {
