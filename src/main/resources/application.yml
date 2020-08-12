@@ -57,12 +57,12 @@ longteng:
    thread: 30
    
 javhihi:
-   #home: https://www1.javhihi.com/
-   home: https://www1.javbuz.com/
+   home: https://www1.javhihi.com/
+   #home: https://www1.javbuz.com/
    #home: https://xart.letfap.com/
    movie: ${javhihi.home}movie?sort=published&page=@{page}&ajax=1
-   #savePath: C:\javhihi\
-   savePath: D:\javbuz\
+   savePath: C:\javhihi\
+   #savePath: D:\javbuz\
    #savePath: D:\xart.letfap\
    thread: 20
    enableProxy: true
@@ -113,10 +113,12 @@ proxyrarbg:
 proxy:
    enabled: false
    socks:
-      host: 192.168.31.184
+      #host: 192.168.31.184
+      host: 127.0.0.1
       port: 10808
    http:
-      host: 192.168.31.184
+      #host: 192.168.31.184
+      host: 127.0.0.1
       port: 10809        
 
 FFmpegPath: C:\\ffmpeg\\bin\\

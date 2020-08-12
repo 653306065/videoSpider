@@ -4,7 +4,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+
 import com.spider.entity.Video;
+import com.spider.service.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -19,7 +22,7 @@ import com.spider.utils.OKHttpUtils;
 import com.spider.utils.download.MultithreadingDownload;
 
 @Component
-public class Javhihi extends BaseWeb{
+public class Javhihi extends BaseWeb {
 
     @Value("${javhihi.home}")
     private String home;
@@ -38,6 +41,9 @@ public class Javhihi extends BaseWeb{
 
     @Autowired
     private MultithreadingDownload MultithreadingDownload;
+
+    @Autowired
+    private VideoService videoService;
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -60,8 +66,9 @@ public class Javhihi extends BaseWeb{
                 String apiJson = OKHttpUtils.post(api, proxy);
                 JSONObject apiJsonObject = JSON.parseObject(apiJson);
                 if (apiJsonObject.getBoolean("success")) {
-                    Video video= new Video();
+                    Video video = new Video();
                     video.setName(movie.getString("name"));
+
 
                     JSONArray jsonArray = apiJsonObject.getJSONArray("data");
                     JSONObject fileJson = jsonArray.getJSONObject(jsonArray.size() - 1);
@@ -86,7 +93,26 @@ public class Javhihi extends BaseWeb{
                     video.setCategories(movie.getJSONArray("categories").toJavaList(String.class));
                     video.setStarNames(movie.getJSONArray("pornstars").toJavaList(String.class));
                     video.setTags(movie.getJSONArray("tags").toJavaList(String.class));
-                    MultithreadingDownload.videoDownload(video, header, proxy, thread,defaultSegmentSize);
+
+                    if(Objects.nonNull(videoService.findByName(video.getName()))){
+                        logger.info(video.getName() + "已存在");
+                        continue;
+                    }
+                    if(Objects.nonNull(video.getMd5())&&Objects.nonNull(videoService.findByMd5(video.getMd5()))){
+                        logger.info(video.getName() + "已存在");
+                        continue;
+                    }
+
+                    if(Objects.nonNull(video.getVideoUrl())&&Objects.nonNull(videoService.findByVideoUrl(video.getVideoUrl()))){
+                        logger.info(video.getName() + "已存在");
+                        continue;
+                    }
+
+                    if(Objects.nonNull(video.getSourceUrl())&&Objects.nonNull(videoService.findBySourceUrl(video.getSourceUrl()))){
+                        logger.info(video.getName() + "已存在");
+                        continue;
+                    }
+                    MultithreadingDownload.videoDownload(video, header, proxy, thread, defaultSegmentSize);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -98,7 +124,11 @@ public class Javhihi extends BaseWeb{
     public void downloadVideo() {
         int i = 1;
         while (true) {
-            getMoive(i);
+            try {
+                getMoive(i);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             i++;
         }
     }
