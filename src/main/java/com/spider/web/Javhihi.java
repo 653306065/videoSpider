@@ -67,7 +67,7 @@ public class Javhihi extends BaseWeb {
                 JSONObject apiJsonObject = JSON.parseObject(apiJson);
                 if (apiJsonObject.getBoolean("success")) {
                     Video video = new Video();
-                    video.setName(movie.getString("name"));
+                    video.setName(movie.getString("name")+".mp4");
 
 
                     JSONArray jsonArray = apiJsonObject.getJSONArray("data");
