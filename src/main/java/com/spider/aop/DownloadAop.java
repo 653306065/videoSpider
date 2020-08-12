@@ -76,6 +76,7 @@ public class DownloadAop {
             File videoFile=new File(video.getSavePath());
             Boolean result = (Boolean) joinPoint.proceed();
             if(!result){
+                logger.info("{},文件下载失败",video.getName());
                 return;
             }
             String md5 = FileUtils.getMD5(videoFile);
