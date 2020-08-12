@@ -45,7 +45,6 @@ public class MultithreadingDownload {
                 RandomAccessFile raf = new RandomAccessFile(file, "rw");
                 raf.setLength(info.getContentLength());
                 ExecutorService executorService = Executors.newFixedThreadPool(threadNum);
-                long threadSize = info.getContentLength() / segmentSize;
                 int i=0;
                 while (true){
                     long startByte = i * segmentSize;

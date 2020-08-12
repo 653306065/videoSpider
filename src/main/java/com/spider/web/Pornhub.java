@@ -28,6 +28,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.spider.utils.FileUtils;
 import com.spider.utils.JsoupUtil;
 import com.spider.utils.download.MultithreadingDownload;
+import org.springframework.util.StringUtils;
 
 @Service
 public class Pornhub extends BaseWeb{
@@ -64,7 +65,8 @@ public class Pornhub extends BaseWeb{
         for (Entry<String, Object> entry : mediaDefinitions.entrySet()) {
             String videoUrl = mediaDefinitions.getJSONObject(entry.getKey()).getString("videoUrl");
             String quality = mediaDefinitions.getJSONObject(entry.getKey()).getString("quality");
-            if (videoUrl != null && videoUrl.length() > 0) {
+            String format = mediaDefinitions.getJSONObject(entry.getKey()).getString("format");
+            if (!StringUtils.isEmpty(videoUrl)&&"mp4".equals(format)) {
                 Map<String, String> video = new HashMap<String, String>();
                 String name = jsonObject.getString("video_title") + ".mp4";
                 video.put("name", name.replace("|", ""));

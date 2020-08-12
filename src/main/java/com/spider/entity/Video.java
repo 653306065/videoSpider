@@ -1,6 +1,7 @@
 package com.spider.entity;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -22,6 +23,16 @@ public class Video {
     private String md5;
 
     private Date createDate;
+
+    private List<String> tags;
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
 
     public Date getCreateDate() {
         return createDate;

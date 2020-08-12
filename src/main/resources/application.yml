@@ -61,10 +61,11 @@ javhihi:
    #home: https://www1.javbuz.com/
    #home: https://xart.letfap.com/
    movie: ${javhihi.home}movie?sort=published&page=@{page}&ajax=1
-   savePath: D:\javhihi\
+   savePath: C:\javhihi\
    #savePath: D:\javbuz\
    #savePath: D:\xart.letfap\
-   thread: 10   
+   thread: 20
+   enableProxy: true
 
 avMovie:
    home: http://av.movie/

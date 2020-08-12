@@ -35,6 +35,9 @@ public class Javhihi extends BaseWeb{
     @Value("${javhihi.thread}")
     private int thread;
 
+    @Value("${javhihi.enableProxy}")
+    private Boolean enableProxy;
+
     @Autowired
     private MultithreadingDownload MultithreadingDownload;
 
@@ -94,6 +97,6 @@ public class Javhihi extends BaseWeb{
 
     @Override
     public boolean enableProxy() {
-        return false;
+        return enableProxy;
     }
 }
