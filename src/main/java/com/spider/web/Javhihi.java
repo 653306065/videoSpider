@@ -57,6 +57,16 @@ public class Javhihi extends BaseWeb {
                 JSONObject movie = movies.getJSONObject(i);
                 String name = FileUtils.repairPath(movie.getString("name"));
                 String movieUrl = home + movie.getString("url");
+
+                if(Objects.nonNull(videoService.findByName(name+".mp4"))){
+                    logger.info(name + ",已存在");
+                    continue;
+                }
+
+                if(Objects.nonNull(videoService.findBySourceUrl(movieUrl))){
+                    logger.info(name + ",已存在");
+                    continue;
+                }
                 Document document = JsoupUtil.getDocumentByProxy(movieUrl);
                 Element element = document.getElementsByClass("dropdown-toggle").get(0);
                 String href = element.attr("href");
@@ -69,23 +79,11 @@ public class Javhihi extends BaseWeb {
                     Video video = new Video();
 
                     video.setSourceUrl(movieUrl);
-
                     //video.setPubDate(new Date(movie.getString("published")));
                     video.setCategories(movie.getJSONArray("categories").toJavaList(String.class));
                     video.setStarNames(movie.getJSONArray("pornstars").toJavaList(String.class));
                     video.setTags(movie.getJSONArray("tags").toJavaList(String.class));
                     video.setName(movie.getString("name")+".mp4");
-
-                    if(Objects.nonNull(videoService.findByName(video.getName()))){
-                        logger.info(video.getName() + "已存在");
-                        continue;
-                    }
-
-                    if(Objects.nonNull(video.getSourceUrl())&&Objects.nonNull(videoService.findBySourceUrl(video.getSourceUrl()))){
-                        logger.info(video.getName() + "已存在");
-                        continue;
-                    }
-
                     JSONArray jsonArray = apiJsonObject.getJSONArray("data");
                     JSONObject fileJson = jsonArray.getJSONObject(jsonArray.size() - 1);
                     String redirector = fileJson.getString("file");
