@@ -3,6 +3,7 @@ package com.spider.aop;
 import java.io.File;
 import java.util.Date;
 
+import com.alibaba.fastjson.JSON;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -76,6 +77,7 @@ public class DownloadAop {
                     videoService.insert(newvideo);
                     MultimediaInfo info = FFmpegUtil.getVideoInfo(videoFile);
                     if (info != null && info.getVideo() != null) {
+                        logger.info("videInfo:{},", JSON.toJSONString(info));
                         long duration = info.getDuration();
                         int height = info.getVideo().getSize().getHeight();
                         int width = info.getVideo().getSize().getWidth();

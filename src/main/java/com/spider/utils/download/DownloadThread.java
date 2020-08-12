@@ -1,5 +1,9 @@
 package com.spider.utils.download;
 
+import com.spider.utils.OKHttpUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
@@ -7,11 +11,6 @@ import java.net.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.spider.utils.OKHttpUtils;
 
 public class DownloadThread extends Thread {
 
@@ -61,23 +60,22 @@ public class DownloadThread extends Thread {
                 int i = in.read(bytes);
                 if (i == -1) {
                     break;
-                } else {
-                    downloadByte.addAndGet(i);
-                    pieceDownloadByte = pieceDownloadByte + i;
-                    raf.write(bytes, 0, i);
                 }
+                downloadByte.getAndAdd(i);
+                pieceDownloadByte = pieceDownloadByte + i;
+                raf.write(bytes, 0, i);
             }
             raf.close();
             in.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             errorTime++;
-            if (errorTime==5){
-                logger.info("{},错误次数过多({})停止运行",getName(),this.errorTime);
+            if (errorTime == 5) {
+                logger.info("{},错误次数过多({})停止运行", getName(), this.errorTime);
                 return;
             }
-            downloadByte.addAndGet(0 - pieceDownloadByte);
-            pieceDownloadByte=0;
+            downloadByte.getAndAdd(0 - pieceDownloadByte);
+            pieceDownloadByte = 0;
             run();
         }
 

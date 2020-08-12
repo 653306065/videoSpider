@@ -40,20 +40,24 @@ public class MultithreadingDownload {
                 return;
             } else {
                 logger.info(path + ",开始下载,url:" + HttpUrl);
-                logger.info(JSON.toJSONString(info) + ",大小" + (info.getContentLength() / 1024.0 / 1024.0) + "m");
-                long size = info.getContentLength() / threadNum;
+                String fileSizeStr=info.getContentLength() / 1024.0 / 1024.0+"m";
+                logger.info(JSON.toJSONString(info) + ",大小" + fileSizeStr);
                 RandomAccessFile raf = new RandomAccessFile(file, "rw");
                 raf.setLength(info.getContentLength());
                 ExecutorService executorService = Executors.newFixedThreadPool(threadNum);
                 long threadSize = info.getContentLength() / segmentSize;
-                for (int i = 0; i < threadSize; i++) {
+                int i=0;
+                while (true){
                     long startByte = i * segmentSize;
                     long endByte = (i + 1) * segmentSize - 1;
-                    if (endByte >= info.getContentLength()) {
-                        endByte = info.getContentLength();
+                    if(endByte >= info.getContentLength()){
+                        DownloadThread thread = new DownloadThread(HttpUrl, header, proxy, startByte, info.getContentLength(), file, downloadByte);
+                        executorService.execute(thread);
+                        break;
                     }
                     DownloadThread thread = new DownloadThread(HttpUrl, header, proxy, startByte, endByte, file, downloadByte);
                     executorService.execute(thread);
+                    i++;
                 }
                 executorService.shutdown();
                 ConsoleProgressBar cpb = new ConsoleProgressBar(100, '#');
@@ -61,9 +65,9 @@ public class MultithreadingDownload {
                     double percentage = (downloadByte.longValue() * 1.0) / (info.getContentLength() * 1.0) * 100.0;
                     cpb.show((int) Math.floor(percentage));
                     if (String.valueOf(percentage).length() > 5) {
-                        System.out.print("(" + String.valueOf(percentage).substring(0, 5) + "%)");
+                        System.out.print("(" + String.valueOf(percentage).substring(0, 5) + "%),"+fileSizeStr);
                     } else {
-                        System.out.print("(" + String.valueOf(percentage) + "%)");
+                        System.out.print("(" + String.valueOf(percentage) + "%),"+fileSizeStr);
                     }
                     Thread.sleep(10);
                     if (executorService.isTerminated()) {
@@ -71,7 +75,7 @@ public class MultithreadingDownload {
                     }
                 }
                 downloadByte.set(0);
-                logger.info("----" + path + ",下载完成----");
+                logger.info("//r----" + path + ",下载完成----");
                 long endTime = System.currentTimeMillis();
                 logger.info("耗时:" + (endTime - startTime) / 1000 / 60.0 + "分钟");
                 raf.close();
