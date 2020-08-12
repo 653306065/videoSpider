@@ -26,4 +26,14 @@ public class VideoService extends BaseService<Video>{
         Query query = new Query(Criteria.where("md5").is(md5));
         return mongoTemplate.findOne(query, Video.class);
     }
+
+    public Video findByVideoUrl(String videoUrl) {
+        Query query = new Query(Criteria.where("videoUrl").is(videoUrl));
+        return mongoTemplate.findOne(query, Video.class);
+    }
+
+    public Video findBySourceUrl(String sourceUrl) {
+        Query query = new Query(Criteria.where("sourceUrl").is(sourceUrl));
+        return mongoTemplate.findOne(query, Video.class);
+    }
 }

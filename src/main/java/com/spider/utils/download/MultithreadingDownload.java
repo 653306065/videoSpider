@@ -1,6 +1,7 @@
 package com.spider.utils.download;
 
 import com.alibaba.fastjson.JSON;
+import com.spider.entity.Video;
 import com.spider.utils.ConsoleProgressBar;
 import com.spider.utils.OKHttpUtils;
 import okhttp3.Response;
@@ -27,29 +28,29 @@ public class MultithreadingDownload {
 
     private final Logger logger = LoggerFactory.getLogger(MultithreadingDownload.class);
 
-    public void fileDownload(String HttpUrl, String path, Map<String, String> header, Proxy proxy, int threadNum, long segmentSize) {
+    public Boolean fileDownload(String HttpUrl, String path, Map<String, String> header, Proxy proxy, int threadNum, long segmentSize) {
         try {
             long startTime = System.currentTimeMillis();
             File file = createFile(path);
-            if(Objects.isNull(file)){
-                return;
+            if (Objects.isNull(file)) {
+                return false;
             }
             DownloadFileInfo info = getDownloadFileInfo(HttpUrl, header, proxy);
             if (Objects.isNull(info) || !String.valueOf(info.getResponseCode()).startsWith("20")) {
                 logger.info("----获取下载信息错误：responseCode=" + info.getResponseCode() + "----");
-                return;
+                return false;
             } else {
                 logger.info(path + ",开始下载,url:" + HttpUrl);
-                String fileSizeStr=info.getContentLength() / 1024.0 / 1024.0+"m";
+                String fileSizeStr = info.getContentLength() / 1024.0 / 1024.0 + "m";
                 logger.info(JSON.toJSONString(info) + ",大小" + fileSizeStr);
                 RandomAccessFile raf = new RandomAccessFile(file, "rw");
                 raf.setLength(info.getContentLength());
                 ExecutorService executorService = Executors.newFixedThreadPool(threadNum);
-                int i=0;
-                while (true){
+                int i = 0;
+                while (true) {
                     long startByte = i * segmentSize;
                     long endByte = (i + 1) * segmentSize - 1;
-                    if(endByte >= info.getContentLength()){
+                    if (endByte >= info.getContentLength()) {
                         DownloadThread thread = new DownloadThread(HttpUrl, header, proxy, startByte, info.getContentLength(), file, downloadByte);
                         executorService.execute(thread);
                         break;
@@ -64,9 +65,9 @@ public class MultithreadingDownload {
                     double percentage = (downloadByte.longValue() * 1.0) / (info.getContentLength() * 1.0) * 100.0;
                     cpb.show((int) Math.floor(percentage));
                     if (String.valueOf(percentage).length() > 5) {
-                        System.out.print("(" + String.valueOf(percentage).substring(0, 5) + "%),"+fileSizeStr);
+                        System.out.print("(" + String.valueOf(percentage).substring(0, 5) + "%)," + fileSizeStr);
                     } else {
-                        System.out.print("(" + String.valueOf(percentage) + "%),"+fileSizeStr);
+                        System.out.print("(" + String.valueOf(percentage) + "%)," + fileSizeStr);
                     }
                     Thread.sleep(10);
                     if (executorService.isTerminated()) {
@@ -74,19 +75,25 @@ public class MultithreadingDownload {
                     }
                 }
                 downloadByte.set(0);
-                logger.info("//r----" + path + ",下载完成----");
+                System.out.println("");
+                logger.info("----" + path + ",下载完成----");
                 long endTime = System.currentTimeMillis();
                 logger.info("耗时:" + (endTime - startTime) / 1000 / 60.0 + "分钟");
                 raf.close();
+                return true;
             }
         } catch (Exception e) {
             downloadByte.set(0);
             logger.info("----下载异常----");
             new File(path).delete();
             e.printStackTrace();
+            return false;
         }
     }
 
+    public Boolean videoDownload(Video video, Map<String, String> header, Proxy proxy, int threadNum, long segmentSize) {
+        return fileDownload(video.getVideoUrl(), video.getSavePath(), header, proxy, threadNum, segmentSize);
+    }
 
     private File createFile(String path) {
         File file = new File(path);

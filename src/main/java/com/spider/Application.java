@@ -5,10 +5,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
 import com.spider.entity.Video;
 import com.spider.service.VideoService;
-import com.sun.org.apache.xpath.internal.objects.XObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;

@@ -1,12 +1,10 @@
 package com.spider.web;
 
-import java.net.Proxy;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
+import com.spider.entity.Video;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -62,6 +60,9 @@ public class Javhihi extends BaseWeb{
                 String apiJson = OKHttpUtils.post(api, proxy);
                 JSONObject apiJsonObject = JSON.parseObject(apiJson);
                 if (apiJsonObject.getBoolean("success")) {
+                    Video video= new Video();
+                    video.setName(movie.getString("name"));
+
                     JSONArray jsonArray = apiJsonObject.getJSONArray("data");
                     JSONObject fileJson = jsonArray.getJSONObject(jsonArray.size() - 1);
                     String redirector = fileJson.getString("file");
@@ -78,7 +79,14 @@ public class Javhihi extends BaseWeb{
                     // header.put("Host", realUrl);
                     header.put("Accept-Encoding", "gzip, deflate");
                     header.put("Connection", "keep-alive");
-                    MultithreadingDownload.fileDownload(realUrl, path, header, proxy, thread,defaultSegmentSize);
+                    video.setVideoUrl(realUrl);
+                    video.setSourceUrl(movieUrl);
+                    video.setSavePath(path);
+                    //video.setPubDate(new Date(movie.getString("published")));
+                    video.setCategories(movie.getJSONArray("categories").toJavaList(String.class));
+                    video.setStarNames(movie.getJSONArray("pornstars").toJavaList(String.class));
+                    video.setTags(movie.getJSONArray("tags").toJavaList(String.class));
+                    MultithreadingDownload.videoDownload(video, header, proxy, thread,defaultSegmentSize);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

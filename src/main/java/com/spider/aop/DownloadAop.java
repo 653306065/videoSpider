@@ -2,12 +2,16 @@ package com.spider.aop;
 
 import java.io.File;
 import java.util.Date;
+import java.util.Map;
+import java.util.Objects;
 
 import com.alibaba.fastjson.JSON;
+import org.apache.http.protocol.HTTP;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,81 +42,58 @@ public class DownloadAop {
     @Autowired
     private UrlRecordService urlRecordService;
 
-    @Pointcut("execution(* com.spider.utils.download.MultithreadingDownload.fileDownload(..))")
-    public void multithreadingDownload_fileDownload() {
+    @Pointcut("execution(* com.spider.utils.download.MultithreadingDownload.videoDownload(..))")
+    public void multithreadingDownload_videoDownload() {
 
     }
 
-    @Around(value = "multithreadingDownload_fileDownload()")
-    public void aroundMultithreadingDownload(ProceedingJoinPoint joinPoint) {
+    @Around(value="multithreadingDownload_videoDownload()")
+    public void aroundVideoDownload(ProceedingJoinPoint joinPoint){
         Object[] args = joinPoint.getArgs();
-        String httpUrl = String.valueOf(args[0]);
-        String path = String.valueOf(args[1]);
-        File file = new File(path);
-        if (urlRecordService.existUrl(httpUrl)) {
-            logger.info(httpUrl + ",已存在");
+        Video video= (Video) args[0];
+
+        if(Objects.nonNull(videoService.findByName(video.getName()))){
+            logger.info(video.getName() + "已存在");
             return;
         }
-        Video video = videoService.findByName(file.getName());
-        if (video != null) {
-            logger.info(file.getName() + "已存在");
+        if(Objects.nonNull(video.getMd5())&&Objects.nonNull(videoService.findByMd5(video.getMd5()))){
+            logger.info(video.getName() + "已存在");
             return;
-        } else {
-            try {
-                logger.info("{},文件名验证通过", file.getName());
-                joinPoint.proceed();
-                urlRecordService.insert(httpUrl);
-                File videoFile = new File(path);
-                Video newvideo = new Video();
-                String md5 = FileUtils.getMD5(videoFile);
-                if (videoService.findByMd5(md5) == null) {
-                    logger.info("{},md5验证通过", file.getName());
-                    newvideo.setMd5(md5);
-                    newvideo.setName(videoFile.getName());
-                    newvideo.setSavePath(videoFile.getAbsolutePath());
-                    newvideo.setSize(videoFile.length());
-                    newvideo.setSizeStr(videoFile.length() / 1024.0 / 1024 + "MB");
-                    newvideo.setSource(httpUrl);
-                    newvideo.setCreateDate(new Date());
-                    videoService.insert(newvideo);
-                    MultimediaInfo info = FFmpegUtil.getVideoInfo(videoFile);
-                    if (info != null && info.getVideo() != null) {
-                        logger.info("videInfo:{},", JSON.toJSONString(info));
-                        long duration = info.getDuration();
-                        int height = info.getVideo().getSize().getHeight();
-                        int width = info.getVideo().getSize().getWidth();
-                        if (height * width < 1280 * 720) {
-                            boolean b = videoFile.delete();
-                            if (b) {
-                                logger.info("{}分辨率太低,删除成功", file.getName());
-                            } else {
-                                logger.info("{}分辨率太低,删除失败", file.getName());
-                            }
-                        }
-                    } else if (info == null || info.getVideo() == null || info.getAudio() == null) {
-                        logger.info("文件不是视频，或者没有音频", file.getName());
-                        boolean b = videoFile.delete();
-                        if (b) {
-                            logger.info("{},删除成功", file.getName());
-                        } else {
-                            logger.info("{},删除失败", file.getName());
-                        }
-                    }
-                    logger.info("{},文件信息存储完成", newvideo.getName());
-                } else {
-                    logger.info("{},md5验证失败", file.getName());
-                    if (videoFile.exists()) {
-                        boolean b = videoFile.delete();
-                        if (b) {
-                            logger.info("{},删除成功", file.getName());
-                        } else {
-                            logger.info("{},删除失败", file.getName());
-                        }
-                    }
-                }
-            } catch (Throwable e) {
-                e.printStackTrace();
+        }
+
+        if(Objects.nonNull(video.getVideoUrl())&&Objects.nonNull(videoService.findByVideoUrl(video.getVideoUrl()))){
+            logger.info(video.getName() + "已存在");
+            return;
+        }
+
+        if(Objects.nonNull(video.getSourceUrl())&&Objects.nonNull(videoService.findBySourceUrl(video.getSourceUrl()))){
+            logger.info(video.getName() + "已存在");
+            return;
+        }
+
+        try {
+            logger.info("{},文件名验证通过", video.getName());
+            File videoFile=new File(video.getSavePath());
+            Boolean result = (Boolean) joinPoint.proceed();
+            if(!result){
+                return;
             }
+            String md5 = FileUtils.getMD5(videoFile);
+            if(Objects.isNull(videoService.findByMd5(md5))){
+                video.setMd5(md5);
+                MultimediaInfo info = FFmpegUtil.getVideoInfo(videoFile);
+                logger.info("videoInfo:{}",JSON.toJSONString(info));
+                video.setSize(videoFile.length());
+                video.setSizeStr(videoFile.length() / 1024.0 / 1024 + "MB");
+                video.setMultimediaInfo(info);
+                video.setCreateDate(new Date());
+                videoService.insert(video);
+                logger.info("{},文件信息保存完成",video.getName());
+            }else{
+                new File(video.getSavePath()).delete();
+            }
+        }catch (Throwable e){
+            e.printStackTrace();
         }
     }
 
