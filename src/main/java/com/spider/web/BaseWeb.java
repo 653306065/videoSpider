@@ -25,4 +25,6 @@ public abstract class BaseWeb {
     }
 
     public abstract boolean enableProxy();
+
+    protected final long  defaultSegmentSize=1024*1024*5;
 }

@@ -28,7 +28,7 @@ import com.spider.utils.download.MultithreadingDownload;
 import okhttp3.Response;
 
 @Service
-public class Javfinder {
+public class Javfinder extends BaseWeb{
 
     private Logger logger = LoggerFactory.getLogger(Javfinder.class);
 
@@ -37,9 +37,6 @@ public class Javfinder {
 
     @Value("${javfinder.category.Uncensored}")
     private String Uncensored;
-
-    @Autowired
-    private Proxy proxy;
 
     @Value("${javfinder.savePath}")
     private String savePath;
@@ -139,7 +136,7 @@ public class Javfinder {
                 String date = simpleDateFormat.format(new Date());
                 String name = map.get("name").replace(":", "");
                 String realPath = savePath + "\\" + path + "\\" + date + "\\" + name + ".mp4";
-                multithreadingDownload.fileDownload(fileUrl, realPath, null, proxy, thread);
+                multithreadingDownload.fileDownload(fileUrl, realPath, null, proxy, thread,defaultSegmentSize);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -166,7 +163,7 @@ public class Javfinder {
                     logger.info("fileUrl:" + fileUrl);
                     String date = simpleDateFormat.format(new Date());
                     String path = savePath + "\\hot\\" + category + "\\" + date + "\\" + map.get("name") + ".mp4";
-                    multithreadingDownload.fileDownload(fileUrl, path, null, proxy, thread);
+                    multithreadingDownload.fileDownload(fileUrl, path, null, proxy, thread,defaultSegmentSize);
                     urlRecordService.insert(str);
                 }
             } catch (Exception e) {
@@ -204,7 +201,7 @@ public class Javfinder {
                     logger.info("fileUrl:" + fileUrl);
                     String date = simpleDateFormat.format(new Date());
                     String path = savePath + "\\" + category + "\\" + date + "\\" + map.get("name") + ".mp4";
-                    multithreadingDownload.fileDownload(fileUrl, path, null, proxy, thread);
+                    multithreadingDownload.fileDownload(fileUrl, path, null, proxy, thread,defaultSegmentSize);
                     urlRecordService.insert(str);
                 }
             } catch (Exception e) {
@@ -212,5 +209,10 @@ public class Javfinder {
             }
             page++;
         }
+    }
+
+    @Override
+    public boolean enableProxy() {
+        return false;
     }
 }

@@ -1,22 +1,23 @@
 package com.spider.utils.download;
 
+import com.alibaba.fastjson.JSON;
+import com.spider.utils.ConsoleProgressBar;
+import com.spider.utils.OKHttpUtils;
+import okhttp3.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.net.Proxy;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-import com.alibaba.fastjson.JSON;
-import com.spider.utils.ConsoleProgressBar;
-import com.spider.utils.OKHttpUtils;
-import okhttp3.Response;
 
 @Component
 @Scope("prototype")
@@ -24,24 +25,17 @@ public class MultithreadingDownload {
 
     public AtomicLong downloadByte = new AtomicLong(0);
 
-    private Logger logger = LoggerFactory.getLogger(MultithreadingDownload.class);
+    private final Logger logger = LoggerFactory.getLogger(MultithreadingDownload.class);
 
-    private volatile Map<String, Boolean> isStop = new HashMap<String, Boolean>() {{
-        put("isStop", false);
-    }};
-
-    public void fileDownload(String HttpUrl, String path, Map<String, String> header, Proxy proxy, int threadNum) {
+    public void fileDownload(String HttpUrl, String path, Map<String, String> header, Proxy proxy, int threadNum, long segmentSize) {
         try {
             long startTime = System.currentTimeMillis();
-            File file = new File(path);
-            if (file.exists()) {
-                logger.info(path + ",已存在");
+            File file = createFile(path);
+            if(Objects.isNull(file)){
                 return;
-            } else {
-                file.getParentFile().mkdirs();
             }
             DownloadFileInfo info = getDownloadFileInfo(HttpUrl, header, proxy);
-            if (!String.valueOf(info.getResponseCode()).startsWith("20")) {
+            if (Objects.isNull(info) || !String.valueOf(info.getResponseCode()).startsWith("20")) {
                 logger.info("----获取下载信息错误：responseCode=" + info.getResponseCode() + "----");
                 return;
             } else {
@@ -51,15 +45,14 @@ public class MultithreadingDownload {
                 RandomAccessFile raf = new RandomAccessFile(file, "rw");
                 raf.setLength(info.getContentLength());
                 ExecutorService executorService = Executors.newFixedThreadPool(threadNum);
-                for (int i = 0; i < threadNum; i++) {
-                    long startByte = i * size;
-                    long endByte = (i + 1) * size - 1;
-                    if (i == threadNum) {
+                long threadSize = info.getContentLength() / segmentSize;
+                for (int i = 0; i < threadSize; i++) {
+                    long startByte = i * segmentSize;
+                    long endByte = (i + 1) * segmentSize - 1;
+                    if (endByte >= info.getContentLength()) {
                         endByte = info.getContentLength();
                     }
-                    DownloadThread thread = new DownloadThread(HttpUrl, header, proxy, startByte, endByte, file,
-                            downloadByte, isStop);
-                    thread.setName("下载线程" + i);
+                    DownloadThread thread = new DownloadThread(HttpUrl, header, proxy, startByte, endByte, file, downloadByte);
                     executorService.execute(thread);
                 }
                 executorService.shutdown();
@@ -72,19 +65,16 @@ public class MultithreadingDownload {
                     } else {
                         System.out.print("(" + String.valueOf(percentage) + "%)");
                     }
-                    Thread.sleep(20);
+                    Thread.sleep(10);
                     if (executorService.isTerminated()) {
                         break;
                     }
                 }
                 downloadByte.set(0);
-                if (!isStop.get("isStop")) {
-                    logger.info("----" + path + ",下载完成----");
-                    long endTime = System.currentTimeMillis();
-                    logger.info("耗时:" + (endTime - startTime) / 1000 / 60.0 + "分钟");
-                }
+                logger.info("----" + path + ",下载完成----");
+                long endTime = System.currentTimeMillis();
+                logger.info("耗时:" + (endTime - startTime) / 1000 / 60.0 + "分钟");
                 raf.close();
-                isStop.put("isStop", false);
             }
         } catch (Exception e) {
             downloadByte.set(0);
@@ -92,20 +82,32 @@ public class MultithreadingDownload {
             new File(path).delete();
             e.printStackTrace();
         }
-
     }
+
+
+    private File createFile(String path) {
+        File file = new File(path);
+        if (file.exists()) {
+            logger.info(path + ",已存在");
+            return null;
+        }
+        file.getParentFile().mkdirs();
+        return file;
+    }
+
 
     private DownloadFileInfo getDownloadFileInfo(String HttpUrl, Map<String, String> header, Proxy proxy) {
         try {
             Response response = OKHttpUtils.getResponse(HttpUrl, header, proxy);
             DownloadFileInfo fileInfo = new DownloadFileInfo();
-            if (response.header("Content-Length") != null) {
+            if (Objects.nonNull(response.header("Content-Length"))) {
                 fileInfo.setContentLength(Long.valueOf(response.header("Content-Length")));
             }
             fileInfo.setContentType(response.header("Content-Type"));
             fileInfo.setResponseCode(response.code());
             fileInfo.setEtag(response.header("etag"));
             response.body().close();
+            response.close();
             return fileInfo;
         } catch (Exception e) {
             e.printStackTrace();

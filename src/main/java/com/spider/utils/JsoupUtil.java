@@ -18,6 +18,12 @@ public class JsoupUtil {
         return document;
     }
 
+    public static Document getDocument(String url,Proxy proxy) {
+        String html = OKHttpUtils.get(url, proxy);
+        Document document = Jsoup.parse(html);
+        return document;
+    }
+
     public static Document getDocumentByProxy(String url) {
         String html = OKHttpUtils.get(url, proxy);
         Document document = Jsoup.parse(html);

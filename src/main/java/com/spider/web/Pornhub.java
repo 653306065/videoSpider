@@ -30,7 +30,7 @@ import com.spider.utils.JsoupUtil;
 import com.spider.utils.download.MultithreadingDownload;
 
 @Service
-public class Pornhub {
+public class Pornhub extends BaseWeb{
 
     @Value("${pornhub.savePath}")
     private String savePath;
@@ -41,20 +41,20 @@ public class Pornhub {
     @Value("${pornhub.searchUrl}")
     private String searchUrl;
 
-    @Autowired
-    Proxy proxy;
-
     @Value("${pornhub.thread}")
     private int thread;
 
     @Value("${pornhub.channels}")
     private String channelsTemplate;
 
+    @Value("${pornhub.enableProxy}")
+    private Boolean enableProxy;
+
     @Autowired
     private MultithreadingDownload multithreadingDownload;
 
     public Map<String, String> getVideoByUrl(String url) {
-        Document document = JsoupUtil.getDocumentByProxy(url);
+        Document document = JsoupUtil.getDocument(url,proxy);
         Element element = document.getElementById("player");
         String videoId = element.attr("data-video-id");
         String js = element.getElementsByTag("script").get(0).html().split("loadScriptUniqueId")[0];
@@ -78,7 +78,7 @@ public class Pornhub {
 
     public List<String> getVideoList(String url) {
         List<String> list = new ArrayList<String>();
-        Document document = JsoupUtil.getDocumentByProxy(url);
+        Document document = JsoupUtil.getDocument(url,proxy);
         if (document.getElementById("videoSearchResult") != null) {
             Elements elements = document.getElementById("videoSearchResult").getElementsByClass("title");
             for (Element element : elements) {
@@ -101,7 +101,7 @@ public class Pornhub {
 
     public List<String> getChannelsVideoList(String url) {
         List<String> list = new ArrayList<String>();
-        Document document = JsoupUtil.getDocumentByProxy(url);
+        Document document = JsoupUtil.getDocument(url,proxy);
         Element element = document.getElementById("showAllChanelVideos");
         Elements elements = element.getElementsByClass("videoPreviewBg");
         for (Element e : elements) {
@@ -112,7 +112,7 @@ public class Pornhub {
     }
 
     public void downloadChannels(String channels) {
-        int page = 20;
+        int page = 1;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         while (true) {
             String url = channelsTemplate.replace("@{channelName}", channels).replace("@{page}", String.valueOf(page));
@@ -129,7 +129,7 @@ public class Pornhub {
                     if (Integer.valueOf(quality) < 720) {
                         return;
                     }
-                    multithreadingDownload.fileDownload(httpUrl, path, null, proxy, thread);
+                    multithreadingDownload.fileDownload(httpUrl, path, null, proxy, thread,defaultSegmentSize);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -160,7 +160,7 @@ public class Pornhub {
                         if (Integer.valueOf(quality) < 720) {
                             continue;
                         }
-                        multithreadingDownload.fileDownload(httpUrl, path, null, proxy, thread);
+                        multithreadingDownload.fileDownload(httpUrl, path, null, proxy, thread,defaultSegmentSize);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -209,7 +209,7 @@ public class Pornhub {
                     if (Integer.valueOf(quality) < 720) {
                         continue;
                     }
-                    multithreadingDownload.fileDownload(httpUrl, path, null, proxy, thread);
+                    multithreadingDownload.fileDownload(httpUrl, path, null, proxy, thread,defaultSegmentSize);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -233,5 +233,10 @@ public class Pornhub {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    public boolean enableProxy() {
+        return enableProxy;
     }
 }

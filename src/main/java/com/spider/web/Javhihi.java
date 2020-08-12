@@ -21,7 +21,7 @@ import com.spider.utils.OKHttpUtils;
 import com.spider.utils.download.MultithreadingDownload;
 
 @Component
-public class Javhihi {
+public class Javhihi extends BaseWeb{
 
     @Value("${javhihi.home}")
     private String home;
@@ -34,9 +34,6 @@ public class Javhihi {
 
     @Value("${javhihi.thread}")
     private int thread;
-
-    @Autowired
-    private Proxy proxy;
 
     @Autowired
     private MultithreadingDownload MultithreadingDownload;
@@ -78,7 +75,7 @@ public class Javhihi {
                     // header.put("Host", realUrl);
                     header.put("Accept-Encoding", "gzip, deflate");
                     header.put("Connection", "keep-alive");
-                    MultithreadingDownload.fileDownload(realUrl, path, header, proxy, thread);
+                    MultithreadingDownload.fileDownload(realUrl, path, header, proxy, thread,defaultSegmentSize);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -95,4 +92,8 @@ public class Javhihi {
         }
     }
 
+    @Override
+    public boolean enableProxy() {
+        return false;
+    }
 }

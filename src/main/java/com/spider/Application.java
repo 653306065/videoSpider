@@ -4,6 +4,11 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+import com.spider.entity.Video;
+import com.spider.service.VideoService;
+import com.sun.org.apache.xpath.internal.objects.XObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -22,6 +27,8 @@ import com.spider.web.Javhihi;
 import com.spider.web.Pornhub;
 import com.spider.web.Wallhaven;
 import com.spider.web.YoutubeSpider;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import ws.schild.jave.MultimediaInfo;
 import ws.schild.jave.VideoInfo;
 
@@ -32,10 +39,7 @@ public class Application {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(Application.class);
-        By114 By114 = context.getBean(By114.class);
-        Eporner Eporner= context.getBean(Eporner.class);
-        Eporner.download4K();
-
-        //By114.downloadBt();
+        Pornhub Pornhub=context.getBean(Pornhub.class);
+        Pornhub.downloadChannels("javhd");
     }
 }

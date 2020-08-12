@@ -15,6 +15,7 @@ javfinder:
    categoryTemplate: https://javfinder.la/category/@{category}/page-@{page}.html 
    thread: 100
    ignoreCode: FC2,XXX-AV,Heydouga,Tokyo Hot,Pacopacomama,H0930,C0930,H4610,10Musume
+   enableProxy: true
    
 pixiv:
    home: https://www.pixiv.net
@@ -82,13 +83,15 @@ pornhub:
    categories: 
       - hentai
    categoriesUrl: https://www.pornhub.com/categories/@{categories}
-   thread: 15   
+   thread: 15
+   enableProxy: true
 
 youtube:
    home: https://www.findyoutube.net/
    api: https://www.findyoutube.net/result
    savePath: F:\youtube\
    thread: 5
+   enableProxy: true
    googleApi:
       #key: AIzaSyA7H9oVSXwPbOyIaC2kKV1UTtoOyjRjgmw
       key: AIzaSyBSLTrFguRE5p75BJ6OzhwXuiPHTTO8Ryc

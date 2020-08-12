@@ -33,10 +33,9 @@ public class DownloadThread extends Thread {
 
     private AtomicLong downloadByte;
 
-    private volatile Map<String, Boolean> isStop;
+    private Integer errorTime;
 
-    public DownloadThread(String httpUrl, Map<String, String> header, Proxy proxy, long startByte, long endByte,
-                          File file, AtomicLong downloadByte, Map<String, Boolean> isStop) {
+    public DownloadThread(String httpUrl, Map<String, String> header, Proxy proxy, long startByte, long endByte, File file, AtomicLong downloadByte) {
         this.httpUrl = httpUrl;
         this.header = header;
         this.proxy = proxy;
@@ -44,7 +43,6 @@ public class DownloadThread extends Thread {
         this.endByte = endByte;
         this.file = file;
         this.downloadByte = downloadByte;
-        this.isStop = isStop;
     }
 
     @Override
@@ -61,34 +59,26 @@ public class DownloadThread extends Thread {
             raf.seek(startByte);
             while (true) {
                 int i = in.read(bytes);
-                downloadByte.addAndGet(i);
-                pieceDownloadByte = pieceDownloadByte + i;
-                if (isStop.get("isStop")) {
-                    logger.info("网络连接出错，线程停止运行");
-                    break;
-                }
                 if (i == -1) {
                     break;
                 } else {
+                    downloadByte.addAndGet(i);
+                    pieceDownloadByte = pieceDownloadByte + i;
                     raf.write(bytes, 0, i);
                 }
             }
             raf.close();
             in.close();
-            // logger.info(Thread.currentThread().getName() + ",下载完成");
         } catch (Exception e) {
             e.printStackTrace();
-            if (e.getLocalizedMessage().endsWith("\\n not found: limit=0 content=…")
-                    || e.getLocalizedMessage().endsWith("unexpected end of stream")
-                    || e.getLocalizedMessage().endsWith("stream was reset: INTERNAL_ERROR")
-                    || e.getLocalizedMessage().endsWith("stream was reset: PROTOCOL_ERROR")) {
-                isStop.put("isStop", true);
+            errorTime++;
+            if (errorTime==5){
+                logger.info("{},错误次数过多({})停止运行",getName(),this.errorTime);
                 return;
             }
-            // logger.info(Thread.currentThread().getName() + ",下载异常");
             downloadByte.addAndGet(0 - pieceDownloadByte);
-            new DownloadThread(this.httpUrl, this.header, this.proxy, this.startByte, this.endByte, this.file,
-                    downloadByte, isStop).run();
+            pieceDownloadByte=0;
+            run();
         }
 
     }

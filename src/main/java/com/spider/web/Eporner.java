@@ -123,7 +123,7 @@ public class Eporner extends BaseWeb{
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String date = simpleDateFormat.format(new Date());
         String path = savePath + category + "\\" + date + "\\" + name + ".mp4";
-        multithreadingDownload.fileDownload(videoUrl, path, null, proxy, thread);
+        multithreadingDownload.fileDownload(videoUrl, path, null, proxy, thread,defaultSegmentSize);
     }
 
     public void download4K() {
