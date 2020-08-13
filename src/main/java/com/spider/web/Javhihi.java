@@ -88,12 +88,15 @@ public class Javhihi extends BaseWeb {
                     JSONObject fileJson = jsonArray.getJSONObject(jsonArray.size() - 1);
                     String redirector = fileJson.getString("file");
                     String realUrl = OKHttpUtils.getRedirectUrl(redirector, proxy);
+                    if(Objects.isNull(realUrl)){
+                        logger.info("获取视频地址失败");
+                        continue;
+                    }
                     String data = simpleDateFormat.format(new Date());
                     String path = savePath + data + "\\" + name + ".mp4";
                     System.out.println(realUrl);
                     Map<String, String> header = new HashMap<>();
-                    header.put("user-agent",
-                            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.106 Safari/537.36 Edg/80.0.361.54");
+                    header.put("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.106 Safari/537.36 Edg/80.0.361.54");
                     header.put("referer", realUrl);
                     header.put("Accept", "*/*");
                     header.put("Cache-Control", "no-cache");

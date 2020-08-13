@@ -37,7 +37,7 @@ public class MultithreadingDownload {
             }
             DownloadFileInfo info = getDownloadFileInfo(HttpUrl, header, proxy);
             if (Objects.isNull(info) || !String.valueOf(info.getResponseCode()).startsWith("20")) {
-                logger.info("----获取下载信息错误：responseCode=" + info.getResponseCode() + "----");
+                logger.info("----获取下载信息错误----");
                 return false;
             } else {
                 logger.info(path + ",开始下载,url:" + HttpUrl);
