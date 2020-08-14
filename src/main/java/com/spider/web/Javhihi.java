@@ -67,7 +67,7 @@ public class Javhihi extends BaseWeb {
                     logger.info(name + ",已存在");
                     continue;
                 }
-                Document document = JsoupUtil.getDocumentByProxy(movieUrl);
+                Document document = JsoupUtil.getDocument(movieUrl,proxy);
                 Element element = document.getElementsByClass("dropdown-toggle").get(0);
                 String href = element.attr("href");
                 String[] strArr = href.split("/");
