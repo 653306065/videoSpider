@@ -13,11 +13,10 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.net.Proxy;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Component
@@ -47,16 +46,19 @@ public class MultithreadingDownload {
                 raf.setLength(info.getContentLength());
                 ExecutorService executorService = Executors.newFixedThreadPool(threadNum);
                 int i = 0;
+                List<Future<Boolean>> downloadResult=new ArrayList<Future<Boolean>>();
                 while (true) {
                     long startByte = i * segmentSize;
                     long endByte = (i + 1) * segmentSize - 1;
                     if (endByte >= info.getContentLength()) {
-                        DownloadThread thread = new DownloadThread(HttpUrl, header, proxy, startByte, info.getContentLength(), file, downloadByte);
-                        executorService.execute(thread);
+                        CallableDownloadThread callableDownloadThread=new CallableDownloadThread(HttpUrl, header, proxy, startByte, endByte, file, downloadByte);
+                        Future<Boolean> future=executorService.submit(callableDownloadThread);
+                        downloadResult.add(future);
                         break;
                     }
-                    DownloadThread thread = new DownloadThread(HttpUrl, header, proxy, startByte, endByte, file, downloadByte);
-                    executorService.execute(thread);
+                    CallableDownloadThread callableDownloadThread=new CallableDownloadThread(HttpUrl, header, proxy, startByte, endByte, file, downloadByte);
+                    Future<Boolean> future= executorService.submit(callableDownloadThread);
+                    downloadResult.add(future);
                     i++;
                 }
                 executorService.shutdown();
@@ -74,13 +76,26 @@ public class MultithreadingDownload {
                         break;
                     }
                 }
+                boolean result=true;
+                for(Future<Boolean> future:downloadResult){
+                    if(!future.get()){
+                        result=false;
+                    }
+                }
                 downloadByte.set(0);
                 System.out.println("");
                 logger.info("----" + path + ",下载完成----");
                 long endTime = System.currentTimeMillis();
                 logger.info("耗时:" + (endTime - startTime) / 1000 / 60.0 + "分钟");
                 raf.close();
-                return true;
+                if(!result){
+                    logger.info("{},下载失败",file.getName());
+                    while (!file.delete()){
+                        logger.info("{},删除失败",file.getName());
+                    }
+                    logger.info("{},删除成功",file.getName());
+                }
+                return result;
             }
         } catch (Exception e) {
             downloadByte.set(0);
