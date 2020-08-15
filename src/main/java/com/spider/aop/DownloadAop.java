@@ -91,6 +91,7 @@ public class DownloadAop {
                 videoService.insert(video);
                 logger.info("{},文件信息保存完成",video.getName());
             }else{
+                logger.info("{},文件MD5验证失败",video.getName());
                 new File(video.getSavePath()).delete();
             }
         }catch (Throwable e){

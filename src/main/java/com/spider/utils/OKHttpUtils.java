@@ -23,6 +23,7 @@ public class OKHttpUtils {
             if (response.isSuccessful()) {
                 String html = response.body().string();
                 response.body().close();
+                response.close();
                 return html;
             }
             return null;
@@ -45,6 +46,7 @@ public class OKHttpUtils {
             if (response.isSuccessful()) {
                 String html = response.body().string();
                 response.body().close();
+                response.close();
                 return html;
             }
             return null;
@@ -63,6 +65,7 @@ public class OKHttpUtils {
             if (response.isSuccessful()) {
                 String redirectUrl = response.request().url().toString();
                 response.body().close();
+                response.close();
                 return redirectUrl;
             }
             return null;

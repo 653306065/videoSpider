@@ -61,7 +61,7 @@ javhihi:
    #home: https://www1.javbuz.com/
    #home: https://xart.letfap.com/
    movie: ${javhihi.home}movie?sort=published&page=@{page}&ajax=1
-   savePath: C:\javhihi\
+   savePath: D:\javhihi\
    #savePath: D:\javbuz\
    #savePath: D:\xart.letfap\
    thread: 20
@@ -84,7 +84,7 @@ pornhub:
    categories: 
       - hentai
    categoriesUrl: https://www.pornhub.com/categories/@{categories}
-   thread: 20
+   thread: 15
    enableProxy: true
 
 youtube:

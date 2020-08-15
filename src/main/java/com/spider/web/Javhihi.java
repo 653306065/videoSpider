@@ -83,7 +83,7 @@ public class Javhihi extends BaseWeb {
                     video.setCategories(movie.getJSONArray("categories").toJavaList(String.class));
                     video.setStarNames(movie.getJSONArray("pornstars").toJavaList(String.class));
                     video.setTags(movie.getJSONArray("tags").toJavaList(String.class));
-                    video.setName(movie.getString("name")+".mp4");
+                    video.setName(name+".mp4");
                     JSONArray jsonArray = apiJsonObject.getJSONArray("data");
                     JSONObject fileJson = jsonArray.getJSONObject(jsonArray.size() - 1);
                     String redirector = fileJson.getString("file");
