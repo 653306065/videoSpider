@@ -5,6 +5,7 @@ import com.spider.utils.FileUtils;
 import com.spider.utils.JsoupUtil;
 import com.spider.utils.OKHttpUtils;
 import com.spider.utils.download.MultithreadingDownload;
+import okhttp3.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -59,68 +60,102 @@ public class Javbangers extends BaseWeb {
     }
 
     public Video getVideoInfo(Video video) {
-        if (Objects.isNull(video.getSourceUrl())) {
-            return null;
-        }
-        Map<String, String> header = new HashMap<String, String>();
-        header.put("cookie", cookie);
-        String html = OKHttpUtils.get(video.getSourceUrl(), header, proxy);
-        Document document = Jsoup.parse(html);
-        Element element = document.getElementById("tab_video_info");
-        Element info = element.getElementsByClass("info").get(0);
-        Elements videodescs = info.getElementsByClass("videodesc");
-        if (Objects.nonNull(video) && Objects.nonNull(videodescs.get(0))) {
-            String videodescText = videodescs.get(0).text();
-            video.setIntroduction(videodescText);
-        }
-        Elements videoFileElements = info.getElementsByClass("btn-success");
-        String htmlStr = videoFileElements.toString();
-        String maxFile = "1080p";
-        if (htmlStr.indexOf("1080p") != -1) {
-            maxFile = "1080p";
-        } else if (htmlStr.indexOf("720p") != -1) {
-            maxFile = "720p";
-        } else if (htmlStr.indexOf("480p") != -1) {
-            maxFile = "480p";
-        } else if (htmlStr.indexOf("360p") != -1) {
-            maxFile = "360p";
-        }
-        String videoFileUrl = "";
-        if (Objects.nonNull(videoFileElements)) {
-            for (Element videoFile : videoFileElements) {
-                String text = videoFile.text();
-                if (text.indexOf(maxFile) != -1) {
-                    videoFileUrl = videoFile.attr("href");
-                    break;
+        try {
+            if (Objects.isNull(video.getSourceUrl())) {
+                return null;
+            }
+            Map<String, String> header = new HashMap<String, String>();
+            header.put("cookie", cookie);
+            Response response = OKHttpUtils.getResponse(video.getSourceUrl(), header, proxy);
+            String html = response.body().string();
+            String setCookie = response.headers().get("set-cookie");
+            setCookie(setCookie);
+            response.close();
+            Document document = Jsoup.parse(html);
+            Element element = document.getElementById("tab_video_info");
+            Element info = element.getElementsByClass("info").get(0);
+            Elements videodescs = info.getElementsByClass("videodesc");
+            if (Objects.nonNull(video) && Objects.nonNull(videodescs.get(0))) {
+                String videodescText = videodescs.get(0).text();
+                video.setIntroduction(videodescText);
+            }
+            Elements videoFileElements = info.getElementsByClass("btn-success");
+            String htmlStr = videoFileElements.toString();
+            String maxFile = "1080p";
+            if (htmlStr.indexOf("1080p") != -1) {
+                maxFile = "1080p";
+            } else if (htmlStr.indexOf("720p") != -1) {
+                maxFile = "720p";
+            } else if (htmlStr.indexOf("480p") != -1) {
+                maxFile = "480p";
+            } else if (htmlStr.indexOf("360p") != -1) {
+                maxFile = "360p";
+            }
+            String videoFileUrl = "";
+            if (Objects.nonNull(videoFileElements)) {
+                for (Element videoFile : videoFileElements) {
+                    String text = videoFile.text();
+                    if (text.indexOf(maxFile) != -1) {
+                        videoFileUrl = videoFile.attr("href");
+                        break;
+                    }
                 }
             }
+            video.setQuality(maxFile);
+            video.setVideoUrl(videoFileUrl);
+            logger.info("videoFileUrl:{}",videoFileUrl);
+            return video;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
-        video.setQuality(maxFile);
-        video.setVideoUrl(videoFileUrl);
-        return video;
     }
 
     public void downloadUncensored() {
-        int page = 1;
+        int page = 10;
         while (true) {
             try {
                 List<Video> videoList = getVideoListByUrl("uncensored", page);
                 videoList = videoList.stream().filter(v -> Objects.nonNull(v.getSourceUrl())).collect(Collectors.toList());
-                videoList = videoList.stream().map(v -> {
-                    return getVideoInfo(v);
-                }).collect(Collectors.toList());
-                videoList= videoList.stream().filter(v-> Objects.nonNull(v.getVideoUrl())).collect(Collectors.toList());
-                videoList.stream().forEach(video->{
+                for(Video video:videoList){
+                    video=getVideoInfo(video);
                     String date = simpleDateFormat.format(new Date());
-                    String videoSavePath=savePath+"uncensored"+File.separator+date+File.separator+video.getName();
+                    String videoSavePath = savePath + "uncensored" + File.separator + date + File.separator + video.getName();
                     video.setSavePath(videoSavePath);
-                    multithreadingDownload.videoDownload(video,null,proxy,thread,defaultSegmentSize);
-                });
+                    multithreadingDownload.videoDownload(video, null, proxy, thread, defaultSegmentSize);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
             page++;
         }
+    }
+
+    public String setCookie(String setCookie) {
+        Map<String, String> setCookieMap = cookieToMap(setCookie);
+        Map<String, String> cookieMap = cookieToMap(cookie);
+        for (Map.Entry<String, String> entry : setCookieMap.entrySet()) {
+            if(cookieMap.containsKey(entry.getKey())){
+                cookieMap.put(entry.getKey(),entry.getValue());
+            }
+        }
+        String str="";
+        for(Map.Entry<String,String> entry:cookieMap.entrySet()){
+            str=str+entry.getKey()+"="+entry.getValue()+";";
+        }
+        cookie=str;
+        return str;
+    }
+
+    public Map<String, String> cookieToMap(String cookie) {
+        Map<String, String> map = new HashMap<>();
+        String[] dataArr = cookie.split(";");
+        for (String data : dataArr) {
+            String name = data.split("=")[0];
+            String value = data.split("=")[1];
+            map.put(name, value);
+        }
+        return map;
     }
 
     @Override
