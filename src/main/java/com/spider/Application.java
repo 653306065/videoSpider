@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import com.spider.entity.Video;
 import com.spider.service.VideoService;
+import com.spider.web.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -17,14 +18,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.spider.entity.By114BT;
 import com.spider.utils.FFmpegUtil;
 import com.spider.utils.FileUtils;
-import com.spider.web.By114;
-import com.spider.web.Eporner;
-import com.spider.web.Hanime;
-import com.spider.web.Javfinder;
-import com.spider.web.Javhihi;
-import com.spider.web.Pornhub;
-import com.spider.web.Wallhaven;
-import com.spider.web.YoutubeSpider;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import ws.schild.jave.MultimediaInfo;
@@ -37,7 +30,7 @@ public class Application {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(Application.class);
-        Javhihi Javhihi=context.getBean(Javhihi.class);
-        Javhihi.downloadVideo();
+        Javbangers Javbangers=context.getBean(Javbangers.class);
+        Javbangers.downloadUncensored();
     }
 }

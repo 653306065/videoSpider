@@ -109,6 +109,14 @@ proxyrarbg:
    home: https://proxyrarbg.org/torrents.php
    template: https://proxyrarbg.org/torrents.php?category=@{category}&page=@{page}
    savePath: C:\proxyrarbg\
+
+javbangers:
+   home: https://www.javbangers.com/
+   template: https://www.javbangers.com/categories/@{categories}/?mode=async&function=get_block&block_id=list_videos_common_videos_list&sort_by=post_date&from=@{page}&_=@{time}
+   savePath: C:\javbangers\
+   cookie: PHPSESSID=685a667ca0d3d4b3b27b2ac6939dff11; kt_qparams=id%3D102615%26dir%3D127-coco; kt_ips=103.126.24.82; kt_tcookie=1; _ga=GA1.2.1608883958.1597630864; _gid=GA1.2.1104513743.1597630864; kt_is_visited=1; bcs_cookie_bongacams_pop=1; kt_rt_adv_player=hidden; _gat_gtag_UA_154629456_1=1
+   enableProxy: false
+   thread: 10
       
 proxy:
    enabled: false
