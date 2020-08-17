@@ -184,7 +184,7 @@ public class Pornhub extends BaseWeb {
                     try {
                         Video video = getVideoByUrl(str);
                         String date = simpleDateFormat.format(new Date());
-                        String path = savePath + "dp" + File.separator + date + File.separator + video.getName();
+                        String path = savePath + key + File.separator + date + File.separator + video.getName();
                         video.setSavePath(path);
                         if (Integer.valueOf(video.getQuality()) < 720) {
                             continue;
