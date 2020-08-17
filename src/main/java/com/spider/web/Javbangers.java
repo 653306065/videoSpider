@@ -119,6 +119,7 @@ public class Javbangers extends BaseWeb {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            page++;
         }
     }
 
