@@ -112,7 +112,7 @@ public class Javbangers extends BaseWeb {
     }
 
     public void downloadUncensored() {
-        int page = 10;
+        int page = 1;
         while (true) {
             try {
                 List<Video> videoList = getVideoListByUrl("uncensored", page);
