@@ -129,13 +129,14 @@ javbus:
    actressesListTemplate: ${javbus.home}/@{category}/actresses/@{page}
    actressesDetailsTemplate: ${javbus.home}/@{category}/star/@{name}
    avTemplate: ${javbus.home}/@{code}
+   savePath: F:\javbus\
 
 proxy:
    enabled: false
    socks:
       #host: 192.168.31.184
       host: 127.0.0.1
-      port: 1080
+      port: 10808
    http:
       #host: 192.168.31.184
       host: 127.0.0.1

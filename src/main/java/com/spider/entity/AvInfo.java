@@ -1,101 +1,88 @@
 package com.spider.entity;
 
 import java.util.Date;
+import java.util.List;
 
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+@Data
+@Getter
+@Setter
 @Document(collection = "avInfo")
 public class AvInfo {
 
     private String id;
 
-    private String code;// 识别码
+    //识别码
+    private String code;
 
-    private Date date;// 发布日期
+    //发布日期
+    private Date publishDate;
 
-    private int minute;// 时长
+    //时长
+    private int minute;
 
-    private String maker;// 制作商
+    //制作商
+    private String maker;
 
-    private String tag;// 标签
+    //系列
+    private String series;
 
-    private String avatars;// 女优
+    //标签
+    private List<String> tags;
 
-    private String cover;//封面
+    //女优
+    private List<String> avatars;
 
-    private String url;
+    //封面
+    private String coverUrl;
 
-    public String getUrl() {
-        return url;
+    //封面文件
+    private byte[] cover;
+
+    //来源地址
+    private String sourceUrl;
+
+    //磁力链接
+    private List<Magnet> MagnetList;
+
+    // 预览图
+    private List<String>  previewImageUrlList;
+
+    // 保存的预览图文件
+    private List<byte[]> previewImageUrl;
+
+    //本地是否有这个文件
+    private boolean hasVideo;
+
+    //保存的videoID
+    private String videoId;
+
+    //文件的保存路径
+    private String videoSavePath;
+
+    @Data
+    public class Magnet{
+
+        //名称
+        private String name;
+
+        //磁力地址
+        private String magnet;
+
+        //文件大小
+        private long size;
+
+        //文件大小的简写
+        private String sizeStr;
+
+        //分享日期
+        private Date shareDate;
+
+        //来源页
+        private String sourceUrl;
     }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getCover() {
-        return cover;
-    }
-
-    public void setCover(String cover) {
-        this.cover = cover;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public int getMinute() {
-        return minute;
-    }
-
-    public void setMinute(int minute) {
-        this.minute = minute;
-    }
-
-    public String getMaker() {
-        return maker;
-    }
-
-    public void setMaker(String maker) {
-        this.maker = maker;
-    }
-
-    public String getTag() {
-        return tag;
-    }
-
-    public void setTag(String tag) {
-        this.tag = tag;
-    }
-
-    public String getAvatars() {
-        return avatars;
-    }
-
-    public void setAvatars(String avatars) {
-        this.avatars = avatars;
-    }
-
-
 }

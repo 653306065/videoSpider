@@ -18,10 +18,6 @@ public class VideoService extends BaseService<Video>{
         return mongoTemplate.findOne(query, Video.class);
     }
 
-    public Video insert(Video video) {
-        return mongoTemplate.insert(video);
-    }
-
     public Video findByMd5(String md5) {
         Query query = new Query(Criteria.where("md5").is(md5));
         return mongoTemplate.findOne(query, Video.class);

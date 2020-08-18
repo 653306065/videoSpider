@@ -13,17 +13,26 @@ public abstract class BaseService<T> {
     @Autowired
     protected MongoTemplate mongoTemplate;
 
-    private Class<T> clasz;
+    private Class<T> clazz;
 
     public BaseService() {
-        clasz = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+        clazz = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 
     public long count(String key, String value) {
-        return mongoTemplate.count(new Query(Criteria.where(key).is(value)), clasz);
+        return mongoTemplate.count(new Query(Criteria.where(key).is(value)), clazz);
     }
 
     public List<T> findAll(){
-        return mongoTemplate.findAll(clasz);
+        return mongoTemplate.findAll(clazz);
+    }
+
+    public List<T> findBykeyValue(String key,String value){
+        Query query = new Query(Criteria.where(key).is(value));
+        return  mongoTemplate.find(query,clazz);
+    }
+
+    public void insert(T t){
+        mongoTemplate.insert(t);
     }
 }

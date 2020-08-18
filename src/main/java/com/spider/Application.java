@@ -33,7 +33,7 @@ public class Application {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(Application.class);
-        Avsox Avsox=context.getBean(Avsox.class);
-        Avsox.saveAvInfo();
+        Javbus Javbus=context.getBean(Javbus.class);
+        Javbus.saveAllUncensoredActressesInfo();
     }
 }
