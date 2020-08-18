@@ -30,9 +30,6 @@ public class Avsox {
     private Logger logger = LoggerFactory.getLogger(Avsox.class);
 
     @Autowired
-    private Proxy proxy;
-
-    @Autowired
     private AvsoxService avsoxService;
 
     public String actressesListUrl = "https://avsox.asia/cn/actresses/page/@{page}";
@@ -54,7 +51,7 @@ public class Avsox {
         int page = 1;
         while (true) {
             String realUrl = url + "/page/" + page;
-            String html = OKHttpUtils.get(realUrl, proxy);
+            String html = OKHttpUtils.get(realUrl, true);
             if (html == null) {
                 break;
             }

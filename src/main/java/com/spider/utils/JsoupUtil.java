@@ -18,20 +18,20 @@ public class JsoupUtil {
         return document;
     }
 
-    public static Document getDocument(String url,Proxy proxy) {
-        String html = OKHttpUtils.get(url, proxy);
+    public static Document getDocument(String url,Boolean isProxy) {
+        String html = OKHttpUtils.get(url, isProxy);
         Document document = Jsoup.parse(html);
         return document;
     }
 
     public static Document getDocumentByProxy(String url) {
-        String html = OKHttpUtils.get(url, proxy);
+        String html = OKHttpUtils.get(url, true);
         Document document = Jsoup.parse(html);
         return document;
     }
 
     public static Document getDocumentByProxy(String url, Map<String, String> header) {
-        String html = OKHttpUtils.get(url, header, proxy);
+        String html = OKHttpUtils.get(url, header, true);
         Document document = Jsoup.parse(html);
         return document;
     }

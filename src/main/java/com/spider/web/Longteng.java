@@ -1,10 +1,17 @@
 package com.spider.web;
 
+import com.spider.utils.OKHttpUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,20 +19,8 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import com.spider.utils.OKHttpUtils;
-
 @Component
 public class Longteng {
-
-    @Autowired
-    private Proxy proxy;
 
     @Value("${longteng.home}")
     private String home;
@@ -36,23 +31,20 @@ public class Longteng {
     @Value("${longteng.savePath}")
     private String savePath;
 
+    @Value("${longteng.enableProxy}")
+    private Boolean enableProxy;
+
     public List<Map<String, String>> getBookList(String url) {
         List<Map<String, String>> list = new ArrayList<Map<String, String>>();
         try {
-            byte[] bytes = OKHttpUtils.getBytes(url, proxy);
-            String html = new String(bytes, "gbk");
+            String html = OKHttpUtils.get(url, enableProxy);
             Document document = Jsoup.parse(html);
-            Elements elements = document.getElementsByClass("table").get(0).getElementsByTag("tr");
-            int i = 0;
+            Elements elements = document.getElementsByClass("blue");
             for (Element element : elements) {
-                if (i != 0) {
-                    Element a = element.getElementsByTag("td").get(0).getElementsByTag("a").get(0);
-                    Map<String, String> map = new HashMap<String, String>();
-                    map.put("url", a.attr("href"));
-                    map.put("name", a.attr("title"));
-                    list.add(map);
-                }
-                i++;
+                Map<String, String> map = new HashMap<String, String>();
+                map.put("url",home+element.attr("href"));
+                map.put("name", element.text());
+                list.add(map);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -63,8 +55,7 @@ public class Longteng {
     public List<String> getChapterList(String url) {
         List<String> list = new ArrayList<String>();
         try {
-            byte[] bytes = OKHttpUtils.getBytes(url, proxy);
-            String html = new String(bytes, "gbk");
+            String html = OKHttpUtils.get(url, enableProxy);
             Document document = Jsoup.parse(html);
             Elements elements = document.getElementById("list-chapterAll").getElementsByTag("dd");
             for (Element element : elements) {
@@ -79,7 +70,7 @@ public class Longteng {
 
     public String getChapterText(String url) {
         try {
-            byte[] bytes = OKHttpUtils.getBytes(url, proxy);
+            byte[] bytes = OKHttpUtils.getBytes(url, enableProxy);
             String html = new String(bytes, "gbk");
             Document document = Jsoup.parse(html);
             String text = document.getElementById("htmlContent").text();

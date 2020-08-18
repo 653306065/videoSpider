@@ -13,7 +13,6 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -47,7 +46,7 @@ public class Javbangers extends BaseWeb {
 
     public List<Video> getVideoListByUrl(String categories, Integer page) {
         String listUrl = template.replace("@{categories}", categories).replace("@{page}", String.valueOf(page)).replace("@{time}", String.valueOf(System.currentTimeMillis()));
-        Document document = JsoupUtil.getDocument(listUrl, proxy);
+        Document document = JsoupUtil.getDocument(listUrl, enableProxy);
         Elements elements = document.getElementsByClass("inf");
         return elements.stream().map(element -> {
             Video video = new Video();
@@ -66,7 +65,7 @@ public class Javbangers extends BaseWeb {
             }
             Map<String, String> header = new HashMap<String, String>();
             header.put("cookie", cookie);
-            Response response = OKHttpUtils.getResponse(video.getSourceUrl(), header, proxy);
+            Response response = OKHttpUtils.getResponse(video.getSourceUrl(), header, enableProxy);
             String html = response.body().string();
             String setCookie = response.headers().get("set-cookie");
             setCookie(setCookie);
@@ -122,7 +121,7 @@ public class Javbangers extends BaseWeb {
                     String date = simpleDateFormat.format(new Date());
                     String videoSavePath = savePath + "uncensored" + File.separator + date + File.separator + video.getName();
                     video.setSavePath(videoSavePath);
-                    multithreadingDownload.videoDownload(video, null, proxy, thread, defaultSegmentSize);
+                    multithreadingDownload.videoDownload(video, null, enableProxy, thread, defaultSegmentSize);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -156,10 +155,5 @@ public class Javbangers extends BaseWeb {
             map.put(name, value);
         }
         return map;
-    }
-
-    @Override
-    public boolean enableProxy() {
-        return enableProxy;
     }
 }

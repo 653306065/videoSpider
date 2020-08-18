@@ -16,7 +16,7 @@ public class ImageDownload {
 
     private Logger logger = LoggerFactory.getLogger(ImageDownload.class);
 
-    public File downloadFile(String url, Map<String, String> header, String savePath, Proxy proxy) {
+    public File downloadFile(String url, Map<String, String> header, String savePath, boolean isProxy) {
         File file = new File(savePath);
         if (file.exists()) {
             logger.info(savePath + ",已存在");
@@ -24,7 +24,7 @@ public class ImageDownload {
         } else {
             file.getParentFile().mkdirs();
         }
-        byte[] bytes = OKHttpUtils.getBytes(url, header, proxy);
+        byte[] bytes = OKHttpUtils.getBytes(url, header, isProxy);
         if (bytes == null) {
             logger.info("{},下载失败", url);
             return null;

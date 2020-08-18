@@ -47,6 +47,9 @@ public class Pixiv {
     @Value("${pixiv.thread}")
     private int thread;
 
+    @Value("${pixiv.enableProxy}")
+    private Boolean enableProxy;
+
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
     public List<String> getHistoryRankListUrl(Date date) {
@@ -55,7 +58,7 @@ public class Pixiv {
         String url = R18Url.replace("@{date}", dateStr).replace("@{page}", String.valueOf(1));
         Map<String, String> header = new HashMap<>();
         header.put("cookie", cookie);
-        String json = OKHttpUtils.get(url, header, proxy);
+        String json = OKHttpUtils.get(url, header, enableProxy);
         JSONObject jsonObject = JSON.parseObject(json);
         JSONArray jsonArray = jsonObject.getJSONArray("contents");
         for (int i = 0; i < jsonArray.size(); i++) {
@@ -72,7 +75,7 @@ public class Pixiv {
         }
 
         String page2 = R18Url.replace("@{date}", dateStr).replace("@{page}", String.valueOf(2));
-        String json2 = OKHttpUtils.get(page2, header, proxy);
+        String json2 = OKHttpUtils.get(page2, header, enableProxy);
         JSONObject jsonObject2 = JSON.parseObject(json2);
         JSONArray jsonArray2 = jsonObject2.getJSONArray("contents");
         for (int i = 0; i < jsonArray2.size(); i++) {
@@ -104,7 +107,7 @@ public class Pixiv {
                             Map<String, String> header = new HashMap<>();
                             header.put("Referer", "https://www.pixiv.net/ranking.php?mode=daily&content=illust");
                             String fileName = url.split("/")[url.split("/").length - 1];
-                            imageDownload.downloadFile(url, header, savePath + "\\" + dateStr + "\\" + fileName, proxy);
+                            imageDownload.downloadFile(url, header, savePath + "\\" + dateStr + "\\" + fileName, enableProxy);
                         }
                     });
                 }

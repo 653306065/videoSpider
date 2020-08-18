@@ -47,7 +47,7 @@ public class Pornhub extends BaseWeb {
     private MultithreadingDownload multithreadingDownload;
 
     public Video getVideoByUrl(String url) {
-        Document document = JsoupUtil.getDocument(url, proxy);
+        Document document = JsoupUtil.getDocument(url, enableProxy);
         Element element = document.getElementById("player");
         String videoId = element.attr("data-video-id");
         //分类
@@ -111,7 +111,7 @@ public class Pornhub extends BaseWeb {
 
     public List<String> getVideoList(String url) {
         List<String> list = new ArrayList<String>();
-        Document document = JsoupUtil.getDocument(url, proxy);
+        Document document = JsoupUtil.getDocument(url, enableProxy);
         if (document.getElementById("videoSearchResult") != null) {
             Elements elements = document.getElementById("videoSearchResult").getElementsByClass("title");
             for (Element element : elements) {
@@ -134,7 +134,7 @@ public class Pornhub extends BaseWeb {
 
     public List<String> getChannelsVideoList(String url) {
         List<String> list = new ArrayList<String>();
-        Document document = JsoupUtil.getDocument(url, proxy);
+        Document document = JsoupUtil.getDocument(url, enableProxy);
         Element element = document.getElementById("showAllChanelVideos");
         Elements elements = element.getElementsByClass("videoPreviewBg");
         for (Element e : elements) {
@@ -160,7 +160,7 @@ public class Pornhub extends BaseWeb {
                     if (Integer.valueOf(video.getQuality()) < 720) {
                         return;
                     }
-                    multithreadingDownload.videoDownload(video, null, proxy, thread, defaultSegmentSize);
+                    multithreadingDownload.videoDownload(video, null, enableProxy, thread, defaultSegmentSize);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -189,7 +189,7 @@ public class Pornhub extends BaseWeb {
                         if (Integer.valueOf(video.getQuality()) < 720) {
                             continue;
                         }
-                        multithreadingDownload.videoDownload(video, null, proxy, thread, defaultSegmentSize);
+                        multithreadingDownload.videoDownload(video, null, enableProxy, thread, defaultSegmentSize);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -236,7 +236,7 @@ public class Pornhub extends BaseWeb {
                     if (Integer.valueOf(video.getQuality()) < 720) {
                         continue;
                     }
-                    multithreadingDownload.videoDownload(video, null, proxy, thread, defaultSegmentSize);
+                    multithreadingDownload.videoDownload(video, null, enableProxy, thread, defaultSegmentSize);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -260,10 +260,5 @@ public class Pornhub extends BaseWeb {
             e.printStackTrace();
             return null;
         }
-    }
-
-    @Override
-    public boolean enableProxy() {
-        return enableProxy;
     }
 }

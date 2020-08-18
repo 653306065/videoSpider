@@ -27,14 +27,14 @@ public class MultithreadingDownload {
 
     private final Logger logger = LoggerFactory.getLogger(MultithreadingDownload.class);
 
-    public Boolean fileDownload(String HttpUrl, String path, Map<String, String> header, Proxy proxy, int threadNum, long segmentSize) {
+    public Boolean fileDownload(String HttpUrl, String path, Map<String, String> header, boolean isProxy, int threadNum, long segmentSize) {
         try {
             long startTime = System.currentTimeMillis();
             File file = createFile(path);
             if (Objects.isNull(file)) {
                 return false;
             }
-            DownloadFileInfo info = getDownloadFileInfo(HttpUrl, header, proxy);
+            DownloadFileInfo info = getDownloadFileInfo(HttpUrl, header, isProxy);
             if (Objects.isNull(info) || !String.valueOf(info.getResponseCode()).startsWith("20")) {
                 logger.info("----获取下载信息错误----");
                 return false;
@@ -51,12 +51,12 @@ public class MultithreadingDownload {
                     long startByte = i * segmentSize;
                     long endByte = (i + 1) * segmentSize - 1;
                     if (endByte >= info.getContentLength()) {
-                        CallableDownloadThread callableDownloadThread=new CallableDownloadThread(HttpUrl, header, proxy, startByte, endByte, file, downloadByte);
+                        CallableDownloadThread callableDownloadThread=new CallableDownloadThread(HttpUrl, header, isProxy, startByte, endByte, file, downloadByte);
                         Future<Boolean> future=executorService.submit(callableDownloadThread);
                         downloadResult.add(future);
                         break;
                     }
-                    CallableDownloadThread callableDownloadThread=new CallableDownloadThread(HttpUrl, header, proxy, startByte, endByte, file, downloadByte);
+                    CallableDownloadThread callableDownloadThread=new CallableDownloadThread(HttpUrl, header, isProxy, startByte, endByte, file, downloadByte);
                     Future<Boolean> future= executorService.submit(callableDownloadThread);
                     downloadResult.add(future);
                     i++;
@@ -106,8 +106,8 @@ public class MultithreadingDownload {
         }
     }
 
-    public Boolean videoDownload(Video video, Map<String, String> header, Proxy proxy, int threadNum, long segmentSize) {
-        return fileDownload(video.getVideoUrl(), video.getSavePath(), header, proxy, threadNum, segmentSize);
+    public Boolean videoDownload(Video video, Map<String, String> header, boolean isProxy, int threadNum, long segmentSize) {
+        return fileDownload(video.getVideoUrl(), video.getSavePath(), header, isProxy, threadNum, segmentSize);
     }
 
     private File createFile(String path) {
@@ -121,9 +121,9 @@ public class MultithreadingDownload {
     }
 
 
-    private DownloadFileInfo getDownloadFileInfo(String HttpUrl, Map<String, String> header, Proxy proxy) {
+    private DownloadFileInfo getDownloadFileInfo(String HttpUrl, Map<String, String> header, boolean isProxy) {
         try {
-            Response response = OKHttpUtils.getResponse(HttpUrl, header, proxy);
+            Response response = OKHttpUtils.getResponse(HttpUrl, header, isProxy);
             DownloadFileInfo fileInfo = new DownloadFileInfo();
             if (Objects.nonNull(response.header("Content-Length"))) {
                 fileInfo.setContentLength(Long.valueOf(response.header("Content-Length")));

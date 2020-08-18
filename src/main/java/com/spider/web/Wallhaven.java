@@ -32,11 +32,11 @@ public class Wallhaven {
     @Value("${wallhaven.savePath}")
     private String savePath;
 
-    @Autowired
-    ImageDownload imageDownload;
+    @Value("${wallhaven.enableProxy}")
+    private Boolean enableProxy;
 
     @Autowired
-    private Proxy proxy;
+    ImageDownload imageDownload;
 
     private Logger logger = LoggerFactory.getLogger(Wallhaven.class);
 
@@ -65,7 +65,7 @@ public class Wallhaven {
                 public void run() {
                     String name = System.currentTimeMillis() + "_" + imageUrl.split("-")[1];
                     String save = savePath + path + name;
-                    imageDownload.downloadFile(imageUrl, null, save, proxy);
+                    imageDownload.downloadFile(imageUrl, null, save, enableProxy);
                 }
             });
         }

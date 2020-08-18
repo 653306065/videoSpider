@@ -56,6 +56,9 @@ public class Javfinder extends BaseWeb{
     @Value("${javfinder.category.Hot}")
     private String hot;
 
+    @Value("${javfinder.enableProxy}")
+    private Boolean enableProxy;
+
     @Autowired
     private UrlRecordService urlRecordService;
 
@@ -66,7 +69,7 @@ public class Javfinder extends BaseWeb{
             Map<String, String> header = new HashMap<>();
             header.put("cookie", getCookie());
             header.put("user-agent", WebConstant.user_agent);
-            html = OKHttpUtils.get(url, header, proxy);
+            html = OKHttpUtils.get(url, header, enableProxy);
             logger.info(html);
             if (html != null) {
                 break;
@@ -86,7 +89,7 @@ public class Javfinder extends BaseWeb{
     }
 
     public String getCookie() {
-        Response Response = OKHttpUtils.getResponse(home, null, proxy);
+        Response Response = OKHttpUtils.getResponse(home, null, enableProxy);
         String cookie = Response.header("set-cookie");
         Response.close();
         return cookie;
@@ -94,25 +97,25 @@ public class Javfinder extends BaseWeb{
 
     public Map<String, String> getVideoUrl(String url) {
         Map<String, String> info = new HashMap<String, String>();
-        String html = OKHttpUtils.get(url, proxy);
+        String html = OKHttpUtils.get(url, enableProxy);
         Document document = Jsoup.parse(html);
         String name = document.getElementsByClass("wrap-meta").get(0).getElementsByTag("h1").text();
         String iframeUrl = document.getElementById("avcms_player").attr("src");
-        String iframeHtml = OKHttpUtils.get(iframeUrl, proxy);
+        String iframeHtml = OKHttpUtils.get(iframeUrl, enableProxy);
         Document iframeDocument = Jsoup.parse(iframeHtml);
         String dataVideo = iframeDocument.getElementById("redirector").attr("data-key");
 
         String code = dataVideo.split("https://playfinder.xyz/v/")[1].split("#")[0];
         String apiUrl = "https://playfinder.xyz/api/source/" + code;
         logger.info("apiUrl:{}", apiUrl);
-        String json = OKHttpUtils.post(apiUrl, proxy);
+        String json = OKHttpUtils.post(apiUrl, enableProxy);
         JSONObject jsonObject = JSON.parseObject(json);
         if (jsonObject.getBooleanValue("success")) {
             JSONArray jsonArray = jsonObject.getJSONArray("data");
             String file = jsonArray.getJSONObject(jsonArray.size() - 1).getString("file");
-            String videoUrl = OKHttpUtils.getRedirectUrl(file, proxy);
+            String videoUrl = OKHttpUtils.getRedirectUrl(file, enableProxy);
             logger.info("videoUrl:{}", videoUrl);
-            info.put("videoUrl", OKHttpUtils.getRedirectUrl(file, proxy));
+            info.put("videoUrl", OKHttpUtils.getRedirectUrl(file, enableProxy));
         }
         info.put("name", name);
         return info;
@@ -136,7 +139,7 @@ public class Javfinder extends BaseWeb{
                 String date = simpleDateFormat.format(new Date());
                 String name = map.get("name").replace(":", "");
                 String realPath = savePath + "\\" + path + "\\" + date + "\\" + name + ".mp4";
-                multithreadingDownload.fileDownload(fileUrl, realPath, null, proxy, thread,defaultSegmentSize);
+                multithreadingDownload.fileDownload(fileUrl, realPath, null, enableProxy, thread,defaultSegmentSize);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -163,7 +166,7 @@ public class Javfinder extends BaseWeb{
                     logger.info("fileUrl:" + fileUrl);
                     String date = simpleDateFormat.format(new Date());
                     String path = savePath + "\\hot\\" + category + "\\" + date + "\\" + map.get("name") + ".mp4";
-                    multithreadingDownload.fileDownload(fileUrl, path, null, proxy, thread,defaultSegmentSize);
+                    multithreadingDownload.fileDownload(fileUrl, path, null, enableProxy, thread,defaultSegmentSize);
                     urlRecordService.insert(str);
                 }
             } catch (Exception e) {
@@ -201,7 +204,7 @@ public class Javfinder extends BaseWeb{
                     logger.info("fileUrl:" + fileUrl);
                     String date = simpleDateFormat.format(new Date());
                     String path = savePath + "\\" + category + "\\" + date + "\\" + map.get("name") + ".mp4";
-                    multithreadingDownload.fileDownload(fileUrl, path, null, proxy, thread,defaultSegmentSize);
+                    multithreadingDownload.fileDownload(fileUrl, path, null, enableProxy, thread,defaultSegmentSize);
                     urlRecordService.insert(str);
                 }
             } catch (Exception e) {
@@ -209,10 +212,5 @@ public class Javfinder extends BaseWeb{
             }
             page++;
         }
-    }
-
-    @Override
-    public boolean enableProxy() {
-        return false;
     }
 }

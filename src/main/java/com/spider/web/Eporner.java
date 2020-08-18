@@ -51,7 +51,7 @@ public class Eporner extends BaseWeb{
 
     public List<String> getDetailsList(String category, int page) {
         String realUrl = categoryTemplate.replace("${category}", category).replace("${page}", String.valueOf(page));
-        String html = OKHttpUtils.get(realUrl, proxy);
+        String html = OKHttpUtils.get(realUrl, enableProxy);
         Document document = Jsoup.parse(html);
         Elements elements = document.getElementById("vidresults").getElementsByClass("hdy");
         List<String> urlList = new ArrayList<String>();
@@ -64,7 +64,7 @@ public class Eporner extends BaseWeb{
 
     public Map<String, String> getvideo(String url) {
         Map<String, String> map = new HashMap<String, String>();
-        String html = OKHttpUtils.get(url, proxy);
+        String html = OKHttpUtils.get(url, enableProxy);
         Document document = Jsoup.parse(html);
         String name = document.getElementById("video-info").getElementsByTag("h1").get(0).text();
         Element moviexxx = document.getElementById("moviexxx");
@@ -74,7 +74,7 @@ public class Eporner extends BaseWeb{
         logger.info("name:{},vid:{},hash:{}", name, vid, hash);
         String api = apiUrl.replace("${vid}", vid).replace("${hash}", hash) + System.currentTimeMillis();
         logger.info("APIUrl:{}", api);
-        String json = OKHttpUtils.get(api, proxy);
+        String json = OKHttpUtils.get(api, enableProxy);
         JSONObject mp4 = JSON.parseObject(json).getJSONObject("sources").getJSONObject("mp4");
         String mp4_4k_60fps = mp4.getString("2160p(4K)@60fps HD");
         String mp4_4k = mp4.getString("2160p(4K) HD");
@@ -123,7 +123,7 @@ public class Eporner extends BaseWeb{
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String date = simpleDateFormat.format(new Date());
         String path = savePath + category + "\\" + date + "\\" + name + ".mp4";
-        multithreadingDownload.fileDownload(videoUrl, path, null, proxy, thread,defaultSegmentSize);
+        multithreadingDownload.fileDownload(videoUrl, path, null, enableProxy, thread,defaultSegmentSize);
     }
 
     public void download4K() {
@@ -186,10 +186,5 @@ public class Eporner extends BaseWeb{
         } catch (Exception e) {
             return "";
         }
-    }
-
-    @Override
-    public boolean enableProxy() {
-        return enableProxy;
     }
 }

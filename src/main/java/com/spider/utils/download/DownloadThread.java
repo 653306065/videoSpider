@@ -20,7 +20,7 @@ public class DownloadThread extends Thread {
 
     private Map<String, String> header;
 
-    private Proxy proxy;
+    private Boolean isProxy;
 
     private long startByte;
 
@@ -34,10 +34,10 @@ public class DownloadThread extends Thread {
 
     private Integer errorTime=0;
 
-    public DownloadThread(String httpUrl, Map<String, String> header, Proxy proxy, long startByte, long endByte, File file, AtomicLong downloadByte) {
+    public DownloadThread(String httpUrl, Map<String, String> header, boolean isProxy, long startByte, long endByte, File file, AtomicLong downloadByte) {
         this.httpUrl = httpUrl;
         this.header = header;
-        this.proxy = proxy;
+        this.isProxy = isProxy;
         this.startByte = startByte;
         this.endByte = endByte;
         this.file = file;
@@ -52,7 +52,7 @@ public class DownloadThread extends Thread {
                 newheader.putAll(header);
             }
             newheader.put("range", "bytes=" + startByte + "-" + endByte);
-            InputStream in = OKHttpUtils.getInputStream(httpUrl, newheader, proxy);
+            InputStream in = OKHttpUtils.getInputStream(httpUrl, newheader, isProxy);
             byte[] bytes = new byte[1024 * 1024 * 2];
             RandomAccessFile raf = new RandomAccessFile(file, "rw");
             raf.seek(startByte);

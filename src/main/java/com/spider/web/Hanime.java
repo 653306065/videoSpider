@@ -37,6 +37,9 @@ public class Hanime {
     @Value("${hanime.thread}")
     private int thread;
 
+    @Value("${hanime.enableProxy}")
+    private Boolean enableProxy;
+
     @Autowired
     ImageDownload imageDownload;
 
@@ -65,7 +68,7 @@ public class Hanime {
                 String api = imageApi.replace("@{type}", type).replace("@{offset}", String.valueOf(offset * 24));
                 Map<String, String> header = new HashMap<String, String>();
                 header.put("x-directive", "api");
-                String json = OKHttpUtils.get(api, header, proxy);
+                String json = OKHttpUtils.get(api, header, enableProxy);
                 logger.info(api);
                 JSONObject jsonObject = JSON.parseObject(json);
                 JSONArray array = jsonObject.getJSONArray("data");
@@ -87,7 +90,7 @@ public class Hanime {
                             String random = UUID.randomUUID().toString().replace("-", "").substring(0, 6);
                             String name = filename.split("\\.")[0];
                             String path = savePath + "\\" + type + "\\" + name + "_" + random + "." + extension;
-                            imageDownload.downloadFile(url, null, path, proxy);
+                            imageDownload.downloadFile(url, null, path, enableProxy);
                             logger.info("{},{},下载完成", filename, url);
                         }
                     });
@@ -124,7 +127,7 @@ public class Hanime {
         List<String> list = new ArrayList<String>();
         String json = "{\"search_text\":\"\",\"tags\":[],\"brands\":[],\"blacklist\":[],\"order_by\":\"created_at_unix\",\"ordering\":\"desc\",\"page\":"
                 + page + "}";
-        String data = OKHttpUtils.postJson(videoListApi, null, json, proxy);
+        String data = OKHttpUtils.postJson(videoListApi, null, json, enableProxy);
         JSONObject JSONObject = JSON.parseObject(data);
         String hits = JSONObject.getString("hits");
         JSONArray array = JSON.parseArray(hits);
@@ -138,7 +141,7 @@ public class Hanime {
         String api = videoDownloadApi.replace("@{slug}", slug);
         String json = "{\"auth_kind\":\"saved_download_token\",\"auth\":\"" + auth + "\",\"auth_expires\":\""
                 + auth_expires + "\"}";
-        String data = OKHttpUtils.postJson(api, null, json, proxy);
+        String data = OKHttpUtils.postJson(api, null, json, enableProxy);
         if (data == null) {
             return null;
         }
@@ -179,7 +182,7 @@ public class Hanime {
                         continue;
                     }
                     String path = savePath + "\\video\\" + name;
-                    multithreadingDownload.fileDownload(url, path, null, proxy, thread,1024*1024*5);
+                    multithreadingDownload.fileDownload(url, path, null, enableProxy, thread,1024*1024*5);
                     logger.info(url);
                 }
                 if (videoInfoList.size() == 0) {

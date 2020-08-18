@@ -49,7 +49,7 @@ public class Javhihi extends BaseWeb {
 
     public void getMoive(int page) {
         String url = movie.replace("@{page}", String.valueOf(page));
-        String json = OKHttpUtils.get(url, proxy);
+        String json = OKHttpUtils.get(url, enableProxy);
         JSONObject jsonObject = JSON.parseObject(json);
         JSONArray movies = jsonObject.getJSONArray("movies");
         for (int i = 0; i < movies.size(); i++) {
@@ -67,13 +67,13 @@ public class Javhihi extends BaseWeb {
                     logger.info(name + ",已存在");
                     continue;
                 }
-                Document document = JsoupUtil.getDocument(movieUrl,proxy);
+                Document document = JsoupUtil.getDocument(movieUrl,enableProxy);
                 Element element = document.getElementsByClass("dropdown-toggle").get(0);
                 String href = element.attr("href");
                 String[] strArr = href.split("/");
                 String key = strArr[strArr.length - 1];
                 String api = "https://anime789.com/api/source/" + key;
-                String apiJson = OKHttpUtils.post(api, proxy);
+                String apiJson = OKHttpUtils.post(api, enableProxy);
                 JSONObject apiJsonObject = JSON.parseObject(apiJson);
                 if (apiJsonObject.getBoolean("success")) {
                     Video video = new Video();
@@ -87,7 +87,7 @@ public class Javhihi extends BaseWeb {
                     JSONArray jsonArray = apiJsonObject.getJSONArray("data");
                     JSONObject fileJson = jsonArray.getJSONObject(jsonArray.size() - 1);
                     String redirector = fileJson.getString("file");
-                    String realUrl = OKHttpUtils.getRedirectUrl(redirector, proxy);
+                    String realUrl = OKHttpUtils.getRedirectUrl(redirector, enableProxy);
                     if(Objects.isNull(realUrl)){
                         logger.info("获取视频地址失败");
                         continue;
@@ -105,7 +105,7 @@ public class Javhihi extends BaseWeb {
                     header.put("Connection", "keep-alive");
                     video.setVideoUrl(realUrl);
                     video.setSavePath(path);
-                    MultithreadingDownload.videoDownload(video, header, proxy, thread, defaultSegmentSize);
+                    MultithreadingDownload.videoDownload(video, header, enableProxy, thread, defaultSegmentSize);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -124,10 +124,5 @@ public class Javhihi extends BaseWeb {
             }
             i++;
         }
-    }
-
-    @Override
-    public boolean enableProxy() {
-        return enableProxy;
     }
 }

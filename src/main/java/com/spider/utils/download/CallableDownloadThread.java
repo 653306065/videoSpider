@@ -23,7 +23,7 @@ public class CallableDownloadThread implements Callable<Boolean> {
 
     private Map<String, String> header;
 
-    private Proxy proxy;
+    private Boolean isProxy;
 
     private long startByte;
 
@@ -37,10 +37,10 @@ public class CallableDownloadThread implements Callable<Boolean> {
 
     private Integer errorTime = 0;
 
-    public CallableDownloadThread(String httpUrl, Map<String, String> header, Proxy proxy, long startByte, long endByte, File file, AtomicLong downloadByte) {
+    public CallableDownloadThread(String httpUrl, Map<String, String> header, Boolean isProxy, long startByte, long endByte, File file, AtomicLong downloadByte) {
         this.httpUrl = httpUrl;
         this.header = header;
-        this.proxy = proxy;
+        this.isProxy = isProxy;
         this.startByte = startByte;
         this.endByte = endByte;
         this.file = file;
@@ -67,7 +67,7 @@ public class CallableDownloadThread implements Callable<Boolean> {
                     logger.info("错误次数过多停止下载,{}", errorTime);
                     return false;
                 }
-                Response response = OKHttpUtils.getResponse(httpUrl, newheader, proxy);
+                Response response = OKHttpUtils.getResponse(httpUrl, newheader, isProxy);
                 if(Objects.isNull(response)||!response.isSuccessful()){
                     logger.info("网络连接失败");
                     errorTime++;
