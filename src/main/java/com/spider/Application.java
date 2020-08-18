@@ -4,7 +4,10 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
+
 import com.spider.entity.Video;
 import com.spider.service.VideoService;
 import com.spider.web.*;
@@ -30,7 +33,7 @@ public class Application {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(Application.class);
-        Javbangers Javbangers=context.getBean(Javbangers.class);
-        Javbangers.downloadUncensored();
+        Avsox Avsox=context.getBean(Avsox.class);
+        Avsox.saveAvInfo();
     }
 }
