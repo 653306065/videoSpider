@@ -259,9 +259,9 @@ public class FileUtils {
     }
 
     public static void byteToFile(byte[] bytes, String path) {
+        File localFile = new File(path);
         try {
             // 根据绝对路径初始化文件
-            File localFile = new File(path);
             if (!localFile.exists()) {
                 localFile.getParentFile().mkdirs();
                 localFile.createNewFile();
@@ -271,6 +271,7 @@ public class FileUtils {
             os.write(bytes);
             os.close();
         } catch (Exception e) {
+            localFile.delete();
             e.printStackTrace();
         }
     }

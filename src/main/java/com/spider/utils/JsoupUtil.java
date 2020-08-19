@@ -2,6 +2,7 @@ package com.spider.utils;
 
 import java.net.Proxy;
 import java.util.Map;
+import java.util.Objects;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -20,6 +21,9 @@ public class JsoupUtil {
 
     public static Document getDocument(String url,Boolean isProxy) {
         String html = OKHttpUtils.get(url, isProxy);
+        if(Objects.isNull(html)){
+            return null;
+        }
         Document document = Jsoup.parse(html);
         return document;
     }

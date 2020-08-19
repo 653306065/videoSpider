@@ -129,14 +129,14 @@ javbus:
    actressesListTemplate: ${javbus.home}/@{category}/actresses/@{page}
    actressesDetailsTemplate: ${javbus.home}/@{category}/star/@{name}
    avTemplate: ${javbus.home}/@{code}
-   savePath: F:\javbus\
+   savePath: C:\javbus\
 
 proxy:
    enabled: false
    socks:
       #host: 192.168.31.184
       host: 127.0.0.1
-      port: 10808
+      port: 1080
    http:
       #host: 192.168.31.184
       host: 127.0.0.1
@@ -145,6 +145,8 @@ proxy:
 FFmpegPath: C:\\ffmpeg\\bin\\
    
 spring:
+   application:
+      name: video-spider
    data:
       mongodb:
          uri: mongodb://127.0.0.1:27017/file

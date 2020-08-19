@@ -16,6 +16,9 @@ public class AvInfo {
 
     private String id;
 
+    //名称
+    private String name;
+
     //识别码
     private String code;
 
@@ -40,6 +43,12 @@ public class AvInfo {
     //封面
     private String coverUrl;
 
+    //缩略图地址
+    private String thumbUrl;
+
+    //缩略图
+    private byte[] thumb;
+
     //封面文件
     private byte[] cover;
 
@@ -53,7 +62,7 @@ public class AvInfo {
     private List<String>  previewImageUrlList;
 
     // 保存的预览图文件
-    private List<byte[]> previewImageUrl;
+    private List<byte[]> previewImageList;
 
     //本地是否有这个文件
     private boolean hasVideo;
