@@ -129,6 +129,7 @@ javbus:
    actressesListTemplate: ${javbus.home}/@{category}/actresses/@{page}
    actressesDetailsTemplate: ${javbus.home}/@{category}/star/@{name}
    avTemplate: ${javbus.home}/@{code}
+   magnetApi: https://www.javbus.com/ajax/uncledatoolsbyajax.php?gid=@{gid}&lang=zh&uc=1
    savePath: C:\javbus\
 
 proxy:

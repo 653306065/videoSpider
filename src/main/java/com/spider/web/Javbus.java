@@ -7,17 +7,20 @@ import com.spider.service.AvInfoService;
 import com.spider.utils.FileUtils;
 import com.spider.utils.JsoupUtil;
 import com.spider.utils.OKHttpUtils;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
@@ -44,6 +47,9 @@ public class Javbus extends BaseWeb {
 
     @Value("${javbus.savePath}")
     private String savePath;
+
+    @Value("${javbus.magnetApi}")
+    private String magnetApi;
 
     @Autowired
     private ActressesInfoService actressesInfoService;
@@ -135,7 +141,7 @@ public class Javbus extends BaseWeb {
     }
 
     public AvInfo getAvInfo(AvInfo avInfo) {
-        logger.info("{},{},开始获取",avInfo.getCode(),avInfo.getName());
+        logger.info("{},{},开始获取", avInfo.getCode(), avInfo.getName());
         String sourceUrl = avInfo.getSourceUrl();
         Document document = JsoupUtil.getDocument(sourceUrl, enableProxy);
         if (Objects.isNull(document)) {
@@ -208,25 +214,93 @@ public class Javbus extends BaseWeb {
             }).collect(Collectors.toList());
             avInfo.setPreviewImageList(byteList);
         }
-        logger.info("{},{},获取完成",avInfo.getCode(),avInfo.getName());
+
+        String scriptString = "";
+        Elements scripts = document.getElementsByTag("script");
+        for (Element element : scripts) {
+            if (element.data().contains("gid")) {
+                scriptString = element.data();
+                break;
+            }
+        }
+        String gid = String.valueOf(getGid(scriptString));
+        if (!StringUtils.isEmpty(gid)) {
+            String apiUrl = magnetApi.replace("@{gid}", gid);
+            Map<String, String> header = new HashMap<>();
+            header.put("referer", home);
+            String apihtml = OKHttpUtils.get(apiUrl, header, enableProxy);
+            if (Objects.nonNull(apihtml)) {
+                apihtml="<table>"+apihtml+"</table>";
+                Document apiDocument = Jsoup.parseBodyFragment(apihtml);
+                List<AvInfo.Magnet> magnetList=new CopyOnWriteArrayList<>();
+                apiDocument.getElementsByTag("tr").stream().forEach(tr -> {
+                    AvInfo.Magnet magnetInfo = new AvInfo.Magnet();
+                    Elements dataList = tr.getElementsByTag("a");
+                    if (dataList.size() == 3) {
+                        String magnet = dataList.get(0).attr("href");
+                        magnetInfo.setMagnet(magnet);
+                        String name = dataList.get(0).text();
+                        magnetInfo.setName(name);
+                        String sizeStr = dataList.get(1).text();
+                        magnetInfo.setSizeStr(sizeStr);
+                        double size = 0;
+                        if (sizeStr.endsWith("MB")) {
+                            size = Double.valueOf(sizeStr.replace("MB", "0"));
+                        } else if (sizeStr.endsWith("GB")) {
+                            size = Double.valueOf(sizeStr.replace("GB", "0")) * 1024;
+                        }
+                        magnetInfo.setSize(size);
+                        String shareDate = dataList.get(2).text();
+                        try {
+                            magnetInfo.setShareDate(simpleDateFormat.parse(shareDate));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } else if(dataList.size() == 4){
+                        String magnet = dataList.get(0).attr("href");
+                        magnetInfo.setMagnet(magnet);
+                        String name = dataList.get(0).text();
+                        magnetInfo.setName(name);
+                        String sizeStr = dataList.get(2).text();
+                        magnetInfo.setSizeStr(sizeStr);
+                        double size = 0;
+                        if (sizeStr.endsWith("MB")) {
+                            size = Double.valueOf(sizeStr.replace("MB", "0"));
+                        } else if (sizeStr.endsWith("GB")) {
+                            size = Double.valueOf(sizeStr.replace("GB", "0")) * 1024;
+                        }
+                        magnetInfo.setSize(size);
+                        String shareDate = dataList.get(3).text();
+                        try {
+                            magnetInfo.setShareDate(simpleDateFormat.parse(shareDate));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    magnetList.add(magnetInfo);
+                });
+                avInfo.setMagnetList(magnetList);
+            }
+        }
+        logger.info("{},{},获取完成", avInfo.getCode(), avInfo.getName());
         return avInfo;
     }
 
-    public void saveAvInfoByActresses(String actressesUrl){
-        List<AvInfo> list= getAvInfoUrlByActresses(actressesUrl);
+    public void saveAvInfoByActresses(String actressesUrl) {
+        List<AvInfo> list = getAvInfoUrlByActresses(actressesUrl);
         list.stream().parallel().forEach(avInfo -> {
-             if(avInfoService.count("code",avInfo.getCode())==0){
-                 avInfoService.insert(getAvInfo(avInfo));
-             }
+            if (avInfoService.count("code", avInfo.getCode()) == 0) {
+                avInfoService.insert(getAvInfo(avInfo));
+            }
         });
     }
 
-    public void saveAvInfoByActressesAll(){
-         actressesInfoService.findAll().stream().parallel().forEach(actressesInfo -> {
-             saveAvInfoByActresses(actressesInfo.getJavbusUrl());
-             logger.info("----------{},所有获取完成---------",actressesInfo.getName());
-         });
-         logger.info("----------保存完成-------------");
+    public void saveAvInfoByActressesAll() {
+        actressesInfoService.findAll().stream().parallel().forEach(actressesInfo -> {
+            saveAvInfoByActresses(actressesInfo.getJavbusUrl());
+            logger.info("----------{},所有获取完成---------", actressesInfo.getName());
+        });
+        logger.info("----------保存完成-------------");
     }
 
     public void saveAllUncensoredActressesInfo() {
@@ -249,6 +323,11 @@ public class Javbus extends BaseWeb {
             page++;
         }
         logger.info("信息保存完成");
+    }
+
+
+    public String getGid(String js) {
+        return js.split("gid")[1].replace("=","").split(";")[0].trim();
     }
 
 }

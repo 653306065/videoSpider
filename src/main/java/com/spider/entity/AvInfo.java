@@ -56,7 +56,7 @@ public class AvInfo {
     private String sourceUrl;
 
     //磁力链接
-    private List<Magnet> MagnetList;
+    private List<Magnet> magnetList;
 
     // 预览图
     private List<String>  previewImageUrlList;
@@ -74,7 +74,9 @@ public class AvInfo {
     private String videoSavePath;
 
     @Data
-    public class Magnet{
+    @Setter
+    @Getter
+    public static class Magnet{
 
         //名称
         private String name;
@@ -83,7 +85,7 @@ public class AvInfo {
         private String magnet;
 
         //文件大小
-        private long size;
+        private Double size;
 
         //文件大小的简写
         private String sizeStr;
