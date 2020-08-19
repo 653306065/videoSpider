@@ -290,7 +290,10 @@ public class Javbus extends BaseWeb {
         List<AvInfo> list = getAvInfoUrlByActresses(actressesUrl);
         list.stream().parallel().forEach(avInfo -> {
             if (Objects.nonNull(avInfo)&&avInfoService.count("code", avInfo.getCode()) == 0) {
-                avInfoService.insert(getAvInfo(avInfo));
+                avInfo=getAvInfo(avInfo);
+                if(Objects.nonNull(avInfo)){
+                    avInfoService.insert(avInfo);
+                }
             }
         });
     }
