@@ -3,6 +3,7 @@ package com.spider.service;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
+import com.spider.entity.Video;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -29,6 +30,16 @@ public abstract class BaseService<T> {
 
     public List<T> findBykeyValue(String key,String value){
         Query query = new Query(Criteria.where(key).is(value));
+        return  mongoTemplate.find(query,clazz);
+    }
+
+    public T findOneByRegex(String key,String value){
+        Query query = new Query(Criteria.where(key).regex(value));
+        return  mongoTemplate.findOne(query,clazz);
+    }
+
+    public List<T> findListByRegex(String key,String value){
+        Query query = new Query(Criteria.where(key).regex(value));
         return  mongoTemplate.find(query,clazz);
     }
 

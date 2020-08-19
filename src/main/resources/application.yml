@@ -118,9 +118,9 @@ javbangers:
    home: https://www.javbangers.com/
    template: https://www.javbangers.com/categories/@{categories}/?mode=async&function=get_block&block_id=list_videos_common_videos_list&sort_by=post_date&from=@{page}&_=@{time}
    savePath: C:\javbangers\
-   cookie: kt_qparams=id%3D102615%26dir%3D127-coco; kt_tcookie=1; _ga=GA1.2.1608883958.1597630864; _gid=GA1.2.1104513743.1597630864; kt_is_visited=1; bcs_cookie_bongacams_pop=1; kt_rt_adv_player=hidden; PHPSESSID=89a16c41a94e79445cf3f801d71bcc62; kt_ips=103.126.24.82%2C8.210.182.28; kt_member=62786d16ab3a9fac33116e7a4796256d; _gat_gtag_UA_154629456_1=1
+   cookie: kt_tcookie=1; _ga=GA1.2.759767344.1597591522; kt_qparams=id%3D102615%26dir%3D127-coco; kt_ips=113.104.203.164%2C13.94.59.147; _gid=GA1.2.1225905438.1597849899; kt_is_visited=1; bcs_cookie_bongacams_pop=1; PHPSESSID=ec22e14dd8811fc715ad079953406b9d; _gat_gtag_UA_154629456_1=1
    enableProxy: false
-   thread: 10
+   thread: 20
 
 javbus:
    home: https://www.javbus.com
@@ -130,14 +130,14 @@ javbus:
    actressesDetailsTemplate: ${javbus.home}/@{category}/star/@{name}
    avTemplate: ${javbus.home}/@{code}
    magnetApi: https://www.javbus.com/ajax/uncledatoolsbyajax.php?gid=@{gid}&lang=zh&uc=1
-   savePath: C:\javbus\
+   savePath: F:\javbus\
 
 proxy:
    enabled: false
    socks:
       #host: 192.168.31.184
       host: 127.0.0.1
-      port: 1080
+      port: 10808
    http:
       #host: 192.168.31.184
       host: 127.0.0.1

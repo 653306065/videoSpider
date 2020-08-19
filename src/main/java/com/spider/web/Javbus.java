@@ -77,7 +77,7 @@ public class Javbus extends BaseWeb {
                 if (!"https://images.javbus.com/actress/nowprinting.gif".equals(imgUrl)) {
                     byte[] imgBytes = OKHttpUtils.getBytes(imgUrl, enableProxy);
                     if (Objects.nonNull(imgBytes)) {
-                        String path = savePath + "actresses" + File.separator + name + ".jpg";
+                        String path = savePath + "actresses" + File.separator + FileUtils.repairPath(name) + ".jpg";
                         FileUtils.byteToFile(imgBytes, path);
                     }
                     actressesInfo.setJavbusPhoto(imgBytes);
@@ -153,7 +153,7 @@ public class Javbus extends BaseWeb {
             avInfo.setCoverUrl(imgUrl);
             byte[] imgBytes = OKHttpUtils.getBytes(imgUrl, enableProxy);
             if (Objects.nonNull(imgBytes)) {
-                String path = savePath + "av" + File.separator + avInfo.getCode() + "_" + FileUtils.repairPath(avInfo.getName()) + File.separator + "cover" + File.separator + "cover.jpg";
+                String path = savePath + "av" + File.separator + avInfo.getCode().trim() + File.separator + "cover" + File.separator + "cover.jpg";
                 FileUtils.byteToFile(imgBytes, path);
                 avInfo.setCover(imgBytes);
             }
@@ -207,7 +207,7 @@ public class Javbus extends BaseWeb {
             List<byte[]> byteList = waterfallList.stream().parallel().map(url -> {
                 byte[] bytes = OKHttpUtils.getBytes(url, enableProxy);
                 if (Objects.nonNull(bytes)) {
-                    String path = savePath + "av" + File.separator + avInfo.getCode() + "_" + FileUtils.repairPath(avInfo.getName()) + File.separator + System.currentTimeMillis() + ".jpg";
+                    String path = savePath + "av" + File.separator + avInfo.getCode().trim() + File.separator + System.currentTimeMillis() + ".jpg";
                     FileUtils.byteToFile(bytes, path);
                 }
                 return bytes;
@@ -230,9 +230,9 @@ public class Javbus extends BaseWeb {
             header.put("referer", home);
             String apihtml = OKHttpUtils.get(apiUrl, header, enableProxy);
             if (Objects.nonNull(apihtml)) {
-                apihtml="<table>"+apihtml+"</table>";
+                apihtml = "<table>" + apihtml + "</table>";
                 Document apiDocument = Jsoup.parseBodyFragment(apihtml);
-                List<AvInfo.Magnet> magnetList=new CopyOnWriteArrayList<>();
+                List<AvInfo.Magnet> magnetList = new CopyOnWriteArrayList<>();
                 apiDocument.getElementsByTag("tr").stream().forEach(tr -> {
                     AvInfo.Magnet magnetInfo = new AvInfo.Magnet();
                     Elements dataList = tr.getElementsByTag("a");
@@ -256,7 +256,7 @@ public class Javbus extends BaseWeb {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                    } else if(dataList.size() == 4){
+                    } else if (dataList.size() == 4) {
                         String magnet = dataList.get(0).attr("href");
                         magnetInfo.setMagnet(magnet);
                         String name = dataList.get(0).text();
@@ -289,9 +289,9 @@ public class Javbus extends BaseWeb {
     public void saveAvInfoByActresses(String actressesUrl) {
         List<AvInfo> list = getAvInfoUrlByActresses(actressesUrl);
         list.stream().parallel().forEach(avInfo -> {
-            if (Objects.nonNull(avInfo)&&avInfoService.count("code", avInfo.getCode()) == 0) {
-                avInfo=getAvInfo(avInfo);
-                if(Objects.nonNull(avInfo)){
+            if (Objects.nonNull(avInfo) && avInfoService.count("code", avInfo.getCode()) == 0) {
+                avInfo = getAvInfo(avInfo);
+                if (Objects.nonNull(avInfo)) {
                     avInfoService.insert(avInfo);
                 }
             }
@@ -299,7 +299,8 @@ public class Javbus extends BaseWeb {
     }
 
     public void saveAvInfoByActressesAll() {
-        actressesInfoService.findAll().stream().parallel().forEach(actressesInfo -> {
+        actressesInfoService.findAll().stream().forEach(actressesInfo -> {
+            logger.info("----------{},开始获取---------", actressesInfo.getName());
             saveAvInfoByActresses(actressesInfo.getJavbusUrl());
             logger.info("----------{},所有获取完成---------", actressesInfo.getName());
         });
@@ -330,7 +331,7 @@ public class Javbus extends BaseWeb {
 
 
     public String getGid(String js) {
-        return js.split("gid")[1].replace("=","").split(";")[0].trim();
+        return js.split("gid")[1].replace("=", "").split(";")[0].trim();
     }
 
 }
