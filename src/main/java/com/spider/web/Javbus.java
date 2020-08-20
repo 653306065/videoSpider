@@ -162,7 +162,7 @@ public class Javbus extends BaseWeb {
         if (infos.size() > 0) {
             Element info = infos.get(0);
             Elements infoList = info.getElementsByTag("p");
-            infoList.stream().parallel().forEach(p -> {
+            infoList.stream().sequential().forEach(p -> {
                 String text = p.text();
                 String[] arr = text.split(":");
                 if (arr.length > 1) {
@@ -186,7 +186,7 @@ public class Javbus extends BaseWeb {
                     }
                 }
             });
-            List<String> tags = info.getElementsByClass("genre").stream().parallel().map(element -> {
+            List<String> tags = info.getElementsByClass("genre").stream().map(element -> {
                 return element.text();
             }).collect(Collectors.toList());
             avInfo.setTags(tags);
@@ -233,7 +233,7 @@ public class Javbus extends BaseWeb {
                 apihtml = "<table>" + apihtml + "</table>";
                 Document apiDocument = Jsoup.parseBodyFragment(apihtml);
                 List<AvInfo.Magnet> magnetList = new CopyOnWriteArrayList<>();
-                apiDocument.getElementsByTag("tr").stream().forEach(tr -> {
+                apiDocument.getElementsByTag("tr").stream().sequential().forEach(tr -> {
                     AvInfo.Magnet magnetInfo = new AvInfo.Magnet();
                     Elements dataList = tr.getElementsByTag("a");
                     if (dataList.size() == 3) {
@@ -288,8 +288,8 @@ public class Javbus extends BaseWeb {
 
     public void saveAvInfoByActresses(String actressesUrl) {
         List<AvInfo> list = getAvInfoUrlByActresses(actressesUrl);
-        list.stream().parallel().forEach(avInfo -> {
-            if (Objects.nonNull(avInfo) && avInfoService.count("code", avInfo.getCode()) == 0) {
+        list.stream().filter(avInfo -> Objects.nonNull(avInfo)).parallel().forEach(avInfo -> {
+            if (avInfoService.count("code", avInfo.getCode()) == 0) {
                 avInfo = getAvInfo(avInfo);
                 if (Objects.nonNull(avInfo)) {
                     avInfoService.insert(avInfo);
@@ -299,7 +299,7 @@ public class Javbus extends BaseWeb {
     }
 
     public void saveAvInfoByActressesAll() {
-        actressesInfoService.findAll().stream().forEach(actressesInfo -> {
+        actressesInfoService.findAll().stream().sequential().forEach(actressesInfo -> {
             logger.info("----------{},开始获取---------", actressesInfo.getName());
             saveAvInfoByActresses(actressesInfo.getJavbusUrl());
             logger.info("----------{},所有获取完成---------", actressesInfo.getName());
