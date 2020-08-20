@@ -1,32 +1,15 @@
 package com.spider.utils;
 
-import java.io.BufferedInputStream;
-
+import com.spider.constant.Constant;
 import org.apache.commons.codec.binary.Hex;
-import org.springframework.util.DigestUtils;
 
-import com.alibaba.fastjson.JSON;
-
-import java.security.MessageDigest;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.security.MessageDigest;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class FileUtils {
 
@@ -72,6 +55,25 @@ public class FileUtils {
                     getPathFileList(file.getAbsolutePath(), list);
                 } else {
                     list.add(file);
+                }
+            }
+        }
+        return list;
+    }
+
+    public static List<File> getPathVideoFlieList(String path, List<File> list) {
+        File files = new File(path);
+        if (!files.exists() || !files.isDirectory() || files.listFiles().length == 0) {
+            return null;
+        } else {
+            for (File file : files.listFiles()) {
+                if (file.isDirectory()) {
+                    getPathFileList(file.getAbsolutePath(), list);
+                } else {
+                    String format = getFileFormatName(file.getName()).toLowerCase();
+                    if (Constant.videoFormat.contains(format)) {
+                        list.add(file);
+                    }
                 }
             }
         }
