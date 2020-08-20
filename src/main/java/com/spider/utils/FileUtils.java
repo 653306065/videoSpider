@@ -84,9 +84,10 @@ public class FileUtils {
         } else {
             for (File file : files.listFiles()) {
                 if (file.isDirectory()) {
-                    getPathFileList(file.getAbsolutePath(), list);
+                    getPathVideoFlieList(file.getAbsolutePath(), list);
                 } else {
                     String format = getFileFormatName(file.getName()).toLowerCase();
+                    System.out.println(format);
                     if (Constant.videoFormat.contains(format)) {
                         list.add(file);
                     }
