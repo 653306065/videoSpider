@@ -121,6 +121,9 @@ public class Javbangers extends BaseWeb {
                     String date = simpleDateFormat.format(new Date());
                     String videoSavePath = savePath + "uncensored" + File.separator + date + File.separator + video.getName();
                     video.setSavePath(videoSavePath);
+                    if(video.getName().startsWith("FC2-PPV")){
+                        continue;
+                    }
                     multithreadingDownload.videoDownload(video, null, enableProxy, thread, defaultSegmentSize);
                 }
             } catch (Exception e) {

@@ -1,10 +1,11 @@
 package com.spider.conf;
 
 import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 
-@Configurable
+@Component
 public class SystemConf {
 
     @PostConstruct

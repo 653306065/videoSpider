@@ -9,6 +9,7 @@ import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class FileUtils {
@@ -59,6 +60,21 @@ public class FileUtils {
             }
         }
         return list;
+    }
+
+    public static void clearEmptyFolder (String path){
+        File file = new File(path);
+        if(file.exists()&&file.isDirectory()){
+            if(Objects.nonNull(file.listFiles())&&file.listFiles().length>0){
+                for(File item:file.listFiles()){
+                    if(item.isDirectory()){
+                        clearEmptyFolder(item.getAbsolutePath());
+                    }
+                }
+            }else {
+                file.delete();
+            }
+        }
     }
 
     public static List<File> getPathVideoFlieList(String path, List<File> list) {
@@ -332,31 +348,6 @@ public class FileUtils {
     }
 
     public static void main(String[] args) {
-        List<String> keys = readTxt("E:\\key1.txt", "UTF-8");
-        List<File> list = new ArrayList<File>();
-        getPathFileList("E:\\母子", list);
-        getPathFileList("E:\\黄书", list);
-        for (File file : list) {
-            int time = 0;
-            List<String> text = readTxt(file.getAbsolutePath(), "UTF-8");
-            text.addAll(readTxt(file.getAbsolutePath(), "GBK"));
-            text.addAll(readTxt(file.getAbsolutePath(), "GB2312"));
-            text.addAll(readTxt(file.getAbsolutePath(), "BIG5"));
-            A:
-            for (String str : text) {
-                for (String key : keys) {
-                    if (str.indexOf(key) != -1) {
-                        time++;
-                        System.out.println(str);
-                    }
-                    if (time > 20) {
-                        System.out.println(file.getAbsolutePath());
-                        file.renameTo(new File("E:\\test\\" + file.getName()));
-                        break A;
-                    }
-                }
-            }
-        }
-        // System.out.println(JSON.toJSONString(keys));
+        clearEmptyFolder("F:\\javbus\\av");
     }
 }
