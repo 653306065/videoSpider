@@ -1,16 +1,18 @@
 package com.spider.utils;
 
+import com.alibaba.fastjson.JSON;
+import com.google.api.client.json.Json;
 import com.spider.constant.Constant;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.compress.utils.Lists;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class FileUtils {
 
@@ -62,16 +64,16 @@ public class FileUtils {
         return list;
     }
 
-    public static void clearEmptyFolder (String path){
+    public static void clearEmptyFolder(String path) {
         File file = new File(path);
-        if(file.exists()&&file.isDirectory()){
-            if(Objects.nonNull(file.listFiles())&&file.listFiles().length>0){
-                for(File item:file.listFiles()){
-                    if(item.isDirectory()){
+        if (file.exists() && file.isDirectory()) {
+            if (Objects.nonNull(file.listFiles()) && file.listFiles().length > 0) {
+                for (File item : file.listFiles()) {
+                    if (item.isDirectory()) {
                         clearEmptyFolder(item.getAbsolutePath());
                     }
                 }
-            }else {
+            } else {
                 file.delete();
             }
         }
@@ -348,7 +350,38 @@ public class FileUtils {
                 .replaceAll(">", "").replaceAll("|", "");
     }
 
+
+    @NotNull
+    public static List<String> getSearchKeyList(String name) {
+        List<String> list = new ArrayList<>();
+        list.add(name);
+        String[] splitKeys = {"_", ",", "-", " "};
+        String[] connectKeys = {"_", "-", " "};
+        for (String splitKey : splitKeys) {
+            String[] splitArr = name.split(splitKey);
+            list.addAll(Arrays.asList(splitArr));
+            int index = 0;
+            for (String key : splitArr) {
+                for (String connectKey : connectKeys) {
+                    if(index+1>=splitArr.length){
+                        break;
+                    }
+                    String tmep = key + connectKey + splitArr[index + 1];
+                    list.add(tmep);
+                }
+                index++;
+            }
+        }
+        List<String> all = new ArrayList<>();
+        all.addAll(list.stream().map(key->{ return  key.toLowerCase().trim();}).collect(Collectors.toList()));
+        all.addAll(list.stream().map(key->{ return  key.toUpperCase().trim();}).collect(Collectors.toList()));
+        return all ;
+    }
+
     public static void main(String[] args) {
-        clearEmptyFolder("F:\\javbus\\av");
+
+        List<String> list = getSearchKeyList("11216_337-mura - Kazue Nishito.mp4");
+        System.out.println(JSON.toJSONString(list));
+        //clearEmptyFolder("F:\\javbus\\av");
     }
 }

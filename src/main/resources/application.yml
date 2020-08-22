@@ -118,9 +118,9 @@ javbangers:
    home: https://www.javbangers.com/
    template: https://www.javbangers.com/categories/@{categories}/?mode=async&function=get_block&block_id=list_videos_common_videos_list&sort_by=post_date&from=@{page}&_=@{time}
    savePath: F:\javbangers\
-   cookie: kt_tcookie=1; _ga=GA1.2.759767344.1597591522; kt_qparams=id%3D102615%26dir%3D127-coco; _gid=GA1.2.1225905438.1597849899; kt_is_visited=1; PHPSESSID=9167ee21a303f517eb2e79f8bd05a1eb; kt_ips=113.104.203.164%2C13.94.59.147%2C113.104.181.84%2C23.101.3.171; _gat_gtag_UA_154629456_1=1; kt_member=b64e26dc63e6942391fe1b365734f71a
+   cookie: kt_tcookie=1; _ga=GA1.2.759767344.1597591522; PHPSESSID=ee542c46d0ff78f546297fdabec3c38d; kt_qparams=id%3D102615%26dir%3D127-coco; kt_ips=13.75.113.15; kt_is_visited=1; bcs_cookie_bongacams_pop=1; _gid=GA1.2.491850898.1598071073; kt_member=934ffb9fd7afbd316a58e83871ef7a18; kt_rt_adv_player=hidden
    enableProxy: true
-   thread: 20
+   thread: 30
 
 javbus:
    home: https://www.javbus.com

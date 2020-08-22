@@ -2,10 +2,13 @@ package com.spider.aop;
 
 import java.io.File;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import com.alibaba.fastjson.JSON;
+import com.spider.entity.AvInfo;
+import com.spider.service.AvInfoService;
 import org.apache.http.protocol.HTTP;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -42,6 +45,9 @@ public class DownloadAop {
     @Autowired
     private UrlRecordService urlRecordService;
 
+    @Autowired
+    private AvInfoService avInfoService;
+
     @Pointcut("execution(* com.spider.utils.download.MultithreadingDownload.videoDownload(..))")
     public void multithreadingDownload_videoDownload() {
 
@@ -51,7 +57,24 @@ public class DownloadAop {
     public void aroundVideoDownload(ProceedingJoinPoint joinPoint){
         Object[] args = joinPoint.getArgs();
         Video video= (Video) args[0];
-
+        String name= video.getName();
+        List<String> list= FileUtils.getSearchKeyList(name);
+        AvInfo avInfo=null;
+        for(String key:list){
+            avInfo=avInfoService.findOnekeyValue("code",key);
+           if(Objects.nonNull(avInfo)){
+               logger.info("{},的code是{}",video.getName(),avInfo.getCode());
+               if(avInfo.isHasVideo()){
+                   logger.info("code,{},的视频已存在,vidoeId:{},savePath:{}",avInfo.getCode(),avInfo.getVideoId(),avInfo.getVideoSavePath());
+                   return;
+               }
+               break;
+           }
+        }
+//        if(avInfo==null){
+//            logger.info("没有匹配到code");
+//            return;
+//        }
         if(Objects.nonNull(videoService.findByName(video.getName()))){
             logger.info(video.getName() + "已存在");
             return;
@@ -88,7 +111,16 @@ public class DownloadAop {
                 video.setSizeStr(videoFile.length() / 1024.0 / 1024 + "MB");
                 video.setMultimediaInfo(info);
                 video.setCreateDate(new Date());
+                if(Objects.nonNull(avInfo)){
+                    video.setAvCode(avInfo.getCode());
+                }
                 videoService.insert(video);
+                if(Objects.nonNull(avInfo)){
+                    avInfo.setVideoId(video.getId());
+                    avInfo.setHasVideo(true);
+                    avInfo.setVideoSavePath(video.getSavePath());
+                    avInfoService.updateById(avInfo);
+                }
                 logger.info("{},文件信息保存完成",video.getName());
             }else{
                 logger.info("{},文件MD5验证失败",video.getName());
@@ -169,5 +201,4 @@ public class DownloadAop {
             e.printStackTrace();
         }
     }
-
 }

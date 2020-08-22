@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.spider.constant.WebConstant;
+import com.spider.constant.Constant;
 import com.spider.service.UrlRecordService;
 import com.spider.utils.OKHttpUtils;
 import com.spider.utils.download.MultithreadingDownload;
@@ -68,7 +68,7 @@ public class Javfinder extends BaseWeb{
         while (true) {
             Map<String, String> header = new HashMap<>();
             header.put("cookie", getCookie());
-            header.put("user-agent", WebConstant.user_agent);
+            header.put("user-agent", Constant.user_agent);
             html = OKHttpUtils.get(url, header, enableProxy);
             logger.info(html);
             if (html != null) {
