@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Logback configuration. See http://logback.qos.ch/manual/index.html -->
+<configuration scan="true" scanPeriod="60000">
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <jmxConfigurator/>
+
+    <contextName>api-cc-cloud.obc.im</contextName>
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d [%15.25thread] %-5level %logger{35}[%line] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="rollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/data/logs/videoSpider/logs/logfile.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>/data/logs/videoSpider/logs/logfile.%d{yyyy-MM-dd}.log.zip</fileNamePattern>
+            <!-- keep 365 days' worth of history -->
+            <maxHistory>365</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d [%15.25thread] %-5level %logger{35}[%line] - %msg %n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- project default level -->
+    <logger name="com.obc" level="INFO"/>
+    <logger name="org.springframework" level="INFO"/>
+
+    <root level="INFO">
+        <appender-ref ref="console"/>
+        <appender-ref ref="rollingFile"/>
+    </root>
+</configuration>
