@@ -1,6 +1,7 @@
 package com.spider.web;
 
 import com.spider.entity.Video;
+import com.spider.service.VideoService;
 import com.spider.utils.FileUtils;
 import com.spider.utils.JsoupUtil;
 import com.spider.utils.OKHttpUtils;
@@ -40,6 +41,9 @@ public class Javbangers extends BaseWeb {
     private Integer thread;
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+    @Autowired
+    private VideoService videoService;
 
     @Autowired
     private MultithreadingDownload multithreadingDownload;
@@ -117,6 +121,11 @@ public class Javbangers extends BaseWeb {
                 List<Video> videoList = getVideoListByUrl("uncensored", page);
                 videoList = videoList.stream().filter(v -> Objects.nonNull(v.getSourceUrl())).collect(Collectors.toList());
                 for(Video video:videoList){
+                    Video findVideo= videoService.findOnekeyValue("sourceUrl",video.getSourceUrl());
+                    if(Objects.nonNull(findVideo)){
+                        logger.info("{},已存在",video.getSourceUrl());
+                        continue;
+                    }
                     video=getVideoInfo(video);
                     String date = simpleDateFormat.format(new Date());
                     String videoSavePath = savePath + "uncensored" + File.separator + date + File.separator + video.getName();
@@ -128,6 +137,9 @@ public class Javbangers extends BaseWeb {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+            if(page==0){
+                break;
             }
             page--;
         }
