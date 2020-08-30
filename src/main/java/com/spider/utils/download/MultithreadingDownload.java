@@ -40,46 +40,50 @@ public class MultithreadingDownload {
                 return false;
             } else {
                 logger.info(path + ",开始下载,url:" + HttpUrl);
-                String fileSizeStr = info.getContentLength() / 1024.0 / 1024.0 + "m";
+                String fileSizeStr = getOmitValue(info.getContentLength() / 1024.0 / 1024.0,5)+ "m";
                 logger.info(JSON.toJSONString(info) + ",大小" + fileSizeStr);
                 RandomAccessFile raf = new RandomAccessFile(file, "rw");
                 raf.setLength(info.getContentLength());
                 ExecutorService executorService = Executors.newFixedThreadPool(threadNum);
                 int i = 0;
-                List<Future<Boolean>> downloadResult=new ArrayList<Future<Boolean>>();
+                List<Future<Boolean>> downloadResult = new ArrayList<Future<Boolean>>();
                 while (true) {
                     long startByte = i * segmentSize;
                     long endByte = (i + 1) * segmentSize - 1;
                     if (endByte >= info.getContentLength()) {
-                        CallableDownloadThread callableDownloadThread=new CallableDownloadThread(HttpUrl, header, isProxy, startByte, endByte, file, downloadByte);
-                        Future<Boolean> future=executorService.submit(callableDownloadThread);
+                        CallableDownloadThread callableDownloadThread = new CallableDownloadThread(HttpUrl, header, isProxy, startByte, endByte, file, downloadByte);
+                        Future<Boolean> future = executorService.submit(callableDownloadThread);
                         downloadResult.add(future);
                         break;
                     }
-                    CallableDownloadThread callableDownloadThread=new CallableDownloadThread(HttpUrl, header, isProxy, startByte, endByte, file, downloadByte);
-                    Future<Boolean> future= executorService.submit(callableDownloadThread);
+                    CallableDownloadThread callableDownloadThread = new CallableDownloadThread(HttpUrl, header, isProxy, startByte, endByte, file, downloadByte);
+                    Future<Boolean> future = executorService.submit(callableDownloadThread);
                     downloadResult.add(future);
                     i++;
                 }
                 executorService.shutdown();
                 ConsoleProgressBar cpb = new ConsoleProgressBar(100, '#');
+                long tmep = 0;
+                long sleepTime = 300;
                 while (true) {
-                    double percentage = (downloadByte.longValue() * 1.0) / (info.getContentLength() * 1.0) * 100.0;
+                    double percentage = (downloadByte.get() * 1.0) / (info.getContentLength() * 1.0) * 100.0;
                     cpb.show((int) Math.floor(percentage));
-                    if (String.valueOf(percentage).length() > 5) {
-                        System.out.print("(" + String.valueOf(percentage).substring(0, 5) + "%)," + fileSizeStr);
-                    } else {
-                        System.out.print("(" + String.valueOf(percentage) + "%)," + fileSizeStr);
-                    }
-                    Thread.sleep(10);
+                    String speedStr = "0.0";
+                    if (tmep < downloadByte.get()) {
+                        double speed = ((downloadByte.get() - tmep) / 1024.0 / 1024) / (sleepTime / 1000.0);
+                        speedStr=getOmitValue(speed,5)
+;                    }
+                    System.out.print("(" + getOmitValue(percentage,5) + "%)," +  fileSizeStr+","+speedStr+"m/s");
+                    tmep = downloadByte.get();
+                    Thread.sleep(sleepTime);
                     if (executorService.isTerminated()) {
                         break;
                     }
                 }
-                boolean result=true;
-                for(Future<Boolean> future:downloadResult){
-                    if(!future.get()){
-                        result=false;
+                boolean result = true;
+                for (Future<Boolean> future : downloadResult) {
+                    if (!future.get()) {
+                        result = false;
                     }
                 }
                 downloadByte.set(0);
@@ -88,12 +92,12 @@ public class MultithreadingDownload {
                 long endTime = System.currentTimeMillis();
                 logger.info("耗时:" + (endTime - startTime) / 1000 / 60.0 + "分钟");
                 raf.close();
-                if(!result){
-                    logger.info("{},下载失败",file.getName());
-                    while (!file.delete()){
-                        logger.info("{},删除失败",file.getName());
+                if (!result) {
+                    logger.info("{},下载失败", file.getName());
+                    while (!file.delete()) {
+                        logger.info("{},删除失败", file.getName());
                     }
-                    logger.info("{},删除成功",file.getName());
+                    logger.info("{},删除成功", file.getName());
                 }
                 return result;
             }
@@ -103,6 +107,14 @@ public class MultithreadingDownload {
             new File(path).delete();
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public String getOmitValue(double value,int index){
+        if (String.valueOf(value).length() > index) {
+           return  String.valueOf(value).substring(0, index);
+        } else {
+           return String.valueOf(value);
         }
     }
 

@@ -45,6 +45,9 @@ public class Javbangers extends BaseWeb {
     @Autowired
     private VideoService videoService;
 
+    @Value("#{'${javbangers.filterKey}'.split(',')}")
+    private List<String> filterKey;
+
     @Autowired
     private MultithreadingDownload multithreadingDownload;
 
@@ -115,12 +118,12 @@ public class Javbangers extends BaseWeb {
     }
 
     public void downloadUncensored() {
-        int page = 888;
+        int page = 1;
         while (true) {
             try {
                 List<Video> videoList = getVideoListByUrl("uncensored", page);
                 videoList = videoList.stream().filter(v -> Objects.nonNull(v.getSourceUrl())).collect(Collectors.toList());
-                for(Video video:videoList){
+                A: for(Video video:videoList){
                     Video findVideo= videoService.findOnekeyValue("sourceUrl",video.getSourceUrl());
                     if(Objects.nonNull(findVideo)){
                         logger.info("{},已存在",video.getSourceUrl());
@@ -130,18 +133,18 @@ public class Javbangers extends BaseWeb {
                     String date = simpleDateFormat.format(new Date());
                     String videoSavePath = savePath + "uncensored" + File.separator + date + File.separator + video.getName();
                     video.setSavePath(videoSavePath);
-                    if(video.getName().startsWith("FC2-PPV")){
-                        continue;
+                    for(String key:filterKey){
+                        if(video.getName().contains(key)){
+                            logger.info("{},的名称有过滤字段",video.getName());
+                            continue A;
+                        }
                     }
                     multithreadingDownload.videoDownload(video, null, enableProxy, thread, defaultSegmentSize);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            if(page==0){
-                break;
-            }
-            page--;
+            page++;
         }
     }
 

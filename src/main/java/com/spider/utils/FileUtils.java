@@ -355,6 +355,7 @@ public class FileUtils {
     public static List<String> getSearchKeyList(String name) {
         List<String> list = new ArrayList<>();
         list.add(name);
+        name = getFileNameWithoutSuffix(name);
         String[] splitKeys = {"_", ",", "-", " "};
         String[] connectKeys = {"_", "-", " "};
         for (String splitKey : splitKeys) {
@@ -380,7 +381,7 @@ public class FileUtils {
 
     public static void main(String[] args) {
 
-        List<String> list = getSearchKeyList("11216_337-mura - Kazue Nishito.mp4");
+        List<String> list = getSearchKeyList("1Pondo-081310_906.mp4");
         System.out.println(JSON.toJSONString(list));
         //clearEmptyFolder("F:\\javbus\\av");
     }
