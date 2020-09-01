@@ -1,12 +1,9 @@
 package com.spider.utils;
 
-import com.alibaba.fastjson.JSON;
-import com.google.api.client.json.Json;
+
 import com.spider.constant.Constant;
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.NotNull;
-
 import java.io.*;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
@@ -307,7 +304,9 @@ public class FileUtils {
             while ((length = fileInputStream.read(buffer)) != -1) {
                 MD5.update(buffer, 0, length);
             }
-            return new String(Hex.encodeHex(MD5.digest()));
+            String md5Str=new String(Hex.encodeHex(MD5.digest()));
+            System.out.println(file.getName()+",md5:"+md5Str);
+            return md5Str;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -380,9 +379,21 @@ public class FileUtils {
     }
 
     public static void main(String[] args) {
-
-        List<String> list = getSearchKeyList("1Pondo-081310_906.mp4");
-        System.out.println(JSON.toJSONString(list));
-        //clearEmptyFolder("F:\\javbus\\av");
+        List<File> d=new ArrayList<File>();
+        List<File> e=new ArrayList<File>();
+        getPathFileList("D:\\里番",d);
+        getPathFileList("E:\\里番",e);
+        Map<File,String> dmap=d.stream().parallel().collect(Collectors.toMap(file ->file,file -> getMD5(file)));
+        Map<File,String> emap=e.stream().parallel().collect(Collectors.toMap(file -> file,file -> getMD5(file)));
+        for(String value:dmap.values()){
+            if(emap.containsValue(value)){
+                for(Map.Entry<File,String> entry:emap.entrySet()){
+                    if(entry.getValue().equals(value)){
+                        System.out.println(entry.getKey().getAbsoluteFile());
+                        entry.getKey().delete();
+                    }
+                }
+            }
+        }
     }
 }

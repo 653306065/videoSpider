@@ -7,5 +7,5 @@ public abstract class BaseWeb {
 
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    protected final long  defaultSegmentSize=1024*1024*10;
+    protected final long  defaultSegmentSize=1024*1024*5;
 }

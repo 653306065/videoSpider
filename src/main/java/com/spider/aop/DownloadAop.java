@@ -71,10 +71,10 @@ public class DownloadAop {
                break;
            }
         }
-        if(avInfo==null){
-            logger.info("{},没有匹配到code",video.getName());
-            return;
-        }
+//        if(avInfo==null){
+//            logger.info("{},没有匹配到code",video.getName());
+//            return;
+//        }
         if(Objects.nonNull(videoService.findByName(video.getName()))){
             logger.info(video.getName() + "已存在");
             return;
