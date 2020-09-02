@@ -283,6 +283,9 @@ public class FileUtils {
             if (!localFile.exists()) {
                 localFile.getParentFile().mkdirs();
                 localFile.createNewFile();
+            }else{
+                System.out.println(path+",已存在");
+                return;
             }
             // 输出流
             OutputStream os = new FileOutputStream(localFile);
@@ -379,21 +382,6 @@ public class FileUtils {
     }
 
     public static void main(String[] args) {
-        List<File> d=new ArrayList<File>();
-        List<File> e=new ArrayList<File>();
-        getPathFileList("D:\\里番",d);
-        getPathFileList("E:\\里番",e);
-        Map<File,String> dmap=d.stream().parallel().collect(Collectors.toMap(file ->file,file -> getMD5(file)));
-        Map<File,String> emap=e.stream().parallel().collect(Collectors.toMap(file -> file,file -> getMD5(file)));
-        for(String value:dmap.values()){
-            if(emap.containsValue(value)){
-                for(Map.Entry<File,String> entry:emap.entrySet()){
-                    if(entry.getValue().equals(value)){
-                        System.out.println(entry.getKey().getAbsoluteFile());
-                        entry.getKey().delete();
-                    }
-                }
-            }
-        }
+
     }
 }
