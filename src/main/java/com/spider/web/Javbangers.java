@@ -1,6 +1,8 @@
 package com.spider.web;
 
+import com.spider.entity.AvInfo;
 import com.spider.entity.Video;
+import com.spider.service.AvInfoService;
 import com.spider.service.VideoService;
 import com.spider.utils.FileUtils;
 import com.spider.utils.JsoupUtil;
@@ -50,6 +52,9 @@ public class Javbangers extends BaseWeb {
 
     @Autowired
     private MultithreadingDownload multithreadingDownload;
+
+    @Autowired
+    private AvInfoService avInfoService;
 
     public List<Video> getVideoListByUrl(String categories, Integer page) {
         String listUrl = template.replace("@{categories}", categories).replace("@{page}", String.valueOf(page)).replace("@{time}", String.valueOf(System.currentTimeMillis()));
@@ -129,6 +134,11 @@ public class Javbangers extends BaseWeb {
                         logger.info("{},已存在",video.getSourceUrl());
                         continue;
                     }
+                    if(!findAVCode(video.getName())){
+                        logger.info("{},没有avCode",video.getName());
+                        continue;
+                    }
+                    video.getName();
                     video=getVideoInfo(video);
                     String date = simpleDateFormat.format(new Date());
                     String videoSavePath = savePath + "uncensored" + File.separator + date + File.separator + video.getName();
@@ -146,6 +156,21 @@ public class Javbangers extends BaseWeb {
             }
             page++;
         }
+    }
+
+    public Boolean findAVCode(String name){
+        List<String> list= FileUtils.getSearchKeyList(name);
+        AvInfo avInfo=null;
+        for(String key:list){
+            avInfo=avInfoService.findOnekeyValue("code",key);
+            if(Objects.nonNull(avInfo)){
+                if(!avInfo.isHasVideo()){
+                    return true;
+                }
+                break;
+            }
+        }
+        return  false;
     }
 
     public String setCookie(String setCookie) {
