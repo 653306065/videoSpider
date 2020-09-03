@@ -16,11 +16,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
@@ -214,7 +215,13 @@ public class Javbus extends BaseWeb {
             }).collect(Collectors.toList());
             avInfo.setPreviewImageList(byteList);
         }
+        avInfo.setMagnetList(getMagnetList(avInfo.getSourceUrl()));
+        logger.info("{},{},获取完成", avInfo.getCode(), avInfo.getName());
+        return avInfo;
+    }
 
+    public List<AvInfo.Magnet> getMagnetList(String url) {
+        Document document = JsoupUtil.getDocument(url, enableProxy);
         String scriptString = "";
         Elements scripts = document.getElementsByTag("script");
         for (Element element : scripts) {
@@ -223,6 +230,7 @@ public class Javbus extends BaseWeb {
                 break;
             }
         }
+        List<AvInfo.Magnet> magnetList = new CopyOnWriteArrayList<>();
         String gid = String.valueOf(getGid(scriptString));
         if (!StringUtils.isEmpty(gid)) {
             String apiUrl = magnetApi.replace("@{gid}", gid);
@@ -232,7 +240,6 @@ public class Javbus extends BaseWeb {
             if (Objects.nonNull(apihtml)) {
                 apihtml = "<table>" + apihtml + "</table>";
                 Document apiDocument = Jsoup.parseBodyFragment(apihtml);
-                List<AvInfo.Magnet> magnetList = new CopyOnWriteArrayList<>();
                 apiDocument.getElementsByTag("tr").stream().sequential().forEach(tr -> {
                     AvInfo.Magnet magnetInfo = new AvInfo.Magnet();
                     Elements dataList = tr.getElementsByTag("a");
@@ -279,11 +286,9 @@ public class Javbus extends BaseWeb {
                     }
                     magnetList.add(magnetInfo);
                 });
-                avInfo.setMagnetList(magnetList);
             }
         }
-        logger.info("{},{},获取完成", avInfo.getCode(), avInfo.getName());
-        return avInfo;
+        return magnetList;
     }
 
     public void saveAvInfoByActresses(String actressesUrl) {
@@ -305,6 +310,21 @@ public class Javbus extends BaseWeb {
             logger.info("----------{},所有获取完成---------", actressesInfo.getName());
         });
         logger.info("----------保存完成-------------");
+    }
+
+    public void updateAVMagnetList() {
+        List<AvInfo> list = avInfoService.findAll();
+        list.stream().parallel().forEach(avInfo -> {
+            try {
+                logger.info("{},开始获取磁力链接",avInfo.getCode());
+                List<AvInfo.Magnet> magnetList = getMagnetList(avInfo.getSourceUrl());
+                avInfo.setMagnetList(magnetList);
+                avInfoService.updateById(avInfo);
+                logger.info("{},获取磁力链接完成",avInfo.getCode());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     public void saveAllUncensoredActressesInfo() {
