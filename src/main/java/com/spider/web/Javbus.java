@@ -318,8 +318,10 @@ public class Javbus extends BaseWeb {
             try {
                 logger.info("{},开始获取磁力链接",avInfo.getCode());
                 List<AvInfo.Magnet> magnetList = getMagnetList(avInfo.getSourceUrl());
-                avInfo.setMagnetList(magnetList);
-                avInfoService.updateById(avInfo);
+                if(magnetList.size()>0){
+                    avInfo.setMagnetList(magnetList);
+                    avInfoService.updateById(avInfo);
+                }
                 logger.info("{},获取磁力链接完成",avInfo.getCode());
             } catch (Exception e) {
                 e.printStackTrace();
