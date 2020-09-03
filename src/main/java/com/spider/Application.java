@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import com.spider.web.Javhihi;
+import com.spider.web.Shubao;
 
 @SpringBootApplication
 public class Application {
@@ -30,7 +31,7 @@ public class Application {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(Application.class);
-        Javbus Javbus=context.getBean(Javbus.class);
-        Javbus.updateAVMagnetList();
+        Shubao Shubao=context.getBean(Shubao.class);
+        Shubao.getBookList();
     }
 }

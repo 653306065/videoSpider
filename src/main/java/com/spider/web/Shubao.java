@@ -11,21 +11,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class Shubao {
+public class Shubao extends BaseWeb{
 
     public static String listUrl = "http://www.shubao12.cc/qitaxiaoshuo/7_@{page}.html";
 
     public static String downloadUrl = "http://www.shubao12.cc/modules/article/txtarticle.php?id=@{id}";
 
     public void getBookList() {
-        int page = 1;
+        int page = 381;
         while (true) {
             try {
                 String url = listUrl.replace("@{page}", String.valueOf(page));
+                logger.info("-----------------{}--------------",url);
                 byte[] bytes = OKHttpUtils.getBytes(url);
                 String html = new String(bytes, "GBK");
                 Document document = Jsoup.parse(html);
-                Elements elements = document.getElementsByClass("s2");
+                Elements elements = document.getElementById("newscontent").getElementsByClass("l").get(0).getElementsByClass("s2");
                 if (elements.isEmpty()||elements.size()==0) {
                     break;
                 } else {
@@ -45,7 +46,10 @@ public class Shubao {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            page++;
+            if(page==0){
+                break;
+            }
+            page--;
         }
     }
 }
