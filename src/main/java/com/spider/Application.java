@@ -7,8 +7,7 @@ import com.spider.service.AvInfoService;
 import com.spider.service.VideoService;
 import com.spider.utils.FFmpegUtil;
 import com.spider.utils.FileUtils;
-import com.spider.web.Javbangers;
-import com.spider.web.Javbus;
+import com.spider.web.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -21,8 +20,6 @@ import java.io.File;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import com.spider.web.Javhihi;
-import com.spider.web.Shubao;
 
 @SpringBootApplication
 public class Application {
@@ -31,7 +28,7 @@ public class Application {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(Application.class);
-        Shubao Shubao=context.getBean(Shubao.class);
-        Shubao.getBookList();
+        Kissjav Kissjav=context.getBean(Kissjav.class);
+        Kissjav.downloadJavUncensored();
     }
 }

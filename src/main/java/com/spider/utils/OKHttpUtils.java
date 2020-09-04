@@ -91,6 +91,34 @@ public class OKHttpUtils {
         }
     }
 
+
+    public static String getRedirectUrl(String url,Map<String,String> header,Boolean isProxy) {
+        try {
+            Request.Builder builder = new Request.Builder();
+            for (Map.Entry<String, String> entry : header.entrySet()) {
+                builder.addHeader(entry.getKey(), entry.getValue());
+            }
+            Request request = builder.get().url(url).build();
+            Response response = null;
+            if (isProxy) {
+                response = proxyHttpClient.newCall(request).execute();
+            } else {
+                response = httpClient.newCall(request).execute();
+            }
+            if (response.isSuccessful()) {
+                String redirectUrl = response.request().url().toString();
+                response.body().close();
+                response.close();
+                return redirectUrl;
+            }
+            response.close();
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public static InputStream getInputStream(String url, Boolean isProxy) {
         try {
             Request request = new Request.Builder().get().url(url).build();

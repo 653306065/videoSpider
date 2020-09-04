@@ -19,7 +19,7 @@ public class Video {
 
     private String name;
 
-    private long size;
+    private Long size;
 
     private String sizeStr;
 

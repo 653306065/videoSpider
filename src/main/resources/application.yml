@@ -123,6 +123,14 @@ javbangers:
   thread: 30
   filterKey: FC2-PPV,Pacopacomama,Muramura,pacopacomama,FC2
 
+kissjav:
+  home: https://kissjav.com
+  savePath: C:\kissjav\
+  template: https://kissjav.com/videos/@{category}/@{page}/
+  cookie: Angie_89d7248ae8=2c1ac182980f365658895889643d44a4
+  thread: 30
+  enableProxy: true
+
 javbus:
   home: https://www.javbus.com
   enableProxy: true
