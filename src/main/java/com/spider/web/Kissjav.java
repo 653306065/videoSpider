@@ -1,6 +1,7 @@
 package com.spider.web;
 
 import com.spider.entity.Video;
+import com.spider.utils.FileUtils;
 import com.spider.utils.JsoupUtil;
 import com.spider.utils.OKHttpUtils;
 import com.spider.utils.download.MultithreadingDownload;
@@ -11,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -91,8 +91,8 @@ public class Kissjav extends BaseWeb {
                     try {
                         logger.info("{},开始下载", video.getName());
                         Video getVideo = getVideoInfo(video.getSourceUrl());
-                        getVideo.setName(getVideo.getName()+".mp4");
-                        String path=savePath+category+"\\"+simpleDateFormat.format(new Date())+ "\\"+getVideo.getName();
+                        getVideo.setName(FileUtils.repairPath(getVideo.getName()) + ".mp4");
+                        String path = savePath + category + "\\" + simpleDateFormat.format(new Date()) + "\\" + getVideo.getName();
                         getVideo.setSavePath(path);
                         multithreadingDownload.videoDownload(getVideo, null, enableProxy, thread, defaultSegmentSize);
                         logger.info("{},下载完成", video.getName());
