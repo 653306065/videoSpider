@@ -141,6 +141,14 @@ javbus:
   magnetApi: https://www.javbus.com/ajax/uncledatoolsbyajax.php?gid=@{gid}&lang=zh&uc=1
   savePath: E:\javbus\
 
+javrave:
+  home: https://javrave.club/
+  template: https://javrave.club/cat/@{category}uncensored/page/@{page}/
+  savePath: E:\javrave\
+  enableProxy: true
+  thread: 30
+  api: https://javideo.pw/api/source/@{key}
+
 proxy:
   enabled: false
   socks:

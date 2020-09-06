@@ -28,7 +28,7 @@ public class Application {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(Application.class);
-        Javbangers Javbangers=context.getBean(Javbangers.class);
-        Javbangers.downloadUncensored();
+        Javrave Javrave=context.getBean(Javrave.class);
+        Javrave.getVideoInfo("https://javrave.club/tokyo-hot-livesamurai0027-the-powerful-g-cup-big-breasts-and-the-innocently-cute-face-are-the-best-blow-and-insertion-as-well-uncensored/");
     }
 }
