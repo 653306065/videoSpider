@@ -96,46 +96,50 @@ public class Javbus extends BaseWeb {
         List<AvInfo> list = new CopyOnWriteArrayList<>();
         int page = 1;
         while (true) {
-            String url = actressesUrl + "/" + page;
-            Document document = JsoupUtil.getDocument(url, enableProxy);
-            if (Objects.isNull(document)) {
-                break;
-            }
-            Elements elements = document.getElementsByClass("movie-box");
-            if (Objects.isNull(elements) || elements.size() == 0) {
-                break;
-            }
-            elements.stream().parallel().forEach(element -> {
-                AvInfo avInfo = new AvInfo();
-                String avUrl = element.attr("href");
-                avInfo.setSourceUrl(avUrl);
-                Elements imgs = element.getElementsByTag("img");
-                if (Objects.nonNull(imgs) && imgs.size() != 0) {
-                    Element img = imgs.get(0);
-                    String imgSrc = img.attr("src");
-                    avInfo.setThumbUrl(imgSrc);
-                    String title = img.attr("title");
-                    avInfo.setName(title);
-                    byte[] imgBytes = OKHttpUtils.getBytes(imgSrc, enableProxy);
-                    if (Objects.nonNull(imgBytes)) {
-                        avInfo.setThumb(imgBytes);
-                    }
+            try {
+                String url = actressesUrl + "/" + page;
+                Document document = JsoupUtil.getDocument(url, enableProxy);
+                if (Objects.isNull(document)) {
+                    break;
                 }
-                Elements dates = element.getElementsByTag("date");
-                if (dates.size() == 2) {
-                    String code = dates.get(0).text();
-                    avInfo.setCode(code);
-                    String date = dates.get(1).text();
-                    if (Objects.nonNull(date)) {
-                        try {
-                            avInfo.setPublishDate(simpleDateFormat.parse(date));
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                Elements elements = document.getElementsByClass("movie-box");
+                if (Objects.isNull(elements) || elements.size() == 0) {
+                    break;
+                }
+                elements.stream().parallel().forEach(element -> {
+                    AvInfo avInfo = new AvInfo();
+                    String avUrl = element.attr("href");
+                    avInfo.setSourceUrl(avUrl);
+                    Elements imgs = element.getElementsByTag("img");
+                    if (Objects.nonNull(imgs) && imgs.size() != 0) {
+                        Element img = imgs.get(0);
+                        String imgSrc = img.attr("src");
+                        avInfo.setThumbUrl(imgSrc);
+                        String title = img.attr("title");
+                        avInfo.setName(title);
+                        byte[] imgBytes = OKHttpUtils.getBytes(imgSrc, enableProxy);
+                        if (Objects.nonNull(imgBytes)) {
+                            avInfo.setThumb(imgBytes);
                         }
                     }
-                }
-                list.add(avInfo);
-            });
+                    Elements dates = element.getElementsByTag("date");
+                    if (dates.size() == 2) {
+                        String code = dates.get(0).text();
+                        avInfo.setCode(code);
+                        String date = dates.get(1).text();
+                        if (Objects.nonNull(date)) {
+                            try {
+                                avInfo.setPublishDate(simpleDateFormat.parse(date));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                    list.add(avInfo);
+                });
+            }catch (Exception e){
+                e.printStackTrace();
+            }
             page++;
         }
         return list;
@@ -299,6 +303,8 @@ public class Javbus extends BaseWeb {
                 if (Objects.nonNull(avInfo)) {
                     avInfoService.insert(avInfo);
                 }
+            }else{
+                logger.info("{},已存在",avInfo.getCode());
             }
         });
     }

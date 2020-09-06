@@ -134,10 +134,10 @@ public class Javbangers extends BaseWeb {
                         logger.info("{},已存在",video.getSourceUrl());
                         continue;
                     }
-                    if(!findAVCode(video.getName())){
-                        logger.info("{},没有avCode",video.getName());
-                        continue;
-                    }
+//                    if(!findAVCode(video.getName())){
+//                        logger.info("{},没有avCode",video.getName());
+//                        continue;
+//                    }
                     video.getName();
                     video=getVideoInfo(video);
                     String date = simpleDateFormat.format(new Date());

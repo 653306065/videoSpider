@@ -117,7 +117,7 @@ proxyrarbg:
 javbangers:
   home: https://www.javbangers.com/
   template: https://www.javbangers.com/categories/@{categories}/?mode=async&function=get_block&block_id=list_videos_common_videos_list&sort_by=post_date&from=@{page}&_=@{time}
-  savePath: C:\javbangers\
+  savePath: E:\javbangers\
   cookie: kt_tcookie=1; _ga=GA1.2.759767344.1597591522; PHPSESSID=ee542c46d0ff78f546297fdabec3c38d; kt_qparams=id%3D102615%26dir%3D127-coco; kt_ips=13.75.113.15; kt_is_visited=1; bcs_cookie_bongacams_pop=1; _gid=GA1.2.491850898.1598071073; kt_member=934ffb9fd7afbd316a58e83871ef7a18; kt_rt_adv_player=hidden
   enableProxy: true
   thread: 30
@@ -139,7 +139,7 @@ javbus:
   actressesDetailsTemplate: ${javbus.home}/@{category}/star/@{name}
   avTemplate: ${javbus.home}/@{code}
   magnetApi: https://www.javbus.com/ajax/uncledatoolsbyajax.php?gid=@{gid}&lang=zh&uc=1
-  savePath: C:\javbus\
+  savePath: E:\javbus\
 
 proxy:
   enabled: false

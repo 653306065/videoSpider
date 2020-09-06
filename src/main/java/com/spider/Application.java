@@ -28,7 +28,7 @@ public class Application {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(Application.class);
-        Kissjav Kissjav=context.getBean(Kissjav.class);
-        Kissjav.downloadJavUncensored();
+        Javbangers Javbangers=context.getBean(Javbangers.class);
+        Javbangers.downloadUncensored();
     }
 }
