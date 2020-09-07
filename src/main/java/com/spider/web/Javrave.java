@@ -41,6 +41,9 @@ public class Javrave extends BaseWeb {
     @Autowired
     private MultithreadingDownload multithreadingDownload;
 
+    @Value("#{'${javbangers.filterKey}'.split(',')}")
+    private List<String> filterKey;
+
     public List<Video> getVideoList(String category, Integer page) {
         List<Video> list = new ArrayList<>();
         String url = template.replace("@{category}", category).replace("@{page}", String.valueOf(page));
@@ -142,6 +145,12 @@ public class Javrave extends BaseWeb {
             try {
                 List<Video> list= getVideoList(category,page);
                 list.stream().forEach(video -> {
+                    for(String key:filterKey){
+                        if(video.getName().contains(key)){
+                            logger.info("{},的名称有过滤字段",video.getName());
+                            return;
+                        }
+                    }
                     Video getVideo= getVideoInfo(video.getSourceUrl());
                     if(Objects.isNull(getVideo)){
                         return;

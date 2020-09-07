@@ -148,6 +148,7 @@ javrave:
   enableProxy: true
   thread: 30
   api: https://javideo.pw/api/source/@{key}
+  filterKey: FC2-PPV,Pacopacomama,Muramura,pacopacomama,FC2,H0930,C0930,H4610,10Musume
 
 proxy:
   enabled: false

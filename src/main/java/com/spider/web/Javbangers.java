@@ -129,6 +129,12 @@ public class Javbangers extends BaseWeb {
                 List<Video> videoList = getVideoListByUrl("uncensored", page);
                 videoList = videoList.stream().filter(v -> Objects.nonNull(v.getSourceUrl())).collect(Collectors.toList());
                 A: for(Video video:videoList){
+                    for(String key:filterKey){
+                        if(video.getName().contains(key)){
+                            logger.info("{},的名称有过滤字段",video.getName());
+                            continue A;
+                        }
+                    }
                     Video findVideo= videoService.findOnekeyValue("sourceUrl",video.getSourceUrl());
                     if(Objects.nonNull(findVideo)){
                         logger.info("{},已存在",video.getSourceUrl());
@@ -143,12 +149,7 @@ public class Javbangers extends BaseWeb {
                     String date = simpleDateFormat.format(new Date());
                     String videoSavePath = savePath + "uncensored" + File.separator + date + File.separator + video.getName();
                     video.setSavePath(videoSavePath);
-                    for(String key:filterKey){
-                        if(video.getName().contains(key)){
-                            logger.info("{},的名称有过滤字段",video.getName());
-                            continue A;
-                        }
-                    }
+
                     multithreadingDownload.videoDownload(video, null, enableProxy, thread, defaultSegmentSize);
                 }
             } catch (Exception e) {
