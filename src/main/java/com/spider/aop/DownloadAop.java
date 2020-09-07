@@ -71,13 +71,23 @@ public class DownloadAop {
 
         //根据avcode判断视频是否存在
         if (Objects.nonNull(video.getAvCode())) {
-            AvInfo findAv = avInfoService.findOnekeyValue("code", video.getAvCode());
-            Video findVideo=  videoService.findOnekeyValue("avCode",video.getAvCode());
-            if(Objects.nonNull(findAv)&&findAv.isHasVideo()){
+            AvInfo findAv = avInfoService.findOnekeyValue("code", video.getAvCode().toLowerCase());
+            Video findVideo = videoService.findOnekeyValue("avCode", video.getAvCode().toLowerCase());
+            if (Objects.nonNull(findAv) && findAv.isHasVideo()) {
                 logger.info("code,{},的视频已存在,vidoeId:{},savePath:{}", findAv.getCode(), findAv.getVideoId(), findAv.getVideoSavePath());
                 return;
             }
-            if(Objects.nonNull(findVideo)){
+            if (Objects.nonNull(findVideo)) {
+                logger.info("code,{},的视频已存在,vidoeId:{},savePath:{}", findVideo.getAvCode(), findVideo.getId(), findVideo.getSavePath());
+            }
+
+            findAv = avInfoService.findOnekeyValue("code", video.getAvCode().toUpperCase());
+            findVideo = videoService.findOnekeyValue("avCode", video.getAvCode().toUpperCase());
+            if (Objects.nonNull(findAv) && findAv.isHasVideo()) {
+                logger.info("code,{},的视频已存在,vidoeId:{},savePath:{}", findAv.getCode(), findAv.getVideoId(), findAv.getVideoSavePath());
+                return;
+            }
+            if (Objects.nonNull(findVideo)) {
                 logger.info("code,{},的视频已存在,vidoeId:{},savePath:{}", findVideo.getAvCode(), findVideo.getId(), findVideo.getSavePath());
             }
         }

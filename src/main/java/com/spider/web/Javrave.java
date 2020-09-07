@@ -3,6 +3,7 @@ package com.spider.web;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.spider.entity.Video;
+import com.spider.utils.FileUtils;
 import com.spider.utils.JsoupUtil;
 import com.spider.utils.OKHttpUtils;
 import com.spider.utils.download.MultithreadingDownload;
@@ -44,6 +45,12 @@ public class Javrave extends BaseWeb {
     @Value("#{'${javbangers.filterKey}'.split(',')}")
     private List<String> filterKey;
 
+    /**
+     * 获取视频的源地址列表
+     * @param category
+     * @param page
+     * @return
+     */
     public List<Video> getVideoList(String category, Integer page) {
         List<Video> list = new ArrayList<>();
         String url = template.replace("@{category}", category).replace("@{page}", String.valueOf(page));
@@ -69,6 +76,11 @@ public class Javrave extends BaseWeb {
         return list;
     }
 
+    /**
+     * 获取视频的信息
+     * @param url
+     * @return
+     */
     public Video getVideoInfo(String url) {
         Video video = new Video();
         Document document = JsoupUtil.getDocument(url, enableProxy);
@@ -139,6 +151,11 @@ public class Javrave extends BaseWeb {
         return video;
     }
 
+
+    /**
+     * 下载视频
+     * @param category
+     */
     public void downloadVideo(String category){
         int page=1;
         while (true){
@@ -156,7 +173,7 @@ public class Javrave extends BaseWeb {
                         return;
                     }
                     String date = simpleDateFormat.format(new Date());
-                    getVideo.setName(getVideo.getName()+".mp4");
+                    getVideo.setName(FileUtils.repairPath(getVideo.getName())+".mp4");
                     String videoSavePath = savePath + category + File.separator + date + File.separator + getVideo.getName();
                     getVideo.setSavePath(videoSavePath);
                     multithreadingDownload.videoDownload(getVideo,null,enableProxy,thread,defaultSegmentSize);
@@ -168,6 +185,9 @@ public class Javrave extends BaseWeb {
         }
     }
 
+    /**
+     * 下载无码视频
+     */
     public void downloadUncensored(){
         downloadVideo("uncensored");
     }
