@@ -1,34 +1,30 @@
 package com.spider.aop;
 
-import java.io.File;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
 import com.alibaba.fastjson.JSON;
 import com.spider.entity.AvInfo;
-import com.spider.service.AvInfoService;
-import org.apache.http.protocol.HTTP;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
-import org.checkerframework.checker.units.qual.A;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import com.spider.entity.Image;
 import com.spider.entity.Video;
+import com.spider.service.AvInfoService;
 import com.spider.service.ImageService;
 import com.spider.service.UrlRecordService;
 import com.spider.service.VideoService;
 import com.spider.utils.FFmpegUtil;
 import com.spider.utils.FileUtils;
 import com.spider.utils.ImageUtils;
-
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import ws.schild.jave.MultimediaInfo;
+
+import java.io.File;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 @Component
 @Aspect
@@ -53,90 +49,105 @@ public class DownloadAop {
 
     }
 
-    @Around(value="multithreadingDownload_videoDownload()")
-    public void aroundVideoDownload(ProceedingJoinPoint joinPoint){
+    @Around(value = "multithreadingDownload_videoDownload()")
+    public void aroundVideoDownload(ProceedingJoinPoint joinPoint) {
         Object[] args = joinPoint.getArgs();
-        Video video= (Video) args[0];
-        String name= video.getName();
-        List<String> list= FileUtils.getSearchKeyList(name);
-        AvInfo avInfo=null;
-        for(String key:list){
-            avInfo=avInfoService.findOnekeyValue("code",key);
-           if(Objects.nonNull(avInfo)){
-               logger.info("{},的code是{}",video.getName(),avInfo.getCode());
-               if(avInfo.isHasVideo()){
-                   logger.info("code,{},的视频已存在,vidoeId:{},savePath:{}",avInfo.getCode(),avInfo.getVideoId(),avInfo.getVideoSavePath());
-                   return;
-               }
-               break;
-           }
+        Video video = (Video) args[0];
+        String name = video.getName();
+        List<String> list = FileUtils.getSearchKeyList(name);
+        AvInfo avInfo = null;
+        //根据名称AV code判断视频是否存在
+        for (String key : list) {
+            avInfo = avInfoService.findOnekeyValue("code", key);
+            if (Objects.nonNull(avInfo)) {
+                logger.info("{},的code是{}", video.getName(), avInfo.getCode());
+                if (avInfo.isHasVideo()) {
+                    logger.info("code,{},的视频已存在,vidoeId:{},savePath:{}", avInfo.getCode(), avInfo.getVideoId(), avInfo.getVideoSavePath());
+                    return;
+                }
+                break;
+            }
         }
+
+        //根据avcode判断视频是否存在
+        if (Objects.nonNull(video.getAvCode())) {
+            AvInfo findAv = avInfoService.findOnekeyValue("code", video.getAvCode());
+            Video findVideo=  videoService.findOnekeyValue("avCode",video.getAvCode());
+            if(Objects.nonNull(findAv)&&findAv.isHasVideo()){
+                logger.info("code,{},的视频已存在,vidoeId:{},savePath:{}", findAv.getCode(), findAv.getVideoId(), findAv.getVideoSavePath());
+                return;
+            }
+            if(Objects.nonNull(findVideo)){
+                logger.info("code,{},的视频已存在,vidoeId:{},savePath:{}", findVideo.getAvCode(), findVideo.getId(), findVideo.getSavePath());
+            }
+        }
+
 //        if(avInfo==null){
 //            logger.info("{},没有匹配到code",video.getName());
 //            return;
 //        }
-        if(Objects.nonNull(videoService.findByName(video.getName()))){
+        if (Objects.nonNull(videoService.findByName(video.getName()))) {
             logger.info(video.getName() + "已存在");
             return;
         }
-        if(Objects.nonNull(video.getMd5())&&Objects.nonNull(videoService.findByMd5(video.getMd5()))){
-            logger.info(video.getName() + "已存在");
-            return;
-        }
-
-        if(Objects.nonNull(video.getVideoUrl())&&Objects.nonNull(videoService.findByVideoUrl(video.getVideoUrl()))){
+        if (Objects.nonNull(video.getMd5()) && Objects.nonNull(videoService.findByMd5(video.getMd5()))) {
             logger.info(video.getName() + "已存在");
             return;
         }
 
-        if(Objects.nonNull(video.getSourceUrl())&&Objects.nonNull(videoService.findBySourceUrl(video.getSourceUrl()))){
+        if (Objects.nonNull(video.getVideoUrl()) && Objects.nonNull(videoService.findByVideoUrl(video.getVideoUrl()))) {
+            logger.info(video.getName() + "已存在");
+            return;
+        }
+
+        if (Objects.nonNull(video.getSourceUrl()) && Objects.nonNull(videoService.findBySourceUrl(video.getSourceUrl()))) {
             logger.info(video.getName() + "已存在");
             return;
         }
 
         try {
-            logger.info("{},文件名验证通过", video.getName());
-            File videoFile=new File(video.getSavePath());
+            logger.info("{},验证通过", video.getName());
+            File videoFile = new File(video.getSavePath());
             Boolean result = (Boolean) joinPoint.proceed();
-            if(!result){
-                logger.info("{},文件下载失败",video.getName());
+            if (!result) {
+                logger.info("{},文件下载失败", video.getName());
                 return;
             }
             String md5 = FileUtils.getMD5(videoFile);
-            if(Objects.isNull(videoService.findByMd5(md5))){
+            if (Objects.isNull(videoService.findByMd5(md5))) {
                 video.setMd5(md5);
                 MultimediaInfo info = FFmpegUtil.getVideoInfo(videoFile);
-                logger.info("videoInfo:{}",JSON.toJSONString(info));
+                logger.info("videoInfo:{}", JSON.toJSONString(info));
                 video.setSize(videoFile.length());
                 video.setSizeStr(videoFile.length() / 1024.0 / 1024 + "MB");
                 video.setMultimediaInfo(info);
                 video.setCreateDate(new Date());
-                if(Objects.nonNull(avInfo)){
+                if (Objects.nonNull(avInfo)) {
                     video.setAvCode(avInfo.getCode());
                 }
                 videoService.insert(video);
-                if(Objects.nonNull(avInfo)){
+                if (Objects.nonNull(avInfo)) {
                     avInfo.setVideoId(video.getId());
                     avInfo.setHasVideo(true);
                     avInfo.setVideoSavePath(video.getSavePath());
                     avInfoService.updateById(avInfo);
                 }
 
-                if(Objects.nonNull(video.getAvCode())){
-                    avInfo=avInfoService.findOnekeyValue("code",video.getAvCode());
-                    if(Objects.nonNull(avInfo)){
+                if (Objects.nonNull(video.getAvCode())) {
+                    avInfo = avInfoService.findOnekeyValue("code", video.getAvCode());
+                    if (Objects.nonNull(avInfo)) {
                         avInfo.setVideoId(video.getId());
                         avInfo.setHasVideo(true);
                         avInfo.setVideoSavePath(video.getSavePath());
                         avInfoService.updateById(avInfo);
                     }
                 }
-                logger.info("{},文件信息保存完成",video.getName());
-            }else{
-                logger.info("{},文件MD5验证失败",video.getName());
+                logger.info("{},文件信息保存完成", video.getName());
+            } else {
+                logger.info("{},文件MD5验证失败", video.getName());
                 new File(video.getSavePath()).delete();
             }
-        }catch (Throwable e){
+        } catch (Throwable e) {
             e.printStackTrace();
         }
     }
