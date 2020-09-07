@@ -114,7 +114,7 @@ public class Javrave extends BaseWeb {
                         if (map.containsKey("Studio")) {
                             video.setStudio(map.get("Studio"));
                         }
-                        if (map.containsKey("Codes")) {
+                        if (map.containsKey("Codes")&&Objects.isNull(video.getAvCode())) {
                             video.setAvCode(map.get("Codes"));
                         }
                         Elements tags = document.getElementsByTag("tags");
@@ -147,8 +147,8 @@ public class Javrave extends BaseWeb {
                         return;
                     }
                     String date = simpleDateFormat.format(new Date());
-                    getVideo.setName(video.getName()+".mp4");
-                    String videoSavePath = savePath + category + File.separator + date + File.separator + video.getName();
+                    getVideo.setName(getVideo.getName()+".mp4");
+                    String videoSavePath = savePath + category + File.separator + date + File.separator + getVideo.getName();
                     getVideo.setSavePath(videoSavePath);
                     multithreadingDownload.videoDownload(getVideo,null,enableProxy,thread,defaultSegmentSize);
                 });

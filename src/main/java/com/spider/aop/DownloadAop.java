@@ -121,6 +121,16 @@ public class DownloadAop {
                     avInfo.setVideoSavePath(video.getSavePath());
                     avInfoService.updateById(avInfo);
                 }
+
+                if(Objects.nonNull(video.getAvCode())){
+                    avInfo=avInfoService.findOnekeyValue("code",video.getAvCode());
+                    if(Objects.nonNull(avInfo)){
+                        avInfo.setVideoId(video.getId());
+                        avInfo.setHasVideo(true);
+                        avInfo.setVideoSavePath(video.getSavePath());
+                        avInfoService.updateById(avInfo);
+                    }
+                }
                 logger.info("{},文件信息保存完成",video.getName());
             }else{
                 logger.info("{},文件MD5验证失败",video.getName());
