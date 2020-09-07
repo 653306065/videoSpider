@@ -52,4 +52,6 @@ public class Video {
     private String format;
 
     private String avCode;
+
+    private String studio;
 }
