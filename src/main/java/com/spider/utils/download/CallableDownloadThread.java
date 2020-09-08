@@ -64,8 +64,12 @@ public class CallableDownloadThread implements Callable<Boolean> {
                 }
                 newheader.put("range", "bytes=" + startByte + "-" + endByte);
                 if (errorTime == 5) {
+                    MultithreadingDownload.downloadStatusMap.put(httpUrl,false);
                     logger.info("错误次数过多停止下载,{}", errorTime);
                     return false;
+                }
+                if(!MultithreadingDownload.downloadStatusMap.get(httpUrl)){
+                    logger.info("其他分片出错，停止下载");
                 }
                 Response response = OKHttpUtils.getResponse(httpUrl, newheader, isProxy);
                 if(Objects.isNull(response)||!response.isSuccessful()){
@@ -76,7 +80,7 @@ public class CallableDownloadThread implements Callable<Boolean> {
                 byte[] bytes = new byte[1024 * 1024 * 2];
                 raf = new RandomAccessFile(file, "rw");
                 raf.seek(startByte);
-                while (true) {
+                while (true&&MultithreadingDownload.downloadStatusMap.get(httpUrl)) {
                     int i = response.body().byteStream().read(bytes);
                     if (i == -1) {
                         break;

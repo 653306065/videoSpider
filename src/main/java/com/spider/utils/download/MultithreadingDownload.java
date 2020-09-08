@@ -25,6 +25,9 @@ public class MultithreadingDownload {
 
     public AtomicLong downloadByte = new AtomicLong(0);
 
+    //标识下载是否继续
+    public static volatile Map<String,Boolean>  downloadStatusMap=new HashMap<>();
+
     private final Logger logger = LoggerFactory.getLogger(MultithreadingDownload.class);
 
     public Boolean fileDownload(String HttpUrl, String path, Map<String, String> header, boolean isProxy, int threadNum, long segmentSize) {
@@ -39,8 +42,9 @@ public class MultithreadingDownload {
                 logger.info("----获取下载信息错误----");
                 return false;
             } else {
+                downloadStatusMap.put(HttpUrl,true);
                 logger.info(path + ",开始下载,url:" + HttpUrl);
-                String fileSizeStr = getOmitValue(info.getContentLength() / 1024.0 / 1024.0,5)+ "m";
+                String fileSizeStr = getOmitValue(info.getContentLength() / 1024.0 / 1024.0,6)+ "m";
                 logger.info(JSON.toJSONString(info) + ",大小" + fileSizeStr);
                 RandomAccessFile raf = new RandomAccessFile(file, "rw");
                 raf.setLength(info.getContentLength());
@@ -80,6 +84,7 @@ public class MultithreadingDownload {
                         break;
                     }
                 }
+
                 boolean result = true;
                 for (Future<Boolean> future : downloadResult) {
                     if (!future.get()) {
@@ -107,6 +112,8 @@ public class MultithreadingDownload {
             new File(path).delete();
             e.printStackTrace();
             return false;
+        }finally {
+            downloadStatusMap.remove(HttpUrl);
         }
     }
 
