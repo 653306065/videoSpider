@@ -55,7 +55,7 @@ public class MultithreadingDownload {
                     long startByte = i * segmentSize;
                     long endByte = (i + 1) * segmentSize - 1;
                     if (endByte >= info.getContentLength()) {
-                        CallableDownloadThread callableDownloadThread = new CallableDownloadThread(HttpUrl, header, isProxy, startByte, endByte, file, downloadByte);
+                        CallableDownloadThread callableDownloadThread = new CallableDownloadThread(HttpUrl, header, isProxy, startByte, info.getContentLength(), file, downloadByte);
                         Future<Boolean> future = executorService.submit(callableDownloadThread);
                         downloadResult.add(future);
                         break;
@@ -91,7 +91,6 @@ public class MultithreadingDownload {
                         result = false;
                     }
                 }
-                downloadByte.set(0);
                 System.out.println("");
                 logger.info("----" + path + ",下载完成----");
                 long endTime = System.currentTimeMillis();
@@ -107,12 +106,12 @@ public class MultithreadingDownload {
                 return result;
             }
         } catch (Exception e) {
-            downloadByte.set(0);
             logger.info("----下载异常----");
             new File(path).delete();
             e.printStackTrace();
             return false;
         }finally {
+            downloadByte.set(0);
             downloadStatusMap.remove(HttpUrl);
         }
     }
