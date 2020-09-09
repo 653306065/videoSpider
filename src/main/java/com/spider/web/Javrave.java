@@ -42,7 +42,7 @@ public class Javrave extends BaseWeb {
     @Autowired
     private MultithreadingDownload multithreadingDownload;
 
-    @Value("#{'${javbangers.filterKey}'.split(',')}")
+    @Value("#{'${javrave.filterKey}'.split(',')}")
     private List<String> filterKey;
 
     /**
@@ -157,7 +157,7 @@ public class Javrave extends BaseWeb {
      * @param category
      */
     public void downloadVideo(String category){
-        int page=1;
+        int page=1092;
         while (true){
             try {
                 List<Video> list= getVideoList(category,page);
@@ -181,7 +181,7 @@ public class Javrave extends BaseWeb {
             }catch (Exception e){
                 e.printStackTrace();
             }
-            page++;
+            page-- ;
         }
     }
 
