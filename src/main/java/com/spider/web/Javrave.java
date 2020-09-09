@@ -3,6 +3,7 @@ package com.spider.web;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.spider.entity.Video;
+import com.spider.service.VideoService;
 import com.spider.utils.FileUtils;
 import com.spider.utils.JsoupUtil;
 import com.spider.utils.OKHttpUtils;
@@ -40,6 +41,9 @@ public class Javrave extends BaseWeb {
     private String api;
 
     @Autowired
+    private VideoService videoService;
+
+    @Autowired
     private MultithreadingDownload multithreadingDownload;
 
     @Value("#{'${javrave.filterKey}'.split(',')}")
@@ -54,6 +58,7 @@ public class Javrave extends BaseWeb {
     public List<Video> getVideoList(String category, Integer page) {
         List<Video> list = new ArrayList<>();
         String url = template.replace("@{category}", category).replace("@{page}", String.valueOf(page));
+        logger.info(url);
         Document document = JsoupUtil.getDocument(url, enableProxy);
         if (Objects.isNull(document)) {
             return list;
@@ -157,7 +162,7 @@ public class Javrave extends BaseWeb {
      * @param category
      */
     public void downloadVideo(String category){
-        int page=1092;
+        int page=1;
         while (true){
             try {
                 List<Video> list= getVideoList(category,page);
@@ -167,6 +172,10 @@ public class Javrave extends BaseWeb {
                             logger.info("{},的名称有过滤字段",video.getName());
                             return;
                         }
+                    }
+                    if (Objects.nonNull(videoService.findByName(video.getName()))) {
+                        logger.info(video.getName() + "已存在");
+                        return;
                     }
                     Video getVideo= getVideoInfo(video.getSourceUrl());
                     if(Objects.isNull(getVideo)){
@@ -181,7 +190,7 @@ public class Javrave extends BaseWeb {
             }catch (Exception e){
                 e.printStackTrace();
             }
-            page-- ;
+            page++;
         }
     }
 
