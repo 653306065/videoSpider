@@ -4,11 +4,8 @@ import com.spider.utils.OKHttpUtils;
 import okhttp3.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.File;
-import java.io.InputStream;
 import java.io.RandomAccessFile;
-import java.net.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -67,9 +64,6 @@ public class CallableDownloadThread implements Callable<Boolean> {
                     MultithreadingDownload.downloadStatusMap.put(httpUrl,false);
                     logger.info("错误次数过多停止下载,{}", errorTime);
                     return false;
-                }
-                if(!MultithreadingDownload.downloadStatusMap.get(httpUrl)){
-                    logger.info("其他分片出错，停止下载");
                 }
                 Response response = OKHttpUtils.getResponse(httpUrl, newheader, isProxy);
                 if(Objects.isNull(response)||!response.isSuccessful()){

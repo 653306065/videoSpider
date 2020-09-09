@@ -69,6 +69,7 @@ public class MultithreadingDownload {
                 ConsoleProgressBar cpb = new ConsoleProgressBar(100, '#');
                 long tmep = 0;
                 long sleepTime = 300;
+                boolean result = true;
                 while (true) {
                     double percentage = (downloadByte.get() * 1.0) / (info.getContentLength() * 1.0) * 100.0;
                     cpb.show((int) Math.floor(percentage));
@@ -83,18 +84,23 @@ public class MultithreadingDownload {
                     if (executorService.isTerminated()) {
                         break;
                     }
+                    //分片下载失败，停止线程池
+                    if(!downloadStatusMap.get(HttpUrl)){
+                        result=false;
+                        logger.info("分片下载失败,线程池停止下载");
+                        executorService.shutdownNow();
+                        break;
+                    }
                 }
-
-                boolean result = true;
-                for (Future<Boolean> future : downloadResult) {
-                    if (!future.get()) {
-                        result = false;
+                //正常执行完成，获取分片结果
+                if(result){
+                    for (Future<Boolean> future : downloadResult) {
+                        if (!future.get()) {
+                            result = false;
+                        }
                     }
                 }
                 System.out.println("");
-                logger.info("----" + path + ",下载完成----");
-                long endTime = System.currentTimeMillis();
-                logger.info("耗时:" + (endTime - startTime) / 1000 / 60.0 + "分钟");
                 raf.close();
                 if (!result) {
                     logger.info("{},下载失败", file.getName());
@@ -102,6 +108,10 @@ public class MultithreadingDownload {
                         logger.info("{},删除失败", file.getName());
                     }
                     logger.info("{},删除成功", file.getName());
+                }else{
+                    long endTime = System.currentTimeMillis();
+                    logger.info("----" + path + ",下载完成----");
+                    logger.info("耗时:" + (endTime - startTime) / 1000 / 60.0 + "分钟");
                 }
                 return result;
             }
