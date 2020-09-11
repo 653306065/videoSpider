@@ -150,6 +150,15 @@ javrave:
   api: https://javideo.pw/api/source/@{key}
   filterKey: FC2-PPV,Pacopacomama,Muramura,pacopacomama,FC2,H0930,C0930,H4610,10Musume,Mosaic Removed,台湾色情
 
+javfull:
+  home: https://javfull.net/
+  template: https://javfull.net/@{category}/page/@{page}/
+  savePath: C:\javfull\
+  enableProxy: true
+  thread: 30
+  api: https://feurl.com/api/source/@{key}
+  filterKey: FC2-PPV,Pacopacomama,Muramura,pacopacomama,FC2,H0930,C0930,H4610,10Musume,Mosaic Removed,台湾色情
+
 proxy:
   enabled: false
   socks:
