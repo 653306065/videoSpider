@@ -11,6 +11,7 @@ import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
+import com.spider.entity.Video;
 import com.spider.utils.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -123,7 +124,12 @@ public class Eporner extends BaseWeb{
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String date = simpleDateFormat.format(new Date());
         String path = savePath + category + "\\" + date + "\\" + name + ".mp4";
-        multithreadingDownload.fileDownload(videoUrl, path, null, enableProxy, thread,defaultSegmentSize);
+        Video video=new Video();
+        video.setName(name+".mp4");
+        video.setVideoUrl(videoUrl);
+        video.setSourceUrl(path);
+        video.setSavePath(path);
+        multithreadingDownload.videoDownload(video, null, enableProxy, thread,defaultSegmentSize);
     }
 
     public void download4K() {
