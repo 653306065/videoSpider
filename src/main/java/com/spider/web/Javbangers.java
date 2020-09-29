@@ -123,7 +123,7 @@ public class Javbangers extends BaseWeb {
     }
 
     public void downloadUncensored() {
-        int page = 1;
+        int page = 900;
         while (true) {
             try {
                 List<Video> videoList = getVideoListByUrl("uncensored", page);
@@ -155,7 +155,7 @@ public class Javbangers extends BaseWeb {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            page++;
+            page--;
         }
     }
 

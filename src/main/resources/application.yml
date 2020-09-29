@@ -65,7 +65,7 @@ javhihi:
   #home: https://www1.javbuz.com/
   #home: https://xart.letfap.com/
   movie: ${javhihi.home}movie?sort=published&page=@{page}&ajax=1
-  savePath: D:\javhihi\
+  savePath: E:\javhihi\
   #savePath: D:\javbuz\
   #savePath: D:\xart.letfap\
   thread: 20
@@ -118,10 +118,10 @@ javbangers:
   home: https://www.javbangers.com/
   template: https://www.javbangers.com/categories/@{categories}/?mode=async&function=get_block&block_id=list_videos_common_videos_list&sort_by=post_date&from=@{page}&_=@{time}
   savePath: E:\javbangers\
-  cookie: kt_tcookie=1; _ga=GA1.2.759767344.1597591522; PHPSESSID=ee542c46d0ff78f546297fdabec3c38d; kt_qparams=id%3D102615%26dir%3D127-coco; kt_ips=13.75.113.15; kt_is_visited=1; bcs_cookie_bongacams_pop=1; _gid=GA1.2.491850898.1598071073; kt_member=934ffb9fd7afbd316a58e83871ef7a18; kt_rt_adv_player=hidden
+  cookie: _ga=GA1.2.691909481.1600091699; PHPSESSID=6be78946339a08799fcf38140ae7a234; kt_qparams=id%3D102615%26dir%3D127-coco; kt_ips=65.52.182.116; kt_tcookie=1; _gid=GA1.2.1199354712.1600969029; _gat_gtag_UA_154629456_1=1; kt_is_visited=1; kt_member=87beabf211fcb170ea555f40a006fab2
   enableProxy: true
   thread: 30
-  filterKey: FC2-PPV,Pacopacomama,Muramura,pacopacomama,FC2
+  filterKey: FC2-PPV,Pacopacomama,Muramura,pacopacomama,FC2,H0930,C0930,H4610,10Musume,Mosaic Removed,台湾色情,Jukujo-club,Taiwan,CreampieInAsia,HeyDouga,Heydouga,XXX-AV,Lesshin,Nyoshin,素人,Kin8tengoku,fc2,fc2-ppv,Fanta Dream,หนังอาร์เกาหลีอัพเดทใหม่ๆ,ガチん娘
 
 kissjav:
   home: https://kissjav.com

@@ -115,14 +115,14 @@ public class Javhihi extends BaseWeb {
     }
 
     public void downloadVideo() {
-        int i = 166;
+        int i = 1;
         while (true) {
             try {
                 getMoive(i);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            i--;
+            i++;
         }
     }
 }
