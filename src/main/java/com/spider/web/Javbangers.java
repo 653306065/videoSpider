@@ -122,11 +122,19 @@ public class Javbangers extends BaseWeb {
         }
     }
 
-    public void downloadUncensored() {
-        int page = 900;
+    public void downloadOrgy(){
+        downloadVideo("orgy");
+    }
+
+    public void downloadUncensored(){
+        downloadVideo("uncensored");
+    }
+
+    public void downloadVideo(String categories){
+        int page = 1;
         while (true) {
             try {
-                List<Video> videoList = getVideoListByUrl("uncensored", page);
+                List<Video> videoList = getVideoListByUrl(categories, page);
                 videoList = videoList.stream().filter(v -> Objects.nonNull(v.getSourceUrl())).collect(Collectors.toList());
                 A: for(Video video:videoList){
                     for(String key:filterKey){
@@ -147,15 +155,14 @@ public class Javbangers extends BaseWeb {
                     video.getName();
                     video=getVideoInfo(video);
                     String date = simpleDateFormat.format(new Date());
-                    String videoSavePath = savePath + "uncensored" + File.separator + date + File.separator + video.getName();
+                    String videoSavePath = savePath + categories + File.separator + date + File.separator + video.getName();
                     video.setSavePath(videoSavePath);
-
                     multithreadingDownload.videoDownload(video, null, enableProxy, thread, defaultSegmentSize);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            page--;
+            page++;
         }
     }
 
