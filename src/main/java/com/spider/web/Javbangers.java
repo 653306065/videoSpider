@@ -90,6 +90,9 @@ public class Javbangers extends BaseWeb {
                 String videodescText = videodescs.get(0).text();
                 video.setIntroduction(videodescText);
             }
+            if(info.text().contains("Censored")){
+                video.setUncensored(false);
+            }
             Elements videoFileElements = info.getElementsByClass("btn-success");
             String htmlStr = videoFileElements.toString();
             String maxFile = "1080p";
@@ -126,6 +129,22 @@ public class Javbangers extends BaseWeb {
         downloadVideo("orgy");
     }
 
+    public void downloadAnal(){
+        downloadVideo("anal");
+    }
+
+    public void downloadSquirt(){
+        downloadVideo("squirt");
+    }
+
+    public void downloadCreampie(){
+        downloadVideo("creampie");
+    }
+
+    public void downloadCensored(){
+        downloadVideo("censored");
+    }
+
     public void downloadUncensored(){
         downloadVideo("uncensored");
     }
@@ -138,7 +157,7 @@ public class Javbangers extends BaseWeb {
                 videoList = videoList.stream().filter(v -> Objects.nonNull(v.getSourceUrl())).collect(Collectors.toList());
                 A: for(Video video:videoList){
                     for(String key:filterKey){
-                        if(video.getName().contains(key)){
+                        if(video.getName().contains(key)||video.getName().contains(key.toLowerCase())||video.getName().contains(key.toUpperCase())){
                             logger.info("{},的名称有过滤字段",video.getName());
                             continue A;
                         }
@@ -154,6 +173,10 @@ public class Javbangers extends BaseWeb {
 //                    }
                     video.getName();
                     video=getVideoInfo(video);
+                    if(!video.isUncensored()){
+                        logger.info("{},有码",video.getName());
+                        continue;
+                    }
                     String date = simpleDateFormat.format(new Date());
                     String videoSavePath = savePath + categories + File.separator + date + File.separator + video.getName();
                     video.setSavePath(videoSavePath);

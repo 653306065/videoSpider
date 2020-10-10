@@ -54,4 +54,6 @@ public class Video {
     private String avCode;
 
     private String studio;
+
+    private boolean uncensored;
 }

@@ -22,6 +22,6 @@ public class Application {
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(Application.class);
         Javbangers Javbangers = context.getBean(Javbangers.class);
-        Javbangers.downloadOrgy();
+        Javbangers.downloadCensored();
     }
 }
