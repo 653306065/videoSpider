@@ -6,6 +6,7 @@ import com.spider.service.VideoService;
 import com.spider.web.Eporner;
 import com.spider.web.Javbangers;
 import com.spider.web.Javrave;
+import com.spider.web.Pornhub;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -21,7 +22,7 @@ public class Application {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(Application.class);
-        Javbangers Javbangers = context.getBean(Javbangers.class);
-        Javbangers.downloadCensored();
+        Pornhub pornhub=context.getBean(Pornhub.class);
+        pornhub.downloadCreampie();
     }
 }

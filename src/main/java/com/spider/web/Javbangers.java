@@ -58,6 +58,7 @@ public class Javbangers extends BaseWeb {
 
     public List<Video> getVideoListByUrl(String categories, Integer page) {
         String listUrl = template.replace("@{categories}", categories).replace("@{page}", String.valueOf(page)).replace("@{time}", String.valueOf(System.currentTimeMillis()));
+        logger.info(listUrl);
         Document document = JsoupUtil.getDocument(listUrl, enableProxy);
         Elements elements = document.getElementsByClass("inf");
         return elements.stream().map(element -> {
@@ -90,8 +91,8 @@ public class Javbangers extends BaseWeb {
                 String videodescText = videodescs.get(0).text();
                 video.setIntroduction(videodescText);
             }
-            if(info.text().contains("Censored")){
-                video.setUncensored(false);
+            if(info.text().contains("https://www.javbangers.com/categories/censored/")){
+                video.setCensored(true);
             }
             Elements videoFileElements = info.getElementsByClass("btn-success");
             String htmlStr = videoFileElements.toString();
@@ -129,6 +130,14 @@ public class Javbangers extends BaseWeb {
         downloadVideo("orgy");
     }
 
+    public void downloadThreesome(){
+        downloadVideo("threesome");
+    }
+
+    public void downloadBukkake(){
+        downloadVideo("bukkake");
+    }
+
     public void downloadAnal(){
         downloadVideo("anal");
     }
@@ -157,7 +166,7 @@ public class Javbangers extends BaseWeb {
                 videoList = videoList.stream().filter(v -> Objects.nonNull(v.getSourceUrl())).collect(Collectors.toList());
                 A: for(Video video:videoList){
                     for(String key:filterKey){
-                        if(video.getName().contains(key)||video.getName().contains(key.toLowerCase())||video.getName().contains(key.toUpperCase())){
+                        if(video.getName().contains(key)||video.getName().contains(key.toLowerCase())||video.getName().contains(key.toUpperCase())||video.getName().toLowerCase().contains(key)||video.getName().toUpperCase().contains(key)){
                             logger.info("{},的名称有过滤字段",video.getName());
                             continue A;
                         }
@@ -173,7 +182,7 @@ public class Javbangers extends BaseWeb {
 //                    }
                     video.getName();
                     video=getVideoInfo(video);
-                    if(!video.isUncensored()){
+                    if(video.getCensored()){
                         logger.info("{},有码",video.getName());
                         continue;
                     }

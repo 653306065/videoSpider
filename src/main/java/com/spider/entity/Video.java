@@ -55,5 +55,5 @@ public class Video {
 
     private String studio;
 
-    private boolean uncensored;
+    private Boolean censored=false;
 }

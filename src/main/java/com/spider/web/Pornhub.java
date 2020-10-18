@@ -43,6 +43,9 @@ public class Pornhub extends BaseWeb {
     @Value("${pornhub.enableProxy}")
     private Boolean enableProxy;
 
+    @Value("${pornhub.categoriesUrlByNum}")
+    private String categoriesUrlByNum;
+
     @Autowired
     private MultithreadingDownload multithreadingDownload;
 
@@ -57,7 +60,7 @@ public class Pornhub extends BaseWeb {
         //标签
         Element tagsWrapper = document.getElementsByClass("tagsWrapper").get(0);
         //发布商
-        Element production = document.getElementsByClass("production").get(0);
+       //Element production = document.getElementsByClass("production").get(0);
 
         Video video = new Video();
         video.setSourceUrl(url);
@@ -86,9 +89,9 @@ public class Pornhub extends BaseWeb {
         }
 
         //设置发布商
-        if (Objects.nonNull(production)) {
-            video.setProduction(production.text());
-        }
+//        if (Objects.nonNull(production)) {
+//            video.setProduction(production.text());
+//        }
         String js = element.getElementsByTag("script").get(0).html().split("loadScriptUniqueId")[0];
         String json = getScriptJson(js, videoId);
         JSONObject jsonObject = JSON.parseObject(json);
@@ -221,17 +224,17 @@ public class Pornhub extends BaseWeb {
         downloadSearch("3d+monster");
     }
 
-    public void downloadDP() {
-        String url = "https://www.pornhub.com/video?c=72&page=";
+    public void downloadCategoriesUrlByNum(int categoriesNum,int page,String categoriesName) {
+        String url = categoriesUrlByNum.replace("@{categories}",String.valueOf(categoriesNum)).replace("@{page}",String.valueOf(page));
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         int i = 1;
         while (true) {
             try {
-                List<String> list = getVideoList(url + i);
+                List<String> list = getVideoList(url);
                 for (String str : list) {
                     Video video = getVideoByUrl(str);
                     String date = simpleDateFormat.format(new Date());
-                    String path = savePath + "dp" + File.separator + date + File.separator + video.getName();
+                    String path = savePath + categoriesName + File.separator + date + File.separator + video.getName();
                     video.setSavePath(path);
                     if (Integer.valueOf(video.getQuality()) < 720) {
                         continue;
@@ -242,6 +245,22 @@ public class Pornhub extends BaseWeb {
                 e.printStackTrace();
             }
             i++;
+        }
+    }
+
+    public void downloadCreampie(){
+        int page=1;
+        while (true){
+            downloadCategoriesUrlByNum(15,page,"creampie");
+            page++;
+        }
+    }
+
+    public void downloadDoublePenetration(){
+        int page=1;
+        while (true){
+            downloadCategoriesUrlByNum(72,page,"double-penetration");
+            page++;
         }
     }
 
