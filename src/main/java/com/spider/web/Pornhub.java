@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+
 import com.spider.entity.Video;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -46,6 +47,9 @@ public class Pornhub extends BaseWeb {
     @Value("${pornhub.categoriesUrlByNum}")
     private String categoriesUrlByNum;
 
+    @Value("${pornhub.incategoriesUrl}")
+    private String incategoriesUrl;
+
     @Autowired
     private MultithreadingDownload multithreadingDownload;
 
@@ -60,7 +64,7 @@ public class Pornhub extends BaseWeb {
         //标签
         Element tagsWrapper = document.getElementsByClass("tagsWrapper").get(0);
         //发布商
-       //Element production = document.getElementsByClass("production").get(0);
+        //Element production = document.getElementsByClass("production").get(0);
 
         Video video = new Video();
         video.setSourceUrl(url);
@@ -123,8 +127,16 @@ public class Pornhub extends BaseWeb {
                     list.add(home + href);
                 }
             }
-        } else {
+        } else if(document.getElementById("videoCategory")!=null){
             Elements elements = document.getElementById("videoCategory").getElementsByClass("linkVideoThumb");
+            for (Element element : elements) {
+                String href = element.getElementsByTag("a").attr("href");
+                if (href.indexOf("viewkey") != -1) {
+                    list.add(home + href);
+                }
+            }
+        } else if(document.getElementById("incategoryVideos")!=null){
+            Elements elements = document.getElementById("incategoryVideos").getElementsByClass("linkVideoThumb");
             for (Element element : elements) {
                 String href = element.getElementsByTag("a").attr("href");
                 if (href.indexOf("viewkey") != -1) {
@@ -224,12 +236,12 @@ public class Pornhub extends BaseWeb {
         downloadSearch("3d+monster");
     }
 
-    public void downloadCategoriesUrlByNum(int categoriesNum,int page,String categoriesName) {
-        String url = categoriesUrlByNum.replace("@{categories}",String.valueOf(categoriesNum)).replace("@{page}",String.valueOf(page));
+    public void downloadCategoriesUrlByNum(int categoriesNum, String categoriesName) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        int i = 1;
+        int page = 1;
         while (true) {
             try {
+                String url = categoriesUrlByNum.replace("@{categories}", String.valueOf(categoriesNum)).replace("@{page}", String.valueOf(page));
                 List<String> list = getVideoList(url);
                 for (String str : list) {
                     Video video = getVideoByUrl(str);
@@ -244,24 +256,57 @@ public class Pornhub extends BaseWeb {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            i++;
-        }
-    }
-
-    public void downloadCreampie(){
-        int page=1;
-        while (true){
-            downloadCategoriesUrlByNum(15,page,"creampie");
             page++;
         }
     }
 
-    public void downloadDoublePenetration(){
-        int page=1;
-        while (true){
-            downloadCategoriesUrlByNum(72,page,"double-penetration");
+    public void downloadIncategories(String categories, String incategories) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        int page = 1;
+        while (true) {
+            try {
+                String url = incategoriesUrl.replace("@{categories}", categories).replace("@{incategories}", incategories).replace("@{page}", String.valueOf(page));
+                List<String> list = getVideoList(url);
+                for (String str : list) {
+                    Video video = getVideoByUrl(str);
+                    String date = simpleDateFormat.format(new Date());
+                    String path = savePath + categories + "+" + incategories + File.separator + date + File.separator + video.getName();
+                    video.setSavePath(path);
+                    if (Integer.valueOf(video.getQuality()) < 720) {
+                        continue;
+                    }
+                    multithreadingDownload.videoDownload(video, null, enableProxy, thread, defaultSegmentSize);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             page++;
         }
+    }
+
+    public void download_doublePenetration_gangbang(){
+        downloadIncategories("double-penetration", "gangbang");
+    }
+
+    public void download_creampie_orgy(){
+        downloadIncategories("creampie", "orgy");
+    }
+
+    public  void  download_gangbang_hentai (){
+        downloadIncategories("gangbang", "hentai");
+
+    }
+
+    public void downloadCreampie() {
+        downloadCategoriesUrlByNum(15, "creampie");
+    }
+
+    public void downloadDoublePenetration_gangbang() {
+        downloadCategoriesUrlByNum(15, "creampie");
+    }
+
+    public void downloadDoublePenetration() {
+        downloadCategoriesUrlByNum(72, "double-penetration");
     }
 
     public void downloadHentaiGangbang() {

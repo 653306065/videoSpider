@@ -89,7 +89,7 @@ pornhub:
     - hentai
   categoriesUrl: https://www.pornhub.com/categories/@{categories}
   categoriesUrlByNum: https://pornhub.com/video?c=@{categories}&hd=1&page=@{page}&min_duration=10&p=professional
-  incategories: https://pornhub.com/video/incategories/@{categories}/@{incategories}?p=professional&min_duration=10&hd=1&page=@{page}
+  incategoriesUrl: https://pornhub.com/video/incategories/@{categories}/@{incategories}?p=professional&min_duration=10&hd=1&page=@{page}
   thread: 15
   enableProxy: true
 

@@ -23,6 +23,6 @@ public class Application {
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(Application.class);
         Pornhub pornhub=context.getBean(Pornhub.class);
-        pornhub.downloadCreampie();
+        pornhub.download_gangbang_hentai();
     }
 }
