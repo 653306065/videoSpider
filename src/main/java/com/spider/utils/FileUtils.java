@@ -4,6 +4,7 @@ package com.spider.utils;
 import com.spider.constant.Constant;
 import org.apache.commons.codec.binary.Hex;
 import org.jetbrains.annotations.NotNull;
+
 import java.io.*;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
@@ -283,8 +284,8 @@ public class FileUtils {
             if (!localFile.exists()) {
                 localFile.getParentFile().mkdirs();
                 localFile.createNewFile();
-            }else{
-                System.out.println(path+",已存在");
+            } else {
+                System.out.println(path + ",已存在");
                 return;
             }
             // 输出流
@@ -307,8 +308,8 @@ public class FileUtils {
             while ((length = fileInputStream.read(buffer)) != -1) {
                 MD5.update(buffer, 0, length);
             }
-            String md5Str=new String(Hex.encodeHex(MD5.digest()));
-            System.out.println(file.getName()+",md5:"+md5Str);
+            String md5Str = new String(Hex.encodeHex(MD5.digest()));
+            System.out.println(file.getName() + ",md5:" + md5Str);
             return md5Str;
         } catch (Exception e) {
             e.printStackTrace();
@@ -366,7 +367,7 @@ public class FileUtils {
             int index = 0;
             for (String key : splitArr) {
                 for (String connectKey : connectKeys) {
-                    if(index+1>=splitArr.length){
+                    if (index + 1 >= splitArr.length) {
                         break;
                     }
                     String tmep = key + connectKey + splitArr[index + 1];
@@ -376,12 +377,28 @@ public class FileUtils {
             }
         }
         List<String> all = new ArrayList<>();
-        all.addAll(list.stream().map(key->{ return  key.toLowerCase().trim();}).collect(Collectors.toList()));
-        all.addAll(list.stream().map(key->{ return  key.toUpperCase().trim();}).collect(Collectors.toList()));
-        return all ;
+        all.addAll(list.stream().map(key -> {
+            return key.toLowerCase().trim();
+        }).collect(Collectors.toList()));
+        all.addAll(list.stream().map(key -> {
+            return key.toUpperCase().trim();
+        }).collect(Collectors.toList()));
+        return all;
     }
 
     public static void main(String[] args) {
-
+        List<String> keyList= readTxt("C:\\key.txt", "UTF-8");
+        List<File> fileList = new ArrayList<>();
+        getPathFileList("C:\\书包", fileList);
+        fileList.stream().parallel().forEach(file -> {
+            List<String> textLine = readTxt(file.getAbsolutePath(), "GB2312");
+            textLine.stream().forEach(line -> {
+                keyList.stream().forEach(key->{
+                    if(line.contains(key)){
+                        System.out.println(file.getAbsolutePath()+", "+key+" :"+ line);
+                    }
+                });
+            });
+        });
     }
 }
