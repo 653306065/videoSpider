@@ -119,6 +119,9 @@ public class Pornhub extends BaseWeb {
     public List<String> getVideoList(String url) {
         List<String> list = new ArrayList<String>();
         Document document = JsoupUtil.getDocument(url, enableProxy);
+        if(Objects.isNull(document)){
+            return list;
+        }
         if (document.getElementById("videoSearchResult") != null) {
             Elements elements = document.getElementById("videoSearchResult").getElementsByClass("title");
             for (Element element : elements) {
@@ -292,9 +295,25 @@ public class Pornhub extends BaseWeb {
         downloadIncategories("creampie", "orgy");
     }
 
+    public void download_orgy_doublePenetration(){
+        downloadIncategories("orgy","double-penetration" );
+    }
+
+    public void download_japanese_orgy(){
+        downloadIncategories("japanese","orgy" );
+    }
+
+
+    public void download_doublePenetration_creampie(){
+        downloadIncategories("double-penetration", "creampie");
+    }
+
     public  void  download_gangbang_hentai (){
         downloadIncategories("gangbang", "hentai");
+    }
 
+    public void download_compilation_creampie(){
+        downloadIncategories("compilation", "creampie");
     }
 
     public void downloadCreampie() {

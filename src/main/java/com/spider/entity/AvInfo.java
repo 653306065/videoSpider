@@ -26,7 +26,7 @@ public class AvInfo {
     private Date publishDate;
 
     //时长
-    private int minute;
+    private Integer minute;
 
     //制作商
     private String maker;
