@@ -13,6 +13,7 @@ import java.security.MessageDigest;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class FileUtils {
@@ -395,11 +396,11 @@ public class FileUtils {
     }
 
     public static void main(String[] args) {
-        List<String> keyList = readTxt("G:\\key1.txt", "UTF-8");
+        List<String> keyList = readTxt("C:\\book\\key.txt", "UTF-8");
         Set<String> keySet = keyList.stream().filter(key -> !key.startsWith("#")).collect(Collectors.toSet());
         List<File> fileList = new ArrayList<>();
-        getPathFileList("G:\\GBK", fileList);
-        ConcurrentMap<String, Set<String>> map = new ConcurrentHashMap<>();
+        getPathFileList("C:\\book\\keyBook", fileList);
+        ConcurrentMap<String, Integer> map = new ConcurrentHashMap<>();
         fileList.stream().parallel().forEach(file -> {
             List<String> textLine = readTxt(file.getAbsolutePath(), "GBK");
             textLine.stream().forEach(line -> {
@@ -409,24 +410,29 @@ public class FileUtils {
                         if (line.length() > 50) {
                             realLine = line.substring(0, 50);
                         }
-                        System.out.println(file.getAbsolutePath() + ", " + key + " :" + line);
-                        if (map.containsKey(file.getName())) {
-                            map.get(file.getName()).add(realLine);
+                        //System.out.println(file.getAbsolutePath() + ", " + key + " :" + line);
+                        if (map.containsKey(file.getAbsolutePath())) {
+                            map.put(file.getAbsolutePath(), map.get(file.getAbsolutePath())+1);
                         } else {
-                            HashSet<String> hashSet = new HashSet<>();
-                            hashSet.add(realLine);
-                            map.put(file.getName(), hashSet);
+//                            HashSet<String> hashSet = new HashSet<>();
+//                            hashSet.add(realLine);
+                            map.put(file.getAbsolutePath(),1);
                         }
                     }
-
                 });
                 //System.out.println(line);
             });
         });
         System.out.println(JSON.toJSONString(map));
-        byteToFile(JSON.toJSONString(map).getBytes(), "G:\\key.json");
+        byteToFile(JSON.toJSONString(map).getBytes(), "C:\\book\\key.json");
 //        map.keySet().stream().parallel().forEach(file->{
-//            new File(file).renameTo(new File("G:\\keyBook\\"+ new File(file).getName()));
+//            new File(file).renameTo(new File("C:\\book\\keyBook\\"+ new File(file).getName()));
 //        });
+        AtomicInteger size= new AtomicInteger();
+        map.entrySet().stream().parallel().filter(stringIntegerEntry -> stringIntegerEntry.getValue()>5).forEach(stringIntegerEntry -> {
+            System.out.println(stringIntegerEntry.getKey()+","+stringIntegerEntry.getValue());
+            size.getAndIncrement();
+        });
+        System.out.println(size.get());
     }
 }

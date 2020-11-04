@@ -18,10 +18,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
@@ -86,6 +83,7 @@ public class Javbus extends BaseWeb {
                 actressesInfo.setJavbusPhotoUrl(imgUrl);
                 actressesInfo.setName(name);
                 actressesInfo.setJavbusUrl(infoUrl);
+                actressesInfo.setCreateDate(new Date());
                 logger.info("{},信息获取完成", name);
             }
             return actressesInfo;
@@ -135,6 +133,7 @@ public class Javbus extends BaseWeb {
                             }
                         }
                     }
+                    avInfo.setCreateDate(new Date());
                     list.add(avInfo);
                 });
             }catch (Exception e){
@@ -191,23 +190,17 @@ public class Javbus extends BaseWeb {
                     }
                 }
             });
-            List<String> tags = info.getElementsByClass("genre").stream().map(element -> {
-                return element.text();
-            }).collect(Collectors.toList());
+            List<String> tags = info.getElementsByClass("genre").stream().map(Element::text).collect(Collectors.toList());
             avInfo.setTags(tags);
         }
         Element avatar = document.getElementById("avatar-waterfall");
         if (Objects.nonNull(avatar)) {
-            List<String> avatarList = avatar.getElementsByTag("img").stream().map(element -> {
-                return element.attr("title");
-            }).collect(Collectors.toList());
+            List<String> avatarList = avatar.getElementsByTag("img").stream().map(element -> element.attr("title")).collect(Collectors.toList());
             avInfo.setAvatars(avatarList);
         }
         Element waterfall = document.getElementById("sample-waterfall");
         if (Objects.nonNull(waterfall)) {
-            List<String> waterfallList = waterfall.getElementsByTag("img").stream().map(element -> {
-                return element.attr("src");
-            }).collect(Collectors.toList());
+            List<String> waterfallList = waterfall.getElementsByTag("img").stream().map(element -> element.attr("src")).collect(Collectors.toList());
             avInfo.setPreviewImageUrlList(waterfallList);
             List<byte[]> byteList = waterfallList.stream().parallel().map(url -> {
                 byte[] bytes = OKHttpUtils.getBytes(url, enableProxy);
@@ -292,12 +285,12 @@ public class Javbus extends BaseWeb {
                 });
             }
         }
-        return magnetList;
+        return magnetList.stream().filter(magnet -> !StringUtils.isEmpty(magnet.getMagnet())).collect(Collectors.toList());
     }
 
     public void saveAvInfoByActresses(String actressesUrl) {
         List<AvInfo> list = getAvInfoUrlByActresses(actressesUrl);
-        list.stream().filter(avInfo -> Objects.nonNull(avInfo)).parallel().forEach(avInfo -> {
+        list.stream().filter(Objects::nonNull).parallel().forEach(avInfo -> {
             if (avInfoService.count("code", avInfo.getCode()) == 0) {
                 avInfo = getAvInfo(avInfo);
                 if (Objects.nonNull(avInfo)) {

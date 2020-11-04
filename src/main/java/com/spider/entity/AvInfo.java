@@ -73,6 +73,9 @@ public class AvInfo {
     //文件的保存路径
     private String videoSavePath;
 
+    //创建日期
+    private Date createDate;
+
     @Data
     @Setter
     @Getter
