@@ -14,8 +14,12 @@ public class OKHttpUtils {
     static OkHttpClient proxyHttpClient = null;
 
     static {
-        Proxy proxy = SpringContentUtil.getBean(Proxy.class);
-        proxyHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).proxy(proxy).build();
+        try {
+            Proxy proxy = SpringContentUtil.getBean(Proxy.class);
+            proxyHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).proxy(proxy).build();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public static String get(String url, Boolean isProxy) {

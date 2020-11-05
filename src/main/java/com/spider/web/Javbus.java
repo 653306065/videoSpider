@@ -219,6 +219,9 @@ public class Javbus extends BaseWeb {
 
     public List<AvInfo.Magnet> getMagnetList(String url) {
         Document document = JsoupUtil.getDocument(url, enableProxy);
+        if(Objects.isNull(document)){
+            return null;
+        }
         String scriptString = "";
         Elements scripts = document.getElementsByTag("script");
         for (Element element : scripts) {
