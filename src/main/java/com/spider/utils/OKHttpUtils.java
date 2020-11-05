@@ -1,9 +1,13 @@
 package com.spider.utils;
 
 import okhttp3.*;
+import org.springframework.util.CollectionUtils;
 
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.Proxy;
+import java.net.URLEncoder;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -17,7 +21,7 @@ public class OKHttpUtils {
         try {
             Proxy proxy = SpringContentUtil.getBean(Proxy.class);
             proxyHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).proxy(proxy).build();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -48,8 +52,10 @@ public class OKHttpUtils {
     public static String get(String url, Map<String, String> header, Boolean isProxy) {
         try {
             Request.Builder builder = new Request.Builder();
-            for (Map.Entry<String, String> entry : header.entrySet()) {
-                builder.addHeader(entry.getKey(), entry.getValue());
+            if(!CollectionUtils.isEmpty(header)){
+                for (Map.Entry<String, String> entry : header.entrySet()) {
+                    builder.addHeader(entry.getKey(), entry.getValue());
+                }
             }
             Request request = builder.get().url(url).build();
             Response response = null;
@@ -96,7 +102,7 @@ public class OKHttpUtils {
     }
 
 
-    public static String getRedirectUrl(String url,Map<String,String> header,Boolean isProxy) {
+    public static String getRedirectUrl(String url, Map<String, String> header, Boolean isProxy) {
         try {
             Request.Builder builder = new Request.Builder();
             for (Map.Entry<String, String> entry : header.entrySet()) {
@@ -341,5 +347,49 @@ public class OKHttpUtils {
             e.printStackTrace();
             return null;
         }
+    }
+
+
+    public static String get(String url, Map<String, String> params, Map<String, String> header, Boolean isProxy) {
+        return get(getUrlWithQueryString(url, params), header, isProxy);
+    }
+
+    public static String getUrlWithQueryString(String url, Map<String, String> params) {
+        if (params == null) {
+            return url;
+        }
+        StringBuilder builder = new StringBuilder(url);
+        if (url.contains("?")) {
+            builder.append("&");
+        } else {
+            builder.append("?");
+        }
+        int i = 0;
+        for (String key : params.keySet()) {
+            String value = params.get(key);
+            if (value == null) { // 过滤空的key
+                continue;
+            }
+            if (i != 0) {
+                builder.append('&');
+            }
+            builder.append(key);
+            builder.append('=');
+            builder.append(encode(value));
+            i++;
+        }
+        return builder.toString();
+    }
+
+    public static String encode(String input) {
+        if (input == null) {
+            return "";
+        }
+        try {
+            return URLEncoder.encode(input, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return input;
     }
 }

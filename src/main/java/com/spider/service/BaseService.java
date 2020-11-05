@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Objects;
 
 import com.spider.entity.Video;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -13,6 +15,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
 public abstract class BaseService<T> {
+
+    protected  Logger logger=LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     protected MongoTemplate mongoTemplate;

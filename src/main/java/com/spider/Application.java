@@ -1,11 +1,13 @@
 package com.spider;
 
+import com.spider.service.VideoService;
 import com.spider.web.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import ws.schild.jave.VideoInfo;
 
 @SpringBootApplication
 public class Application {
@@ -14,7 +16,7 @@ public class Application {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext context =  SpringApplication.run(Application.class);
-        Shubao Shubao= context.getBean(Shubao.class);
-        Shubao.getBookList();
+        VideoService VideoService= context.getBean(VideoService.class);
+
     }
 }
