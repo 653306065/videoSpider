@@ -19,6 +19,9 @@ public class AvInfo {
     //名称
     private String name;
 
+    //翻译名称
+    private String translateName;
+
     //识别码
     private String code;
 

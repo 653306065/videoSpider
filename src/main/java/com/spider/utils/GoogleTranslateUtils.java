@@ -11,10 +11,10 @@ public class GoogleTranslateUtils {
 
     static Logger logger= LoggerFactory.getLogger(GoogleTranslateUtils.class);
 
-    public static final String api="http://translate.google.cn/translate_a/single?client=gtx&dt=t&dj=1&ie=UTF-8&sl=@{language}&tl=zh&q=";
+    public static final String api="http://translate.google.cn/translate_a/single?client=gtx&dt=t&dj=1&ie=UTF-8&sl=@{sourceLanguage}&tl=@{targetLanguage}&q=";
 
-    public static String translate(String language,String text){
-        String realUrl=api.replace("@{language}",language)+text;
+    public static String translate(String text,String sourceLanguage,String targetLanguage){
+        String realUrl=api.replace("@{sourceLanguage}",sourceLanguage).replace("@{targetLanguage}",targetLanguage)+text;
         String json= OKHttpUtils.get(realUrl,false);
         if(StringUtils.isBlank(json)){
             return null;
@@ -31,7 +31,7 @@ public class GoogleTranslateUtils {
     }
 
     public static void main(String[] args) {
-        System.out.println(translate("ja","メルシーボークー MXX 32 ぶっかけ中出しアナル : 古瀬玲"));
+        System.out.println(translate("メルシーボークー MXX 32 ぶっかけ中出しアナル : 古瀬玲","ja","zh"));
     }
 
 }
