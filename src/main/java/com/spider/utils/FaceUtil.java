@@ -8,20 +8,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class FaceUtil {
 
-    public static Logger logger=LoggerFactory.getLogger(FaceUtil.class);
+    public static Logger logger = LoggerFactory.getLogger(FaceUtil.class);
 
     public static final String apiKey = "ANVDjMVzjAu-w-zyD9f0KZzEznkoRWnC";
 
     public static final String apiSecret = "jK7PpBZn3ZMZyg_7piODby5GR3J1t5p8";
 
-    public static final String api="https://api-cn.faceplusplus.com/facepp/v3/detect";
+    public static final String api = "https://api-cn.faceplusplus.com/facepp/v3/detect";
 
-    public static FaceInfo faceInfo(byte[] imageByte) {
+    public static List<FaceInfo> faceInfo(byte[] imageByte) {
         Map<String, Object> map = new HashMap<>(5);
         map.put("api_key", apiKey);
         map.put("api_secret", apiSecret);
@@ -34,12 +37,16 @@ public class FaceUtil {
             JSONObject jsonObject = JSON.parseObject(json);
             JSONArray jsonArray = jsonObject.getJSONArray("faces");
             if (!CollectionUtils.isEmpty(jsonArray)) {
-                String gender = jsonArray.getJSONObject(0).getJSONObject("attributes").getJSONObject("gender").getString("value");
-                Integer age = jsonArray.getJSONObject(0).getJSONObject("attributes").getJSONObject("age").getInteger("value");
-                double male_score = jsonArray.getJSONObject(0).getJSONObject("attributes").getJSONObject("beauty").getDouble("male_score");
-                double female_score = jsonArray.getJSONObject(0).getJSONObject("attributes").getJSONObject("beauty").getDouble("female_score");
-                FaceInfo faceInfo = FaceInfo.builder().age(age).gender(gender).maleScore(male_score).femaleScore(female_score).build();
-                return faceInfo;
+                List<FaceInfo> list = new ArrayList<>();
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    String gender = jsonArray.getJSONObject(0).getJSONObject("attributes").getJSONObject("gender").getString("value");
+                    Integer age = jsonArray.getJSONObject(0).getJSONObject("attributes").getJSONObject("age").getInteger("value");
+                    double male_score = jsonArray.getJSONObject(0).getJSONObject("attributes").getJSONObject("beauty").getDouble("male_score");
+                    double female_score = jsonArray.getJSONObject(0).getJSONObject("attributes").getJSONObject("beauty").getDouble("female_score");
+                    FaceInfo faceInfo = FaceInfo.builder().age(age).gender(gender).maleScore(male_score).femaleScore(female_score).build();
+                    list.add(faceInfo);
+                }
+                return list;
             } else {
                 return null;
             }
