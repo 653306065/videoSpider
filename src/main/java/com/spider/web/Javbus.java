@@ -129,7 +129,7 @@ public class Javbus extends BaseWeb {
                             try {
                                 avInfo.setPublishDate(simpleDateFormat.parse(date));
                             } catch (Exception e) {
-                                e.printStackTrace();
+                                //e.printStackTrace();
                             }
                         }
                     }
@@ -157,7 +157,7 @@ public class Javbus extends BaseWeb {
             avInfo.setCoverUrl(imgUrl);
             byte[] imgBytes = OKHttpUtils.getBytes(imgUrl, enableProxy);
             if (Objects.nonNull(imgBytes)) {
-                String path = savePath + "av" + File.separator + avInfo.getCode().trim() + File.separator + "cover" + File.separator + "cover.jpg";
+                String path = savePath + "av" + File.separator + avInfo.getCode().trim() + File.separator + "cover.jpg";
                 FileUtils.byteToFile(imgBytes, path);
                 avInfo.setCover(imgBytes);
             }
@@ -205,7 +205,7 @@ public class Javbus extends BaseWeb {
             List<byte[]> byteList = waterfallList.stream().parallel().map(url -> {
                 byte[] bytes = OKHttpUtils.getBytes(url, enableProxy);
                 if (Objects.nonNull(bytes)) {
-                    String path = savePath + "av" + File.separator + avInfo.getCode().trim() + File.separator + System.currentTimeMillis() + ".jpg";
+                    String path = savePath + "av" + File.separator + avInfo.getCode().trim() + File.separator + System.currentTimeMillis()+UUID.randomUUID().toString().substring(0,4) + ".jpg";
                     FileUtils.byteToFile(bytes, path);
                 }
                 return bytes;
@@ -261,7 +261,7 @@ public class Javbus extends BaseWeb {
                         try {
                             magnetInfo.setShareDate(simpleDateFormat.parse(shareDate));
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            //e.printStackTrace();
                         }
                     } else if (dataList.size() == 4) {
                         String magnet = dataList.get(0).attr("href");
@@ -281,7 +281,7 @@ public class Javbus extends BaseWeb {
                         try {
                             magnetInfo.setShareDate(simpleDateFormat.parse(shareDate));
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            //e.printStackTrace();
                         }
                     }
                     magnetList.add(magnetInfo);

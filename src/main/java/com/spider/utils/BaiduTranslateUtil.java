@@ -3,6 +3,8 @@ package com.spider.utils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.util.CollectionUtils;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -22,6 +24,9 @@ public class BaiduTranslateUtil {
         }
         JSONObject jsonObject = JSON.parseObject(json);
         JSONArray jsonArray = jsonObject.getJSONArray("trans_result");
+        if(CollectionUtils.isEmpty(jsonArray)){
+           return null;
+        }
         String translateText = "";
         for (int i = 0; i < jsonArray.size(); i++) {
             translateText = jsonArray.getJSONObject(i).getString("dst");
