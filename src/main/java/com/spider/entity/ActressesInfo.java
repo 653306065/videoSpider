@@ -28,4 +28,6 @@ public class ActressesInfo {
     private Boolean censored;
 
     private Date createDate;
+
+    private FaceInfo faceInfo;
 }

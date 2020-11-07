@@ -349,6 +349,42 @@ public class OKHttpUtils {
         }
     }
 
+    public static String postFormObjectData(String url, Map<String, Object> params, Boolean isProxy) {
+        try {
+            Request.Builder requestBuilder = new Request.Builder();
+            MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder().setType(MultipartBody.FORM);
+            for (Map.Entry<String, Object> entry : params.entrySet()) {
+                if(entry.getValue() instanceof String){
+                    multipartBodyBuilder.addFormDataPart(entry.getKey(),(String) entry.getValue());
+                }else if(entry.getValue() instanceof byte[]){
+                    multipartBodyBuilder.addFormDataPart(entry.getKey(),entry.getKey(),RequestBody.create((byte[])entry.getValue()));
+                }else{
+                    multipartBodyBuilder.addFormDataPart(entry.getKey(),String.valueOf(entry.getValue()));
+                }
+            }
+            Request request = requestBuilder.post(multipartBodyBuilder.build()).url(url).build();
+            Response response = null;
+            if (isProxy) {
+                response = proxyHttpClient.newCall(request).execute();
+            } else {
+                response = httpClient.newCall(request).execute();
+            }
+            if (response.isSuccessful()) {
+                String html = response.body().string();
+                response.body().close();
+                response.close();
+                return html;
+            }else{
+                System.out.println(response.body().string());
+            }
+            response.close();
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 
     public static String get(String url, Map<String, String> params, Map<String, String> header, Boolean isProxy) {
         return get(getUrlWithQueryString(url, params), header, isProxy);
