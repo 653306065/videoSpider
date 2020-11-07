@@ -4,12 +4,16 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.spider.entity.FaceInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import java.util.HashMap;
 import java.util.Map;
 
 public class FaceUtil {
+
+    public static Logger logger=LoggerFactory.getLogger(FaceUtil.class);
 
     public static final String apiKey = "ANVDjMVzjAu-w-zyD9f0KZzEznkoRWnC";
 
@@ -20,11 +24,12 @@ public class FaceUtil {
     public static FaceInfo faceInfo(byte[] imageByte) {
         Map<String, Object> map = new HashMap<>(5);
         map.put("api_key", apiKey);
-        map.put("api_secret", "apiSecret");
+        map.put("api_secret", apiSecret);
         map.put("image_file", imageByte);
         map.put("beauty_score_max", 100);
         map.put("return_attributes", "beauty,age,gender");
         String json = OKHttpUtils.postFormObjectData(api, map, false);
+        logger.info(json);
         if (!StringUtils.isEmpty(json)) {
             JSONObject jsonObject = JSON.parseObject(json);
             JSONArray jsonArray = jsonObject.getJSONArray("faces");
