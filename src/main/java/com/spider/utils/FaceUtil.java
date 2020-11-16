@@ -32,7 +32,7 @@ public class FaceUtil {
         map.put("beauty_score_max", 100);
         map.put("return_attributes", "beauty,age,gender");
         String json = OKHttpUtils.postFormObjectData(api, map, false);
-        logger.info(json);
+        //logger.info(json);
         if (!StringUtils.isEmpty(json)) {
             JSONObject jsonObject = JSON.parseObject(json);
             JSONArray jsonArray = jsonObject.getJSONArray("faces");
@@ -41,9 +41,9 @@ public class FaceUtil {
                 for (int i = 0; i < jsonArray.size(); i++) {
                     String gender = jsonArray.getJSONObject(0).getJSONObject("attributes").getJSONObject("gender").getString("value");
                     Integer age = jsonArray.getJSONObject(0).getJSONObject("attributes").getJSONObject("age").getInteger("value");
-                    double male_score = jsonArray.getJSONObject(0).getJSONObject("attributes").getJSONObject("beauty").getDouble("male_score");
-                    double female_score = jsonArray.getJSONObject(0).getJSONObject("attributes").getJSONObject("beauty").getDouble("female_score");
-                    FaceInfo faceInfo = FaceInfo.builder().age(age).gender(gender).maleScore(male_score).femaleScore(female_score).build();
+                    double maleScore = jsonArray.getJSONObject(0).getJSONObject("attributes").getJSONObject("beauty").getDouble("male_score");
+                    double femaleScore = jsonArray.getJSONObject(0).getJSONObject("attributes").getJSONObject("beauty").getDouble("female_score");
+                    FaceInfo faceInfo = FaceInfo.builder().age(age).gender(gender).maleScore(maleScore).femaleScore(femaleScore).build();
                     list.add(faceInfo);
                 }
                 return list;

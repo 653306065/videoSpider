@@ -306,7 +306,7 @@ public class Javbus extends BaseWeb {
     }
 
     public void saveAvInfoByActressesAll() {
-        actressesInfoService.findAll().stream().sequential().forEach(actressesInfo -> {
+        actressesInfoService.findAll().stream().parallel().forEach(actressesInfo -> {
             logger.info("----------{},开始获取---------", actressesInfo.getName());
             saveAvInfoByActresses(actressesInfo.getJavbusUrl());
             logger.info("----------{},所有获取完成---------", actressesInfo.getName());

@@ -4,8 +4,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.Objects;
-
-import com.spider.entity.Video;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +19,7 @@ public abstract class BaseService<T> {
     @Autowired
     protected MongoTemplate mongoTemplate;
 
-    private Class<T> clazz;
+    protected Class<T> clazz;
 
     public BaseService() {
         clazz = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
@@ -72,9 +70,12 @@ public abstract class BaseService<T> {
         }catch (Exception e){
             e.printStackTrace();
         }
-
     }
 
+    public List<T> findByRegex(String key,String  regex){
+        Query query=new Query(Criteria.where(key).regex(regex));
+        return  mongoTemplate.find(query,clazz);
+    }
 
     public void insert(T t){
         mongoTemplate.insert(t);

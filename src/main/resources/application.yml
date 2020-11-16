@@ -90,8 +90,8 @@ pornhub:
   categoriesUrl: https://www.pornhub.com/categories/@{categories}
   categoriesUrlByNum: https://pornhub.com/video?c=@{categories}&hd=1&page=@{page}&min_duration=10&p=professional
   incategoriesUrl: https://pornhub.com/video/incategories/@{categories}/@{incategories}?p=professional&min_duration=10&hd=1&page=@{page}&o=mv&t=a
-  thread: 15
-  enableProxy: true
+  thread: 30
+  enableProxy: false
 
 youtube:
   home: https://www.findyoutube.net/
@@ -120,7 +120,7 @@ javbangers:
   home: https://www.javbangers.com/
   template: https://www.javbangers.com/categories/@{categories}/?mode=async&function=get_block&block_id=list_videos_common_videos_list&sort_by=post_date&from=@{page}&_=@{time}
   savePath: E:\javbangers\
-  cookie: _ga=GA1.2.691909481.1600091699; PHPSESSID=6be78946339a08799fcf38140ae7a234; kt_qparams=id%3D102615%26dir%3D127-coco; kt_ips=65.52.182.116; kt_tcookie=1; _gid=GA1.2.1199354712.1600969029; _gat_gtag_UA_154629456_1=1; kt_is_visited=1; kt_member=87beabf211fcb170ea555f40a006fab2
+  cookie: _ga=GA1.2.691909481.1600091699; PHPSESSID=f854d3ece2a544f60c3114dfc1affca2; kt_ips=153.122.120.53; kt_tcookie=1; kt_is_visited=1; _gid=GA1.2.1376782016.1605278342; _gat_gtag_UA_154629456_1=1; kt_member=234ad8d8f7780d670eb40d38291ef178
   enableProxy: true
   thread: 30
   filterKey: FC2-PPV,Pacopacomama,Muramura,pacopacomama,FC2,H0930,C0930,H4610,10Musume,Mosaic Removed,台湾色情,Jukujo-club,Taiwan,CreampieInAsia,HeyDouga,Heydouga,XXX-AV,Lesshin,Nyoshin,素人,Kin8tengoku,fc2,fc2-ppv,Fanta Dream,หนังอาร์เกาหลีอัพเดทใหม่ๆ,ガチん娘,Korean,G-Queen,Shemales,amateur,Sol sanchez,Amwf,jukujo-club,TOEN,DASD,HGOT,HND,MIAA,SPRD,T28,Mywife,Thai,KRMV,Gachinco,Vpsds,HOON,SIRO,SR0,GVG,200GANA,300MAAN,ORE-,STAR-,SOD-,unkotare,NSPS-,SDMT-,SVS-,S-Cute,MXSPS,DJE-,BFFF-,BFJG-,DOCP-,PZD-,MDS-,MARA-,mktk,JTP,XVSR,WSP,America,ipx,SL-,259LUXU
@@ -141,7 +141,7 @@ javbus:
   actressesDetailsTemplate: ${javbus.home}/@{category}/star/@{name}
   avTemplate: ${javbus.home}/@{code}
   magnetApi: https://www.javbus.com/ajax/uncledatoolsbyajax.php?gid=@{gid}&lang=zh&uc=1
-  savePath: C:\javbus\
+  savePath: E:\javbus\
 
 javrave:
   home: https://javrave.club/
@@ -166,7 +166,7 @@ proxy:
   socks:
     #host: 192.168.31.184
     host: 127.0.0.1
-    port: 1080
+    port: 10808
   http:
     #host: 192.168.31.184
     host: 127.0.0.1

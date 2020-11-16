@@ -79,6 +79,13 @@ public class AvInfo {
     //创建日期
     private Date createDate;
 
+    //封面女优颜值男性评分
+    private Double coverFaceMaleScore;
+
+    //封面女优颜值女性评分
+    private Double coverFaceFemaleScore;
+
+
     @Data
     @Setter
     @Getter
