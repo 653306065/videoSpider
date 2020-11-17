@@ -1,8 +1,12 @@
 package com.spider;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
 import com.alibaba.fastjson.JSON;
+import com.spider.entity.ActressesInfo;
 import com.spider.entity.AvInfo;
 import com.spider.entity.Video;
+import com.spider.service.ActressesInfoService;
 import com.spider.service.AvInfoService;
 import com.spider.service.VideoService;
 import com.spider.web.Javbangers;
@@ -47,7 +51,20 @@ public class Application {
 //        }
 //        System.out.println(list.size());
         Xslist Xslist=  context.getBean(Xslist.class);
-        List<String> urlList= Xslist.getSearchList("有賀ゆあ");
-        System.out.println(JSON.toJSONString(Xslist.getInfo(urlList.get(0))));
+        ActressesInfoService actressesInfoService=context.getBean(ActressesInfoService.class);
+        List<ActressesInfo>  actressesInfoList=actressesInfoService.findAll();
+        actressesInfoList.stream().parallel().forEach(actressesInfo -> {
+            List<String> urlList= Xslist.getSearchList(actressesInfo.getName());
+            if(CollectionUtils.isEmpty(urlList)){
+                logger.info("{},无搜索结果",actressesInfo.getName());
+            }else{
+                ActressesInfo findActressesInfo= Xslist.getInfo(urlList.get(0));
+                CopyOptions copyOptions=new CopyOptions();
+                copyOptions.setIgnoreNullValue(true);
+                BeanUtil.copyProperties(findActressesInfo,actressesInfo,copyOptions);
+                actressesInfoService.updateById(actressesInfo);
+                logger.info("{},更新数据",actressesInfo.getName());
+            }
+        });
     }
 }
