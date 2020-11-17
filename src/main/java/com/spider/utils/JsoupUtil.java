@@ -14,7 +14,7 @@ public class JsoupUtil {
     private static Proxy proxy = SpringContentUtil.getBean(Proxy.class);
 
     public static Document getDocument(String url) {
-        String html = OKHttpUtils.get(url, null);
+        String html = OKHttpUtils.get(url, false);
         Document document = Jsoup.parse(html);
         return document;
     }

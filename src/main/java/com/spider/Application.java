@@ -8,6 +8,7 @@ import com.spider.service.VideoService;
 import com.spider.web.Javbangers;
 import com.spider.web.Javbus;
 import com.spider.web.Pornhub;
+import com.spider.web.Xslist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -45,7 +46,8 @@ public class Application {
 //            System.out.println(magnet.getMagnet());
 //        }
 //        System.out.println(list.size());
-        Javbangers Javbangers=  context.getBean(Javbangers.class);
-        Javbangers.downloadUncensored();
+        Xslist Xslist=  context.getBean(Xslist.class);
+        List<String> urlList= Xslist.getSearchList("有賀ゆあ");
+        System.out.println(JSON.toJSONString(Xslist.getInfo(urlList.get(0))));
     }
 }
