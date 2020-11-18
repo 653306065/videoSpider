@@ -386,12 +386,8 @@ public class FileUtils {
             }
         }
         List<String> all = new ArrayList<>();
-        all.addAll(list.stream().map(key -> {
-            return key.toLowerCase().trim();
-        }).collect(Collectors.toList()));
-        all.addAll(list.stream().map(key -> {
-            return key.toUpperCase().trim();
-        }).collect(Collectors.toList()));
+        all.addAll(list.stream().map(key -> key.toLowerCase().trim()).collect(Collectors.toList()));
+        all.addAll(list.stream().map(key -> key.toUpperCase().trim()).collect(Collectors.toList()));
         return all;
     }
 

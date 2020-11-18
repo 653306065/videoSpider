@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.spider.entity.AvInfo;
 import com.spider.entity.Image;
 import com.spider.entity.Video;
-import com.spider.service.AvInfoService;
-import com.spider.service.ImageService;
-import com.spider.service.UrlRecordService;
-import com.spider.service.VideoService;
+import com.spider.service.*;
 import com.spider.utils.FFmpegUtil;
 import com.spider.utils.FileUtils;
 import com.spider.utils.ImageUtils;
@@ -24,6 +21,7 @@ import ws.schild.jave.MultimediaInfo;
 import java.io.File;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Component
@@ -69,26 +67,26 @@ public class DownloadAop {
             }
         }
 
+        //确认视频是否为av
+        for (Map.Entry<String, List<String>> entry : AvInfoService.codeTransformMap.entrySet()) {
+            for (String code : entry.getValue()) {
+                if (name.contains(code)) {
+                    video.setAvCode(entry.getKey());
+                }
+            }
+        }
+
         //根据avcode判断视频是否存在
         if (Objects.nonNull(video.getAvCode())) {
-            AvInfo findAv = avInfoService.findOnekeyValue("code", video.getAvCode().toLowerCase());
-            Video findVideo = videoService.findOnekeyValue("avCode", video.getAvCode().toLowerCase());
-            if (Objects.nonNull(findAv) && findAv.isHasVideo()) {
-                logger.info("code,{},的视频已存在,vidoeId:{},savePath:{}", findAv.getCode(), findAv.getVideoId(), findAv.getVideoSavePath());
+            avInfo = avInfoService.findOnekeyValue("code", video.getAvCode());
+            Video findVideo = videoService.findOnekeyValue("avCode", video.getAvCode());
+            if (Objects.nonNull(avInfo) && avInfo.isHasVideo()) {
+                logger.info("code,{},的视频已存在,vidoeId:{},savePath:{}", avInfo.getCode(), avInfo.getVideoId(), avInfo.getVideoSavePath());
                 return;
             }
             if (Objects.nonNull(findVideo)) {
                 logger.info("code,{},的视频已存在,vidoeId:{},savePath:{}", findVideo.getAvCode(), findVideo.getId(), findVideo.getSavePath());
-            }
-
-            findAv = avInfoService.findOnekeyValue("code", video.getAvCode().toUpperCase());
-            findVideo = videoService.findOnekeyValue("avCode", video.getAvCode().toUpperCase());
-            if (Objects.nonNull(findAv) && findAv.isHasVideo()) {
-                logger.info("code,{},的视频已存在,vidoeId:{},savePath:{}", findAv.getCode(), findAv.getVideoId(), findAv.getVideoSavePath());
                 return;
-            }
-            if (Objects.nonNull(findVideo)) {
-                logger.info("code,{},的视频已存在,vidoeId:{},savePath:{}", findVideo.getAvCode(), findVideo.getId(), findVideo.getSavePath());
             }
         }
 

@@ -32,39 +32,7 @@ public class Application {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(Application.class);
-//        AvInfoService avInfoService = context.getBean(AvInfoService.class);
-//        List<AvInfo> avInfoList = avInfoService.findByRegex("code", "MKBD");
-//        List<List<AvInfo.Magnet>> list = avInfoList.stream().filter(Objects::nonNull).filter(avInfo -> avInfo.getMagnetList().size() > 1).map(AvInfo::getMagnetList).collect(Collectors.toList());
-//        List<AvInfo.Magnet> resultList=new ArrayList<>();
-//        for(List<AvInfo.Magnet> magnetList:list){
-//            //String line="";
-//            for(AvInfo.Magnet magnet:magnetList){
-//                if(magnet.getSize()<10240){
-//                    //line=magnet.getMagnet();
-//                    resultList.add(magnet);
-//                    break;
-//                }
-//            }
-//        }
-//        for(AvInfo.Magnet magnet:resultList){
-//            System.out.println(magnet.getMagnet());
-//        }
-//        System.out.println(list.size());
-        Xslist Xslist=  context.getBean(Xslist.class);
-        ActressesInfoService actressesInfoService=context.getBean(ActressesInfoService.class);
-        List<ActressesInfo>  actressesInfoList=actressesInfoService.findAll();
-        actressesInfoList.stream().parallel().forEach(actressesInfo -> {
-            List<String> urlList= Xslist.getSearchList(actressesInfo.getName());
-            if(CollectionUtils.isEmpty(urlList)){
-                logger.info("{},无搜索结果",actressesInfo.getName());
-            }else{
-                ActressesInfo findActressesInfo= Xslist.getInfo(urlList.get(0));
-                CopyOptions copyOptions=new CopyOptions();
-                copyOptions.setIgnoreNullValue(true);
-                BeanUtil.copyProperties(findActressesInfo,actressesInfo,copyOptions);
-                actressesInfoService.updateById(actressesInfo);
-                logger.info("{},更新数据",actressesInfo.getName());
-            }
-        });
+        Javbangers Javbangers=context.getBean(Javbangers.class);
+        Javbangers.downloadUncensored();
     }
 }
