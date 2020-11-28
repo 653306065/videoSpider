@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +61,30 @@ public class FFmpegUtil {
         }
     }
 
+    public static void videoSnapshot(String videoPath, String imagePath, String fileName, long time, int count) {
+        try {
+            String command = new File(FFmpegPath).getAbsolutePath() + "/ffmpeg -ss " + time + " -i  \"" + videoPath + "\"" +
+                    " -vframes " + count + " " + imagePath + "\\" + fileName + "_image-%d.jpg";
+            Process Process = Runtime.getRuntime().exec(command);
+            try {
+                BufferedReader br = new BufferedReader(new InputStreamReader(Process.getErrorStream()));
+                StringBuffer sb = new StringBuffer();
+                String line = "";
+                while ((line = br.readLine()) != null) {
+                    sb.append(line);
+                    System.out.println(line);
+                }
+                br.close();
+                Process.destroy();
+                logger.info("截图完成");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public static MultimediaInfo getVideoInfo(File file) {
         try {
             MultimediaObject object = new MultimediaObject(file);
@@ -68,37 +93,13 @@ public class FFmpegUtil {
             e.printStackTrace();
             return null;
         }
-
     }
 
     public static void main(String[] args) {
-        List<File> list = new ArrayList<File>();
-        // FileUtils.getPathFileList("D:\\pornhub", list);
-        FileUtils.getPathFileList("D:\\javfinder", list);
-        FileUtils.getPathFileList("D:\\eporner", list);
-        FileUtils.getPathFileList("F:\\eporner", list);
-        // FileUtils.getPathFileList("F:\\pornhub", list);
-        List<String> nameList = new ArrayList<String>();
-        for (File file : list) {
-            MultimediaInfo MultimediaInfo = getVideoInfo(file);
-            if (MultimediaInfo == null) {
-                continue;
-            } else {
-                long duration = MultimediaInfo.getDuration();
-                int height = MultimediaInfo.getVideo().getSize().getHeight();
-                int width = MultimediaInfo.getVideo().getSize().getWidth();
-                if (duration < 1000 * 60 * 15) {
-                    // file.delete();
-                    System.out.println(file.getAbsolutePath());
-                    nameList.add(file.getAbsolutePath());
-                }
-            }
-            // System.out.println(JSON.toJSONString(MultimediaInfo));
+        MultimediaInfo MultimediaInfo = getVideoInfo(new File("D:\\javfinder\\Uncensored2019-01-06\\1Pondo 020618_641 Matsuoka Shura Beautiful man beauty big screaming 3P Squirting.mp4"));
+        for(int i=0;i<10;i++){
+            long index0 = (long) (MultimediaInfo.getDuration() /(10-i)) / 1000;
+            videoSnapshot("D:\\javfinder\\Uncensored2019-01-06\\1Pondo 020618_641 Matsuoka Shura Beautiful man beauty big screaming 3P Squirting.mp4", "G:\\test", String.valueOf(i), index0, 1);
         }
-        for (String name : nameList) {
-            System.out.println(name);
-        }
-        System.out.println("-----------------------");
-        System.out.println(nameList.size());
     }
 }

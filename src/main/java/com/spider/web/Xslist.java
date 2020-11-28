@@ -38,14 +38,18 @@ public class Xslist extends BaseWeb {
         ActressesInfo actressesInfo = new ActressesInfo();
         String name = document.getElementById("gallery").getElementsByTag("img").get(0).attr("alt");
         actressesInfo.setName(name);
-        List<String> imgList = document.getElementById("gallery").getElementsByTag("img").stream().map(element -> element.attr("src")).collect(Collectors.toList());
+        List<String> imgList = document.getElementById("gallery").getElementsByTag("img").stream().filter(element -> !"https://xslist.org/assets/images/anonymous2.png".equals(element.attr("src"))).map(element -> element.attr("src")).collect(Collectors.toList());
         actressesInfo.setXsListImageUrlList(imgList);
         List<byte[]> imgByteList = imgList.stream().parallel().map(imgUrl -> {
             byte[] imgByte = OKHttpUtils.getBytes(imgUrl, false);
-            FileUtils.byteToFile(imgByte, "C:\\xslist\\" + UUID.randomUUID() + ".jpg");
-            return imgByte;
+            if(Objects.nonNull(imgByte)){
+                FileUtils.byteToFile(imgByte, "E:\\xslist\\" + name + "\\" + UUID.randomUUID() + ".jpg");
+                return imgByte;
+            }else{
+                return null;
+            }
         }).collect(Collectors.toList());
-        actressesInfo.setXsListImageList(imgByteList);
+        actressesInfo.setXsListImageList(imgByteList.stream().filter(Objects::nonNull).collect(Collectors.toList()));
         String h1 = document.getElementById("sss1").getElementsByTag("h1").text();
         actressesInfo.setEnName(h1.replace(name, "").split("/")[0].replace("(", ""));
         List<String> alias = document.getElementsByAttributeValue("itemprop", "additionalName").stream().map(Element::text).collect(Collectors.toList());
@@ -62,35 +66,35 @@ public class Xslist extends BaseWeb {
                     map.put(textArr[0].trim(), textArr[1].trim());
                 }
             });
-            if (map.containsKey("罩杯")) {
+            if (map.containsKey("罩杯") && !map.get("罩杯").equals("n/a")) {
                 actressesInfo.setCup(map.get("罩杯"));
             }
-            if (map.containsKey("血型")) {
+            if (map.containsKey("血型") && !map.get("血型").equals("n/a")) {
                 actressesInfo.setBloodType(map.get("血型"));
             }
             try {
-                if (map.containsKey("出道日期")) {
+                if (map.containsKey("出道日期") && !map.get("出道日期").equals("n/a")) {
                     actressesInfo.setDebutDate(DateUtil.parse(String.valueOf(map.get("出道日期")), "yyyy年mm月"));
                 }
-                if (map.containsKey("出生")) {
+                if (map.containsKey("出生") && !map.get("出生").equals("n/a")) {
                     actressesInfo.setBirthday(DateUtil.parse(String.valueOf(map.get("出生"))));
                 }
             } catch (Exception e) {
 
             }
-            if (map.containsKey("三围")) {
+            if (map.containsKey("三围") && !map.get("三围").equals("n/a")) {
                 actressesInfo.setBWH(map.get("三围"));
             }
-            if (map.containsKey("星座")) {
+            if (map.containsKey("星座") && !map.get("星座").equals("n/a")) {
                 actressesInfo.setConstellation(map.get("星座"));
             }
         }
         Elements heights = document.getElementsByAttributeValue("itemprop", "height");
-        if(CollectionUtil.isNotEmpty(heights)&&!heights.get(0).text().equals("n/a")){
-            actressesInfo.setHeight(Integer.valueOf(heights.get(0).text().replace("cm","").trim()));
+        if (CollectionUtil.isNotEmpty(heights) && !heights.get(0).text().equals("n/a")) {
+            actressesInfo.setHeight(Integer.valueOf(heights.get(0).text().replace("cm", "").trim()));
         }
         Elements nationality = document.getElementsByAttributeValue("itemprop", "nationality");
-        if(CollectionUtil.isNotEmpty(nationality)){
+        if (CollectionUtil.isNotEmpty(nationality) && !nationality.get(0).text().equals("n/a")) {
             actressesInfo.setConstellation(nationality.get(0).text());
         }
         return actressesInfo;
