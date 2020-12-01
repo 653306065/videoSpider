@@ -9,10 +9,8 @@ import com.spider.entity.Video;
 import com.spider.service.ActressesInfoService;
 import com.spider.service.AvInfoService;
 import com.spider.service.VideoService;
-import com.spider.web.Javbangers;
-import com.spider.web.Javbus;
-import com.spider.web.Pornhub;
-import com.spider.web.Xslist;
+import com.spider.utils.FFmpegUtil;
+import com.spider.web.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -32,7 +30,7 @@ public class Application {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(Application.class);
-        Javbangers Javbangers=context.getBean(Javbangers.class);
-        Javbangers.downloadUncensored();
+        Javhuge Javhuge=context.getBean(Javhuge.class);
+        Javhuge.download("步兵无码");
     }
 }

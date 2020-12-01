@@ -47,7 +47,7 @@ public class Javbangers extends BaseWeb {
     @Autowired
     private VideoService videoService;
 
-    @Value("#{'${javbangers.filterKey}'.split(',')}")
+    @Value("${filterKey}")
     private List<String> filterKey;
 
     @Autowired

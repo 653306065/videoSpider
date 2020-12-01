@@ -46,7 +46,7 @@ public class Javrave extends BaseWeb {
     @Autowired
     private MultithreadingDownload multithreadingDownload;
 
-    @Value("#{'${javrave.filterKey}'.split(',')}")
+    @Value("${filterKey}")
     private List<String> filterKey;
 
     /**
