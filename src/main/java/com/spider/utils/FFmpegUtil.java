@@ -95,11 +95,33 @@ public class FFmpegUtil {
         }
     }
 
-    public static void main(String[] args) {
-        MultimediaInfo MultimediaInfo = getVideoInfo(new File("D:\\javfinder\\Uncensored2019-01-06\\1Pondo 020618_641 Matsuoka Shura Beautiful man beauty big screaming 3P Squirting.mp4"));
-        for(int i=0;i<10;i++){
-            long index0 = (long) (MultimediaInfo.getDuration() /(10-i)) / 1000;
-            videoSnapshot("D:\\javfinder\\Uncensored2019-01-06\\1Pondo 020618_641 Matsuoka Shura Beautiful man beauty big screaming 3P Squirting.mp4", "G:\\test", String.valueOf(i), index0, 1);
+    public static void downloadM3U8(String url, String savePath) {
+        try {
+            String command = new File(FFmpegPath).getAbsolutePath() + "/ffmpeg -i \"" + url + "\" -c copy \"" + savePath + "\" ";
+            Process Process = Runtime.getRuntime().exec(command);
+            try {
+                BufferedReader br = new BufferedReader(new InputStreamReader(Process.getErrorStream()));
+                String line = "";
+                while ((line = br.readLine()) != null) {
+                    System.out.println(line);
+                }
+                br.close();
+                Process.destroy();
+                logger.info("下载完成");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
+
+    public static void main(String[] args) {
+//        MultimediaInfo MultimediaInfo = getVideoInfo(new File("D:\\javfinder\\Uncensored2019-01-06\\1Pondo 020618_641 Matsuoka Shura Beautiful man beauty big screaming 3P Squirting.mp4"));
+//        for (int i = 0; i < 10; i++) {
+//            long index0 = (long) (MultimediaInfo.getDuration() / (10 - i)) / 1000;
+//            videoSnapshot("D:\\javfinder\\Uncensored2019-01-06\\1Pondo 020618_641 Matsuoka Shura Beautiful man beauty big screaming 3P Squirting.mp4", "G:\\test", String.valueOf(i), index0, 1);
+//        }
+        downloadM3U8("https://videocdnbaidu.rhsj520.com/rbny/20181005/ybd/092316_390/2000kb/hls/index.m3u8","C:\\test\\test.mp4");
     }
 }
