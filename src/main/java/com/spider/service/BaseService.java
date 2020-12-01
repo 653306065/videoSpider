@@ -33,6 +33,11 @@ public abstract class BaseService<T> {
         return mongoTemplate.findAll(clazz);
     }
 
+    public List<T> findByexists(String key,Boolean exists){
+        Query query = new Query(Criteria.where(key).exists(exists));
+        return mongoTemplate.find(query,clazz);
+    }
+
     public List<T> find(Query query){
         return mongoTemplate.find(query,clazz);
     }
