@@ -41,8 +41,8 @@ public class JsoupUtil {
         return document;
     }
 
-    public static Document getDocumentByProxy(String url, Map<String, String> header) {
-        String html = OKHttpUtils.get(url, header, true);
+    public static Document getDocument(String url, Map<String, String> header,Boolean isProxy) {
+        String html = OKHttpUtils.get(url, header, isProxy);
         if(StringUtils.isBlank(html)){
             return null;
         }

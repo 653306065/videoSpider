@@ -44,7 +44,7 @@ public class Wallhaven {
         List<String> imageList = new ArrayList<String>();
         Map<String, String> header = new HashMap<String, String>();
         header.put("cookie", cookie);
-        Document document = JsoupUtil.getDocumentByProxy(url, header);
+        Document document = JsoupUtil.getDocument(url, header,enableProxy);
         Elements elements = document.getElementsByClass("thumb-listing-page").get(0).getElementsByTag("ul").get(0).getElementsByTag("li");
         for (Element element : elements) {
             String id = element.getElementsByTag("figure").get(0).attr("data-wallpaper-id");
@@ -58,12 +58,12 @@ public class Wallhaven {
     }
 
     public void downloadImageList(List<String> list, String path) {
-        ExecutorService executorService = Executors.newFixedThreadPool(list.size());
+        ExecutorService executorService = Executors.newFixedThreadPool(list.size()/2);
         for (String imageUrl : list) {
             executorService.execute(new Runnable() {
                 @Override
                 public void run() {
-                    String name = System.currentTimeMillis() + "_" + imageUrl.split("-")[1];
+                    String name = imageUrl.split("-")[1];
                     String save = savePath + path + name;
                     imageDownload.downloadFile(imageUrl, null, save, enableProxy);
                 }
