@@ -51,6 +51,10 @@ public class AvInfoService extends  BaseService<AvInfo>{
             list.add(code.replace("-","_").toUpperCase());
             list.add(code.replace("_","").toUpperCase());
             list.add(code.replace("_","-").toUpperCase());
+            List<String> mp4=  list.stream().map(c->c+".mp4").collect(Collectors.toList());
+            List<String> avi= list.stream().map(c->c+".avi").collect(Collectors.toList());
+            list.addAll(mp4);
+            list.addAll(avi);
             codeTransformMap.put(code,list.stream().distinct().collect(Collectors.toList()));
         });
     }
