@@ -30,7 +30,7 @@ public class Application {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(Application.class);
-        Javhuge Javhuge=context.getBean(Javhuge.class);
-        Javhuge.download("步兵无码");
+        Codex codex=context.getBean(Codex.class);
+        codex.saveCodexGameInfo();
     }
 }
