@@ -9,6 +9,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import com.alibaba.fastjson.JSONArray;
 import com.spider.entity.Video;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -71,24 +72,18 @@ public class Pornhub extends BaseWeb {
         //设置分类
         if (Objects.nonNull(categoriesWrapper)) {
             Elements categoriesElements = categoriesWrapper.getElementsByTag("a");
-            List<String> categoriesList = categoriesElements.stream().map(e -> {
-                return e.text();
-            }).collect(Collectors.toList());
+            List<String> categoriesList = categoriesElements.stream().map(Element::text).collect(Collectors.toList());
             video.setCategories(categoriesList);
         }
 
         //设置演员
-        List<String> starList = starElements.stream().map(e -> {
-            return e.text();
-        }).collect(Collectors.toList());
+        List<String> starList = starElements.stream().map(Element::text).collect(Collectors.toList());
         video.setStarNames(starList);
 
         //设置标签
         if (Objects.nonNull(tagsWrapper)) {
             Elements tagElements = tagsWrapper.getElementsByTag("a");
-            List<String> tagList = tagElements.stream().map(e -> {
-                return e.text();
-            }).collect(Collectors.toList());
+            List<String> tagList = tagElements.stream().map(Element::text).collect(Collectors.toList());
             video.setTags(tagList);
         }
 
@@ -100,20 +95,25 @@ public class Pornhub extends BaseWeb {
         String json = getScriptJson(js, videoId);
         JSONObject jsonObject = JSON.parseObject(json);
         JSONObject mediaDefinitions = jsonObject.getJSONObject("mediaDefinitions");
-        for (Entry<String, Object> entry : mediaDefinitions.entrySet()) {
-            String videoUrl = mediaDefinitions.getJSONObject(entry.getKey()).getString("videoUrl");
-            String quality = mediaDefinitions.getJSONObject(entry.getKey()).getString("quality");
-            String format = mediaDefinitions.getJSONObject(entry.getKey()).getString("format");
-            if (!StringUtils.isEmpty(videoUrl) && "mp4".equals(format)) {
-                String name = jsonObject.getString("video_title") + ".mp4";
-                video.setName(FileUtils.repairPath(name));
-                video.setVideoUrl(videoUrl);
-                video.setQuality(quality);
-                video.setFormat(format);
-                return video;
-            }
+        String name = jsonObject.getString("video_title") + ".mp4";
+        video.setName(FileUtils.repairPath(name));
+        int index=0;
+        while (true){
+          JSONObject info=mediaDefinitions.getJSONObject(""+index);
+          if(Objects.isNull(info)){
+              break;
+          }
+          if("mp4".equals(info.getString("format"))&&"1080".equals(info.getString("quality"))){
+              String videoUrl = info.getString("videoUrl");
+              String quality =info.getString("quality");
+              String format = info.getString("format");
+              video.setVideoUrl(videoUrl);
+              video.setQuality(quality);
+              video.setFormat(format);
+          }
+          index++;
         }
-        return null;
+        return video;
     }
 
     public List<String> getVideoList(String url) {
@@ -275,9 +275,6 @@ public class Pornhub extends BaseWeb {
                     String date = simpleDateFormat.format(new Date());
                     String path = savePath + categories + "+" + incategories + File.separator + date + File.separator + video.getName();
                     video.setSavePath(path);
-                    if (Integer.valueOf(video.getQuality()) < 720) {
-                        continue;
-                    }
                     multithreadingDownload.videoDownload(video, null, enableProxy, thread, defaultSegmentSize);
                 }
             } catch (Exception e) {
