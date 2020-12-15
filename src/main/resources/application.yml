@@ -91,7 +91,7 @@ pornhub:
   categoriesUrlByNum: https://pornhub.com/video?c=@{categories}&hd=1&page=@{page}&min_duration=10&p=professional
   incategoriesUrl: https://pornhub.com/video/incategories/@{categories}/@{incategories}?p=professional&min_duration=10&hd=1&page=@{page}&o=mv&t=a
   thread: 30
-  enableProxy: false
+  enableProxy: true
 
 youtube:
   home: https://www.findyoutube.net/
@@ -120,7 +120,7 @@ javbangers:
   home: https://www.javbangers.com/
   template: https://www.javbangers.com/categories/@{categories}/?mode=async&function=get_block&block_id=list_videos_common_videos_list&sort_by=post_date&from=@{page}&_=@{time}
   savePath: E:\javbangers\
-  cookie: _ga=GA1.2.691909481.1600091699; PHPSESSID=f854d3ece2a544f60c3114dfc1affca2; kt_ips=153.122.120.53; kt_tcookie=1; kt_is_visited=1; _gid=GA1.2.1376782016.1605278342; _gat_gtag_UA_154629456_1=1; kt_member=234ad8d8f7780d670eb40d38291ef178
+  cookie: PHPSESSID=bec48e520518a9e2668a88188eb1c009; kt_qparams=id%3D102615%26dir%3D127-coco; kt_ips=139.162.43.76; kt_tcookie=1; _ga=GA1.2.794378186.1608047077; _gid=GA1.2.124698002.1608047077; _gat_gtag_UA_154629456_1=1; kt_is_visited=1; kt_member=19a7779fc5a1ed1931a103c57a86c760
   enableProxy: true
   thread: 30
 

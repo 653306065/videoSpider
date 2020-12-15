@@ -6,9 +6,13 @@ import com.alibaba.fastjson.JSON;
 import com.spider.entity.ActressesInfo;
 import com.spider.entity.AvInfo;
 import com.spider.entity.Video;
+import com.spider.entity.es.EsAvInfo;
+import com.spider.entity.es.EsVideo;
 import com.spider.service.ActressesInfoService;
 import com.spider.service.AvInfoService;
 import com.spider.service.VideoService;
+import com.spider.service.es.EsAvInfoService;
+import com.spider.service.es.EsVideoService;
 import com.spider.utils.FFmpegUtil;
 import com.spider.web.*;
 import org.slf4j.Logger;
@@ -30,7 +34,7 @@ public class Application {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(Application.class);
-        Codex codex=context.getBean(Codex.class);
-        codex.saveCodexGameInfo();
+        Javbangers Javbangers=context.getBean(Javbangers.class);
+        Javbangers.downloadUncensored();
     }
 }
