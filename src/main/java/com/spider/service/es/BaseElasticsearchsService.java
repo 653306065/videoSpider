@@ -54,17 +54,8 @@ public abstract class BaseElasticsearchsService<T> {
             Field id = clazz.getDeclaredField("id");
             id.setAccessible(true);
             String idStr = String.valueOf(id.get(t));
-            Map<String, Object> params = new HashMap<>();
-            Field[] fields = clazz.getDeclaredFields();
-            for (Field field : fields) {
-                field.setAccessible(true);
-                if (Objects.nonNull(field.get(t))) {
-                    params.put(field.getName(), field.get(t));
-                }
-            }
-            IndexCoordinates indexCoordinates=elasticsearchRestTemplate.getIndexCoordinatesFor(clazz);
-            UpdateQuery updateQuery= UpdateQuery.builder(idStr).withDocument(Document.from(params)).build();
-            elasticsearchRestTemplate.update(updateQuery,indexCoordinates);
+            deleteById(idStr);
+            save(t);
         } catch (Exception e) {
             e.printStackTrace();
         }
