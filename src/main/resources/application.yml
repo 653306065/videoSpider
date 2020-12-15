@@ -187,3 +187,7 @@ spring:
   redis:
     host: 127.0.0.1
     port: 6379
+  elasticsearch:
+    rest:
+      uris: http://localhost:9200
+      connection-timeout: 1s

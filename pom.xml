@@ -18,7 +18,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.3.5.RELEASE</version>
+		<version>2.4.1</version>
 	</parent>
 
 	<dependencies>
@@ -80,7 +80,6 @@
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
-			<version>1.12</version>
 		</dependency>
 
 		<!-- ffmpeg -->
@@ -177,6 +176,12 @@
 			<artifactId>htmlcleaner</artifactId>
 			<version>2.9</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+		</dependency>
+
 
 	</dependencies>
 
