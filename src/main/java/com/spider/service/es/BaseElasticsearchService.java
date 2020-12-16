@@ -2,6 +2,8 @@ package com.spider.service.es;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.SearchHit;
@@ -27,6 +29,11 @@ public abstract class BaseElasticsearchService<T> {
     public List<SearchHit<T>> searchByKeyValue(String key, String value) {
         BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder().must(new MatchQueryBuilder(key, value));
         NativeSearchQuery searchQuery = new NativeSearchQueryBuilder().withQuery(boolQueryBuilder).build();
+        return elasticsearchRestTemplate.search(searchQuery, clazz).toList();
+    }
+
+    public List<SearchHit<T>> searchByValue(String value) {
+        NativeSearchQuery searchQuery = new NativeSearchQueryBuilder().withQuery(QueryBuilders.queryStringQuery(value)).build();
         return elasticsearchRestTemplate.search(searchQuery, clazz).toList();
     }
 
