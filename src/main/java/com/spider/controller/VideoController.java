@@ -34,7 +34,7 @@ public class VideoController extends BaseController {
     @GetMapping("/clean/video")
     public ResponseVo cleanVideo(@RequestParam(required = false, defaultValue = "800") Integer height, @RequestParam(required = false, defaultValue = "800") Integer width) {
         AtomicLong size = new AtomicLong(0);
-        videoService.findAll().stream().filter(video -> new File(video.getSavePath()).exists()).filter(video -> Objects.nonNull(video.getMultimediaInfo())).parallel().forEach(video -> {
+        videoService.findAll().stream().filter(video -> new File(video.getSavePath()).exists()).filter(video -> Objects.nonNull(video.getMultimediaInfo())).forEach(video -> {
             if (height * width > video.getMultimediaInfo().getVideo().getSize().getHeight() * video.getMultimediaInfo().getVideo().getSize().getWidth()) {
                 logger.info(video.getSavePath());
                 //new File(video.getSavePath()).delete();
