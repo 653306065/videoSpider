@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/video")
-public class VideoConller {
+public class VideoController extends BaseController {
 
     @Autowired
     private EsVideoService esVideoService;
@@ -36,10 +36,11 @@ public class VideoConller {
         AtomicLong size = new AtomicLong(0);
         videoService.findAll().stream().filter(video -> new File(video.getSavePath()).exists()).filter(video -> Objects.nonNull(video.getMultimediaInfo())).parallel().forEach(video -> {
             if (height * width > video.getMultimediaInfo().getVideo().getSize().getHeight() * video.getMultimediaInfo().getVideo().getSize().getWidth()) {
+                logger.info(video.getSavePath());
                 //new File(video.getSavePath()).delete();
                 size.addAndGet(video.getSize());
             }
         });
-        return ResponseVo.succee(size.get()/1024.0/1024/1024);
+        return ResponseVo.succee(size.get() / 1024.0 / 1024 / 1024);
     }
 }

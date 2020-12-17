@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/avInfo")
-public class AvInfoConller {
+public class AvInfoController extends BaseController {
 
     @Autowired
     private EsAvInfoService esAvInfoService;
