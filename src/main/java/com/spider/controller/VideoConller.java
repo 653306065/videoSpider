@@ -40,6 +40,6 @@ public class VideoConller {
                 size.addAndGet(video.getSize());
             }
         });
-        return ResponseVo.succee(size);
+        return ResponseVo.succee(size.get()/1024.0/1024/1024);
     }
 }
