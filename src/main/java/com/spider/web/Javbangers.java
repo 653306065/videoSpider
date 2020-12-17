@@ -241,4 +241,8 @@ public class Javbangers extends BaseWeb {
         }
         return map;
     }
+
+    public void setThread(Integer thread) {
+        this.thread = thread;
+    }
 }

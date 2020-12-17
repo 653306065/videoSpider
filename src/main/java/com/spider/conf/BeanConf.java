@@ -1,8 +1,13 @@
 package com.spider.conf;
 
 import java.io.IOException;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpHost;
+import org.apache.tomcat.util.threads.TaskQueue;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
@@ -32,5 +37,11 @@ public class BeanConf {
             }
         }).build();
         return Youtube;
+    }
+
+    @Bean
+    public ThreadPoolExecutor threadPoolExecutor(){
+        ThreadPoolExecutor threadPoolExecutor=new ThreadPoolExecutor(8*3, 8*3*10, 1, TimeUnit.MINUTES, new ArrayBlockingQueue<Runnable>(1000));
+        return threadPoolExecutor;
     }
 }
