@@ -408,11 +408,11 @@ public class FileUtils {
                         }
                         //System.out.println(file.getAbsolutePath() + ", " + key + " :" + line);
                         if (map.containsKey(file.getAbsolutePath())) {
-                            map.put(file.getAbsolutePath(), map.get(file.getAbsolutePath())+1);
+                            map.put(file.getAbsolutePath(), map.get(file.getAbsolutePath()) + 1);
                         } else {
 //                            HashSet<String> hashSet = new HashSet<>();
 //                            hashSet.add(realLine);
-                            map.put(file.getAbsolutePath(),1);
+                            map.put(file.getAbsolutePath(), 1);
                         }
                     }
                 });
@@ -424,9 +424,9 @@ public class FileUtils {
 //        map.keySet().stream().parallel().forEach(file->{
 //            new File(file).renameTo(new File("C:\\book\\keyBook\\"+ new File(file).getName()));
 //        });
-        AtomicInteger size= new AtomicInteger();
-        map.entrySet().stream().parallel().filter(stringIntegerEntry -> stringIntegerEntry.getValue()>5).forEach(stringIntegerEntry -> {
-            System.out.println(stringIntegerEntry.getKey()+","+stringIntegerEntry.getValue());
+        AtomicInteger size = new AtomicInteger();
+        map.entrySet().stream().parallel().filter(stringIntegerEntry -> stringIntegerEntry.getValue() > 5).forEach(stringIntegerEntry -> {
+            System.out.println(stringIntegerEntry.getKey() + "," + stringIntegerEntry.getValue());
             size.getAndIncrement();
         });
         System.out.println(size.get());

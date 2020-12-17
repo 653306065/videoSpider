@@ -6,10 +6,11 @@ import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
 import java.util.List;
 
 @Component
-public class Javfull extends  BaseWeb{
+public class Javfull extends BaseWeb {
 
     @Value("${javfull.home}")
     private String home;
@@ -29,10 +30,10 @@ public class Javfull extends  BaseWeb{
     @Value("${javfull.api}")
     private String api;
 
-    public List<Video> getVideoList(String category,Integer page){
+    public List<Video> getVideoList(String category, Integer page) {
         try {
-            String url=template.replace("@{category}",category).replace("@{page}",String.valueOf(page));
-            String html=  OKHttpUtils.get(url,enableProxy);
+            String url = template.replace("@{category}", category).replace("@{page}", String.valueOf(page));
+            String html = OKHttpUtils.get(url, enableProxy);
             HtmlCleaner hc = new HtmlCleaner();
             TagNode tn = hc.clean(html);
             String xpath = "//a[@class='hover-posts']/text()";
@@ -41,8 +42,8 @@ public class Javfull extends  BaseWeb{
                 System.out.println(object);
             }
             return null;
-        }catch (Exception e){
-           e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }

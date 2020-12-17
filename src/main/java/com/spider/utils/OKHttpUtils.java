@@ -52,7 +52,7 @@ public class OKHttpUtils {
     public static String get(String url, Map<String, String> header, Boolean isProxy) {
         try {
             Request.Builder builder = new Request.Builder();
-            if(!CollectionUtils.isEmpty(header)){
+            if (!CollectionUtils.isEmpty(header)) {
                 for (Map.Entry<String, String> entry : header.entrySet()) {
                     builder.addHeader(entry.getKey(), entry.getValue());
                 }
@@ -354,12 +354,12 @@ public class OKHttpUtils {
             Request.Builder requestBuilder = new Request.Builder();
             MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder().setType(MultipartBody.FORM);
             for (Map.Entry<String, Object> entry : params.entrySet()) {
-                if(entry.getValue() instanceof String){
-                    multipartBodyBuilder.addFormDataPart(entry.getKey(),(String) entry.getValue());
-                }else if(entry.getValue() instanceof byte[]){
-                    multipartBodyBuilder.addFormDataPart(entry.getKey(),entry.getKey(),RequestBody.create((byte[])entry.getValue()));
-                }else{
-                    multipartBodyBuilder.addFormDataPart(entry.getKey(),String.valueOf(entry.getValue()));
+                if (entry.getValue() instanceof String) {
+                    multipartBodyBuilder.addFormDataPart(entry.getKey(), (String) entry.getValue());
+                } else if (entry.getValue() instanceof byte[]) {
+                    multipartBodyBuilder.addFormDataPart(entry.getKey(), entry.getKey(), RequestBody.create((byte[]) entry.getValue()));
+                } else {
+                    multipartBodyBuilder.addFormDataPart(entry.getKey(), String.valueOf(entry.getValue()));
                 }
             }
             Request request = requestBuilder.post(multipartBodyBuilder.build()).url(url).build();
@@ -374,7 +374,7 @@ public class OKHttpUtils {
                 response.body().close();
                 response.close();
                 return html;
-            }else{
+            } else {
                 System.out.println(response.body().string());
             }
             response.close();

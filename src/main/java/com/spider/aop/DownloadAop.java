@@ -51,7 +51,7 @@ public class DownloadAop {
     public void aroundVideoDownload(ProceedingJoinPoint joinPoint) {
         Object[] args = joinPoint.getArgs();
         Video video = (Video) args[0];
-        if(Objects.isNull(video.getVideoUrl())){
+        if (Objects.isNull(video.getVideoUrl())) {
             logger.info("视频地址为空");
             return;
         }

@@ -24,8 +24,8 @@ public class BaiduTranslateUtil {
         }
         JSONObject jsonObject = JSON.parseObject(json);
         JSONArray jsonArray = jsonObject.getJSONArray("trans_result");
-        if(CollectionUtils.isEmpty(jsonArray)){
-           return null;
+        if (CollectionUtils.isEmpty(jsonArray)) {
+            return null;
         }
         String translateText = "";
         for (int i = 0; i < jsonArray.size(); i++) {

@@ -42,7 +42,7 @@ public class Longteng {
             Elements elements = document.getElementsByClass("blue");
             for (Element element : elements) {
                 Map<String, String> map = new HashMap<String, String>();
-                map.put("url",home+element.attr("href"));
+                map.put("url", home + element.attr("href"));
                 map.put("name", element.text());
                 list.add(map);
             }

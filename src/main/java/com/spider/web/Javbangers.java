@@ -16,6 +16,7 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -91,7 +92,7 @@ public class Javbangers extends BaseWeb {
                 String videodescText = videodescs.get(0).text();
                 video.setIntroduction(videodescText);
             }
-            if(info.text().contains("https://www.javbangers.com/categories/censored/")){
+            if (info.text().contains("https://www.javbangers.com/categories/censored/")) {
                 video.setCensored(true);
             }
             Elements videoFileElements = info.getElementsByClass("btn-success");
@@ -118,7 +119,7 @@ public class Javbangers extends BaseWeb {
             }
             video.setQuality(maxFile);
             video.setVideoUrl(videoFileUrl);
-            logger.info("videoFileUrl:{}",videoFileUrl);
+            logger.info("videoFileUrl:{}", videoFileUrl);
             return video;
         } catch (Exception e) {
             e.printStackTrace();
@@ -126,54 +127,55 @@ public class Javbangers extends BaseWeb {
         }
     }
 
-    public void downloadOrgy(){
+    public void downloadOrgy() {
         downloadVideo("orgy");
     }
 
-    public void downloadThreesome(){
+    public void downloadThreesome() {
         downloadVideo("threesome");
     }
 
-    public void downloadBukkake(){
+    public void downloadBukkake() {
         downloadVideo("bukkake");
     }
 
-    public void downloadAnal(){
+    public void downloadAnal() {
         downloadVideo("anal");
     }
 
-    public void downloadSquirt(){
+    public void downloadSquirt() {
         downloadVideo("squirt");
     }
 
-    public void downloadCreampie(){
+    public void downloadCreampie() {
         downloadVideo("creampie");
     }
 
-    public void downloadCensored(){
+    public void downloadCensored() {
         downloadVideo("censored");
     }
 
-    public void downloadUncensored(){
+    public void downloadUncensored() {
         downloadVideo("uncensored");
     }
 
-    public void downloadVideo(String categories){
+    public void downloadVideo(String categories) {
         int page = 1;
         while (true) {
             try {
                 List<Video> videoList = getVideoListByUrl(categories, page);
                 videoList = videoList.stream().filter(v -> Objects.nonNull(v.getSourceUrl())).collect(Collectors.toList());
-                A: for(Video video:videoList){
-                    for(String key:filterKey){
-                        if(video.getName().contains(key)||video.getName().contains(key.toLowerCase())||video.getName().contains(key.toUpperCase())||video.getName().toLowerCase().contains(key)||video.getName().toUpperCase().contains(key)){
-                            logger.info("{},的名称有过滤字段",video.getName());
+                A:
+                for (Video video : videoList) {
+                    for (String key : filterKey) {
+                        if (video.getName().contains(key) || video.getName().contains(key.toLowerCase()) || video.getName().contains(key.toUpperCase()) || video.getName().toLowerCase().contains(key) || video.getName().toUpperCase().contains(key)) {
+                            logger.info("{},的名称有过滤字段", video.getName());
                             continue A;
                         }
                     }
-                    Video findVideo= videoService.findOnekeyValue("sourceUrl",video.getSourceUrl());
-                    if(Objects.nonNull(findVideo)){
-                        logger.info("{},已存在",video.getSourceUrl());
+                    Video findVideo = videoService.findOnekeyValue("sourceUrl", video.getSourceUrl());
+                    if (Objects.nonNull(findVideo)) {
+                        logger.info("{},已存在", video.getSourceUrl());
                         continue;
                     }
 //                    if(!findAVCode(video.getName())){
@@ -181,9 +183,9 @@ public class Javbangers extends BaseWeb {
 //                        continue;
 //                    }
                     video.getName();
-                    video=getVideoInfo(video);
-                    if(video.getCensored()){
-                        logger.info("{},有码",video.getName());
+                    video = getVideoInfo(video);
+                    if (video.getCensored()) {
+                        logger.info("{},有码", video.getName());
                         continue;
                     }
                     String date = simpleDateFormat.format(new Date());
@@ -198,34 +200,34 @@ public class Javbangers extends BaseWeb {
         }
     }
 
-    public Boolean findAVCode(String name){
-        List<String> list= FileUtils.getSearchKeyList(name);
-        AvInfo avInfo=null;
-        for(String key:list){
-            avInfo=avInfoService.findOnekeyValue("code",key);
-            if(Objects.nonNull(avInfo)){
-                if(!avInfo.isHasVideo()){
+    public Boolean findAVCode(String name) {
+        List<String> list = FileUtils.getSearchKeyList(name);
+        AvInfo avInfo = null;
+        for (String key : list) {
+            avInfo = avInfoService.findOnekeyValue("code", key);
+            if (Objects.nonNull(avInfo)) {
+                if (!avInfo.isHasVideo()) {
                     return true;
                 }
                 break;
             }
         }
-        return  false;
+        return false;
     }
 
     public String setCookie(String setCookie) {
         Map<String, String> setCookieMap = cookieToMap(setCookie);
         Map<String, String> cookieMap = cookieToMap(cookie);
         for (Map.Entry<String, String> entry : setCookieMap.entrySet()) {
-            if(cookieMap.containsKey(entry.getKey())){
-                cookieMap.put(entry.getKey(),entry.getValue());
+            if (cookieMap.containsKey(entry.getKey())) {
+                cookieMap.put(entry.getKey(), entry.getValue());
             }
         }
-        String str="";
-        for(Map.Entry<String,String> entry:cookieMap.entrySet()){
-            str=str+entry.getKey()+"="+entry.getValue()+";";
+        String str = "";
+        for (Map.Entry<String, String> entry : cookieMap.entrySet()) {
+            str = str + entry.getKey() + "=" + entry.getValue() + ";";
         }
-        cookie=str;
+        cookie = str;
         return str;
     }
 

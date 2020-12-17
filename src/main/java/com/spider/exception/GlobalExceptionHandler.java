@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @ResponseBody
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(value =Exception.class)
+    @ExceptionHandler(value = Exception.class)
     public ResponseVo<Object> exceptionHandler(Exception e) {
-        return ResponseVo.failure(-1,e.getMessage());
+        return ResponseVo.failure(-1, e.getMessage());
     }
 }

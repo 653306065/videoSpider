@@ -16,16 +16,16 @@ public class JsoupUtil {
 
     public static Document getDocument(String url) {
         String html = OKHttpUtils.get(url, false);
-        if(StringUtils.isBlank(html)){
+        if (StringUtils.isBlank(html)) {
             return null;
         }
         Document document = Jsoup.parse(html);
         return document;
     }
 
-    public static Document getDocument(String url,Boolean isProxy) {
+    public static Document getDocument(String url, Boolean isProxy) {
         String html = OKHttpUtils.get(url, isProxy);
-        if(Objects.isNull(html)){
+        if (Objects.isNull(html)) {
             return null;
         }
         Document document = Jsoup.parse(html);
@@ -34,16 +34,16 @@ public class JsoupUtil {
 
     public static Document getDocumentByProxy(String url) {
         String html = OKHttpUtils.get(url, true);
-        if(StringUtils.isBlank(html)){
+        if (StringUtils.isBlank(html)) {
             return null;
         }
         Document document = Jsoup.parse(html);
         return document;
     }
 
-    public static Document getDocument(String url, Map<String, String> header,Boolean isProxy) {
+    public static Document getDocument(String url, Map<String, String> header, Boolean isProxy) {
         String html = OKHttpUtils.get(url, header, isProxy);
-        if(StringUtils.isBlank(html)){
+        if (StringUtils.isBlank(html)) {
             return null;
         }
         Document document = Jsoup.parse(html);

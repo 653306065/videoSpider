@@ -9,7 +9,7 @@ public abstract class BaseWeb {
 
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    protected final long  defaultSegmentSize=1024*1024*2;
+    protected final long defaultSegmentSize = 1024 * 1024 * 2;
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 }

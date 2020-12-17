@@ -32,7 +32,7 @@ public class DownloadThread extends Thread {
 
     private AtomicLong downloadByte;
 
-    private Integer errorTime=0;
+    private Integer errorTime = 0;
 
     public DownloadThread(String httpUrl, Map<String, String> header, boolean isProxy, long startByte, long endByte, File file, AtomicLong downloadByte) {
         this.httpUrl = httpUrl;

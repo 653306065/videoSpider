@@ -51,6 +51,7 @@ public class Javrave extends BaseWeb {
 
     /**
      * 获取视频的源地址列表
+     *
      * @param category
      * @param page
      * @return
@@ -83,13 +84,14 @@ public class Javrave extends BaseWeb {
 
     /**
      * 获取视频的信息
+     *
      * @param url
      * @return
      */
     public Video getVideoInfo(String url) {
         Video video = new Video();
         Document document = JsoupUtil.getDocument(url, enableProxy);
-        if(Objects.isNull(document)){
+        if (Objects.isNull(document)) {
             return null;
         }
         Elements elements = document.getElementsByTag("script");
@@ -101,7 +103,7 @@ public class Javrave extends BaseWeb {
                 String src = document1.getElementById("vid_iframe").attr("src");
                 String key = src.split("/")[src.split("/").length - 1];
                 String json = OKHttpUtils.post(api.replace("@{key}", key), enableProxy);
-                if(Objects.isNull(json)){
+                if (Objects.isNull(json)) {
                     return null;
                 }
                 logger.info("{}", json);
@@ -134,7 +136,7 @@ public class Javrave extends BaseWeb {
                         if (map.containsKey("Studio")) {
                             video.setStudio(map.get("Studio"));
                         }
-                        if (map.containsKey("Codes")&&Objects.isNull(video.getAvCode())) {
+                        if (map.containsKey("Codes") && Objects.isNull(video.getAvCode())) {
                             video.setAvCode(map.get("Codes"));
                         }
                         Elements tags = document.getElementsByTag("tags");
@@ -147,7 +149,7 @@ public class Javrave extends BaseWeb {
                             video.setTags(tagList);
                         }
                     }
-                }else{
+                } else {
                     return null;
                 }
             }
@@ -159,35 +161,36 @@ public class Javrave extends BaseWeb {
 
     /**
      * 下载视频
+     *
      * @param category
      */
-    public void downloadVideo(String category){
-        int page=1;
-        while (true){
+    public void downloadVideo(String category) {
+        int page = 1;
+        while (true) {
             try {
-                List<Video> list= getVideoList(category,page);
+                List<Video> list = getVideoList(category, page);
                 list.stream().forEach(video -> {
-                    for(String key:filterKey){
-                        if(video.getName().contains(key)){
-                            logger.info("{},的名称有过滤字段",video.getName());
+                    for (String key : filterKey) {
+                        if (video.getName().contains(key)) {
+                            logger.info("{},的名称有过滤字段", video.getName());
                             return;
                         }
                     }
-                    if (Objects.nonNull(videoService.findByName(video.getName()+".mp4"))) {
+                    if (Objects.nonNull(videoService.findByName(video.getName() + ".mp4"))) {
                         logger.info(video.getName() + "已存在");
                         return;
                     }
-                    Video getVideo= getVideoInfo(video.getSourceUrl());
-                    if(Objects.isNull(getVideo)){
+                    Video getVideo = getVideoInfo(video.getSourceUrl());
+                    if (Objects.isNull(getVideo)) {
                         return;
                     }
                     String date = simpleDateFormat.format(new Date());
-                    getVideo.setName(FileUtils.repairPath(getVideo.getName())+".mp4");
+                    getVideo.setName(FileUtils.repairPath(getVideo.getName()) + ".mp4");
                     String videoSavePath = savePath + category + File.separator + date + File.separator + getVideo.getName();
                     getVideo.setSavePath(videoSavePath);
-                    multithreadingDownload.videoDownload(getVideo,null,enableProxy,thread,defaultSegmentSize);
+                    multithreadingDownload.videoDownload(getVideo, null, enableProxy, thread, defaultSegmentSize);
                 });
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             page++;
@@ -197,7 +200,7 @@ public class Javrave extends BaseWeb {
     /**
      * 下载无码视频
      */
-    public void downloadUncensored(){
+    public void downloadUncensored() {
         downloadVideo("uncensored");
     }
 }

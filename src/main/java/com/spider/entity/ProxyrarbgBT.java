@@ -1,6 +1,7 @@
 package com.spider.entity;
 
 import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.util.Date;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class ProxyrarbgBT {
 
     private String posterUrl;
 
-    private String descriptionContent ;
+    private String descriptionContent;
 
     private String descriptionHtml;
 

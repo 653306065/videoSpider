@@ -64,7 +64,7 @@ public class Kissjav extends BaseWeb {
         return list;
     }
 
-    public Video getVideoInfo(String url) throws Exception{
+    public Video getVideoInfo(String url) throws Exception {
         Video video = new Video();
         video.setSourceUrl(url);
         Document document = JsoupUtil.getDocument(url, enableProxy);
@@ -76,14 +76,14 @@ public class Kissjav extends BaseWeb {
         if (Objects.nonNull(elements) && elements.size() != 0) {
             String redirection = elements.get(0).attr("src");
             Map<String, String> map = new HashMap<>();
-            String[] valueArr= url.split("/");
-            map.put("Referer",url.replace(valueArr[4], URLEncoder.encode(valueArr[4])));
+            String[] valueArr = url.split("/");
+            map.put("Referer", url.replace(valueArr[4], URLEncoder.encode(valueArr[4])));
             map.put("Cookie", cookie);
             map.put("User-Agent", Constant.user_agent);
             map.put("Accept", "*/*");
             map.put("Accept-Encoding", "gzip, deflate, br");
             map.put("Connection", "keep-alive");
-            map.put("Host","kissjav.com");
+            map.put("Host", "kissjav.com");
             String realUrl = OKHttpUtils.getRedirectUrl(redirection, map, enableProxy);
             video.setVideoUrl(realUrl);
         }
@@ -99,8 +99,8 @@ public class Kissjav extends BaseWeb {
                     try {
                         logger.info("{},开始下载", video.getName());
                         Video getVideo = getVideoInfo(video.getSourceUrl());
-                        if(Objects.isNull(getVideo.getVideoUrl())){
-                            logger.info("{},获取下载地址失败",video.getName());
+                        if (Objects.isNull(getVideo.getVideoUrl())) {
+                            logger.info("{},获取下载地址失败", video.getName());
                             continue;
                         }
                         getVideo.setName(FileUtils.repairPath(getVideo.getName()) + ".mp4");

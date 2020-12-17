@@ -81,7 +81,7 @@ public class Javhuge {
         while (true) {
             try {
                 List<Map<String, String>> list = getVideoList(category, page);
-                if(CollectionUtils.isEmpty(list)){
+                if (CollectionUtils.isEmpty(list)) {
                     continue;
                 }
                 list.stream().parallel().forEach(map -> {

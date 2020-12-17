@@ -182,7 +182,7 @@ public class Hanime {
                         continue;
                     }
                     String path = savePath + "\\video\\" + name;
-                    multithreadingDownload.fileDownload(url, path, null, enableProxy, thread,1024*1024*5);
+                    multithreadingDownload.fileDownload(url, path, null, enableProxy, thread, 1024 * 1024 * 5);
                     logger.info(url);
                 }
                 if (videoInfoList.size() == 0) {

@@ -9,8 +9,8 @@ import javax.annotation.PostConstruct;
 public class SystemConf {
 
     @PostConstruct
-    public void init(){
-          int availableProcessors= Runtime.getRuntime().availableProcessors();
-          System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", String.valueOf(availableProcessors*3));
+    public void init() {
+        int availableProcessors = Runtime.getRuntime().availableProcessors();
+        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", String.valueOf(availableProcessors * 3));
     }
 }

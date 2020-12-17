@@ -26,7 +26,7 @@ public class MultithreadingDownload {
     public AtomicLong downloadByte = new AtomicLong(0);
 
     //标识下载是否继续
-    public static volatile Map<String,Boolean>  downloadStatusMap=new HashMap<>();
+    public static volatile Map<String, Boolean> downloadStatusMap = new HashMap<>();
 
     private final Logger logger = LoggerFactory.getLogger(MultithreadingDownload.class);
 
@@ -42,9 +42,9 @@ public class MultithreadingDownload {
                 logger.info("----获取下载信息错误----");
                 return false;
             } else {
-                downloadStatusMap.put(HttpUrl,true);
+                downloadStatusMap.put(HttpUrl, true);
                 logger.info(path + ",开始下载,url:" + HttpUrl);
-                String fileSizeStr = getOmitValue(info.getContentLength() / 1024.0 / 1024.0,6)+ "m";
+                String fileSizeStr = getOmitValue(info.getContentLength() / 1024.0 / 1024.0, 6) + "m";
                 logger.info(JSON.toJSONString(info) + ",大小" + fileSizeStr);
                 RandomAccessFile raf = new RandomAccessFile(file, "rw");
                 raf.setLength(info.getContentLength());
@@ -76,24 +76,25 @@ public class MultithreadingDownload {
                     String speedStr = "0.0";
                     if (tmep < downloadByte.get()) {
                         double speed = ((downloadByte.get() - tmep) / 1024.0 / 1024) / (sleepTime / 1000.0);
-                        speedStr=getOmitValue(speed,5)
-;                    }
-                    System.out.print("(" + getOmitValue(percentage,5) + "%)," +  fileSizeStr+","+speedStr+"m/s");
+                        speedStr = getOmitValue(speed, 5)
+                        ;
+                    }
+                    System.out.print("(" + getOmitValue(percentage, 5) + "%)," + fileSizeStr + "," + speedStr + "m/s");
                     tmep = downloadByte.get();
                     Thread.sleep(sleepTime);
                     if (executorService.isTerminated()) {
                         break;
                     }
                     //分片下载失败，停止线程池
-                    if(!downloadStatusMap.get(HttpUrl)){
-                        result=false;
+                    if (!downloadStatusMap.get(HttpUrl)) {
+                        result = false;
                         logger.info("分片下载失败,线程池停止下载");
                         executorService.shutdownNow();
                         break;
                     }
                 }
                 //正常执行完成，获取分片结果
-                if(result){
+                if (result) {
                     for (Future<Boolean> future : downloadResult) {
                         if (!future.get()) {
                             result = false;
@@ -108,7 +109,7 @@ public class MultithreadingDownload {
                         logger.info("{},删除失败", file.getName());
                     }
                     logger.info("{},删除成功", file.getName());
-                }else{
+                } else {
                     long endTime = System.currentTimeMillis();
                     logger.info("----" + path + ",下载完成----");
                     logger.info("耗时:" + (endTime - startTime) / 1000 / 60.0 + "分钟");
@@ -120,17 +121,17 @@ public class MultithreadingDownload {
             new File(path).delete();
             e.printStackTrace();
             return false;
-        }finally {
+        } finally {
             downloadByte.set(0);
             downloadStatusMap.remove(HttpUrl);
         }
     }
 
-    public String getOmitValue(double value,int index){
+    public String getOmitValue(double value, int index) {
         if (String.valueOf(value).length() > index) {
-           return  String.valueOf(value).substring(0, index);
+            return String.valueOf(value).substring(0, index);
         } else {
-           return String.valueOf(value);
+            return String.valueOf(value);
         }
     }
 

@@ -30,7 +30,7 @@ public class ImageDownload {
             logger.info("{},下载失败", url);
             return null;
         }
-        FileUtils.byteToFile(bytes,savePath);
+        FileUtils.byteToFile(bytes, savePath);
         return new File(savePath);
     }
 }

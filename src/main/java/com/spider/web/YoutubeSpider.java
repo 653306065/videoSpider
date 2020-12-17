@@ -35,7 +35,7 @@ import com.spider.utils.JsoupUtil;
 import com.spider.utils.OKHttpUtils;
 
 @Component
-public class YoutubeSpider extends BaseWeb{
+public class YoutubeSpider extends BaseWeb {
 
     @Value("${youtube.savePath}")
     private String savePath;
@@ -142,9 +142,9 @@ public class YoutubeSpider extends BaseWeb{
                         + FileUtils.repairPath(audioName);
                 String targetPath = this.savePath + FileUtils.repairPath(channelTitle) + "\\"
                         + FileUtils.repairPath(playListTitle) + "\\" + FileUtils.repairPath(title) + ".mp4";
-                multithreadingDownload.fileDownload(videoUrl, videoPath, null, enableProxy, thread,defaultSegmentSize);
+                multithreadingDownload.fileDownload(videoUrl, videoPath, null, enableProxy, thread, defaultSegmentSize);
                 logger.info("title:{},视频下载完成", title);
-                multithreadingDownload.fileDownload(audioUrl, audioPath, null, enableProxy, thread,defaultSegmentSize);
+                multithreadingDownload.fileDownload(audioUrl, audioPath, null, enableProxy, thread, defaultSegmentSize);
                 logger.info("title:{},音频下载完成", title);
                 File videoFile = new File(videoPath);
                 File audioFile = new File(audioPath);
@@ -215,9 +215,9 @@ public class YoutubeSpider extends BaseWeb{
                             + FileUtils.repairPath(audioName);
                     String targetPath = this.savePath + channelTitle + "\\" + "\\" + FileUtils.repairPath(title)
                             + ".mp4";
-                    multithreadingDownload.fileDownload(videoUrl, videoPath, null, enableProxy, thread,defaultSegmentSize);
+                    multithreadingDownload.fileDownload(videoUrl, videoPath, null, enableProxy, thread, defaultSegmentSize);
                     logger.info("title:{},视频下载完成", title);
-                    multithreadingDownload.fileDownload(audioUrl, audioPath, null, enableProxy, thread,defaultSegmentSize);
+                    multithreadingDownload.fileDownload(audioUrl, audioPath, null, enableProxy, thread, defaultSegmentSize);
                     logger.info("title:{},音频下载完成", title);
                     File videoFile = new File(videoPath);
                     File audioFile = new File(audioPath);
@@ -300,8 +300,8 @@ public class YoutubeSpider extends BaseWeb{
         String videoPath = (this.savePath + "\\" + title + videoName).replaceAll(" ", "_");
         String audioPath = (this.savePath + "\\" + title + audioName).replaceAll(" ", "_");
         String targetPath = (this.savePath + "\\" + title + ".mp4").replaceAll(" ", "_");
-        multithreadingDownload.fileDownload(videoUrl, videoPath, null, enableProxy, thread,defaultSegmentSize);
-        multithreadingDownload.fileDownload(audioUrl, audioPath, null, enableProxy, thread,defaultSegmentSize);
+        multithreadingDownload.fileDownload(videoUrl, videoPath, null, enableProxy, thread, defaultSegmentSize);
+        multithreadingDownload.fileDownload(audioUrl, audioPath, null, enableProxy, thread, defaultSegmentSize);
         if (new File(videoPath).exists() && new File(audioPath).exists()) {
             FFmpegUtil.audioVideoSynthesis(videoPath, audioPath, targetPath);
         }

@@ -29,7 +29,7 @@ public class Codex {
 
     public List<String> getListUrl(Integer page) {
         Document document = JsoupUtil.getDocument(listUrl + page);
-        if(Objects.isNull(document)){
+        if (Objects.isNull(document)) {
             return null;
         }
         return document.getElementsByClass("post-thumbnail single-post-thumb archive-wide-thumb").stream().map(element -> {

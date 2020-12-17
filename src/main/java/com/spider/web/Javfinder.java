@@ -28,7 +28,7 @@ import com.spider.utils.download.MultithreadingDownload;
 import okhttp3.Response;
 
 @Service
-public class Javfinder extends BaseWeb{
+public class Javfinder extends BaseWeb {
 
     private Logger logger = LoggerFactory.getLogger(Javfinder.class);
 
@@ -139,7 +139,7 @@ public class Javfinder extends BaseWeb{
                 String date = simpleDateFormat.format(new Date());
                 String name = map.get("name").replace(":", "");
                 String realPath = savePath + "\\" + path + "\\" + date + "\\" + name + ".mp4";
-                multithreadingDownload.fileDownload(fileUrl, realPath, null, enableProxy, thread,defaultSegmentSize);
+                multithreadingDownload.fileDownload(fileUrl, realPath, null, enableProxy, thread, defaultSegmentSize);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -166,7 +166,7 @@ public class Javfinder extends BaseWeb{
                     logger.info("fileUrl:" + fileUrl);
                     String date = simpleDateFormat.format(new Date());
                     String path = savePath + "\\hot\\" + category + "\\" + date + "\\" + map.get("name") + ".mp4";
-                    multithreadingDownload.fileDownload(fileUrl, path, null, enableProxy, thread,defaultSegmentSize);
+                    multithreadingDownload.fileDownload(fileUrl, path, null, enableProxy, thread, defaultSegmentSize);
                     urlRecordService.insert(str);
                 }
             } catch (Exception e) {
@@ -204,7 +204,7 @@ public class Javfinder extends BaseWeb{
                     logger.info("fileUrl:" + fileUrl);
                     String date = simpleDateFormat.format(new Date());
                     String path = savePath + "\\" + category + "\\" + date + "\\" + map.get("name") + ".mp4";
-                    multithreadingDownload.fileDownload(fileUrl, path, null, enableProxy, thread,defaultSegmentSize);
+                    multithreadingDownload.fileDownload(fileUrl, path, null, enableProxy, thread, defaultSegmentSize);
                     urlRecordService.insert(str);
                 }
             } catch (Exception e) {

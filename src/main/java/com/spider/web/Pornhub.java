@@ -97,21 +97,21 @@ public class Pornhub extends BaseWeb {
         JSONObject mediaDefinitions = jsonObject.getJSONObject("mediaDefinitions");
         String name = jsonObject.getString("video_title") + ".mp4";
         video.setName(FileUtils.repairPath(name));
-        int index=0;
-        while (true){
-          JSONObject info=mediaDefinitions.getJSONObject(""+index);
-          if(Objects.isNull(info)){
-              break;
-          }
-          if("mp4".equals(info.getString("format"))&&"1080".equals(info.getString("quality"))){
-              String videoUrl = info.getString("videoUrl");
-              String quality =info.getString("quality");
-              String format = info.getString("format");
-              video.setVideoUrl(videoUrl);
-              video.setQuality(quality);
-              video.setFormat(format);
-          }
-          index++;
+        int index = 0;
+        while (true) {
+            JSONObject info = mediaDefinitions.getJSONObject("" + index);
+            if (Objects.isNull(info)) {
+                break;
+            }
+            if ("mp4".equals(info.getString("format")) && "1080".equals(info.getString("quality"))) {
+                String videoUrl = info.getString("videoUrl");
+                String quality = info.getString("quality");
+                String format = info.getString("format");
+                video.setVideoUrl(videoUrl);
+                video.setQuality(quality);
+                video.setFormat(format);
+            }
+            index++;
         }
         return video;
     }
@@ -119,7 +119,7 @@ public class Pornhub extends BaseWeb {
     public List<String> getVideoList(String url) {
         List<String> list = new ArrayList<String>();
         Document document = JsoupUtil.getDocument(url, enableProxy);
-        if(Objects.isNull(document)){
+        if (Objects.isNull(document)) {
             return list;
         }
         if (document.getElementById("videoSearchResult") != null) {
@@ -130,7 +130,7 @@ public class Pornhub extends BaseWeb {
                     list.add(home + href);
                 }
             }
-        } else if(document.getElementById("videoCategory")!=null){
+        } else if (document.getElementById("videoCategory") != null) {
             Elements elements = document.getElementById("videoCategory").getElementsByClass("linkVideoThumb");
             for (Element element : elements) {
                 String href = element.getElementsByTag("a").attr("href");
@@ -138,7 +138,7 @@ public class Pornhub extends BaseWeb {
                     list.add(home + href);
                 }
             }
-        } else if(document.getElementById("incategoryVideos")!=null){
+        } else if (document.getElementById("incategoryVideos") != null) {
             Elements elements = document.getElementById("incategoryVideos").getElementsByClass("linkVideoThumb");
             for (Element element : elements) {
                 String href = element.getElementsByTag("a").attr("href");
@@ -284,32 +284,32 @@ public class Pornhub extends BaseWeb {
         }
     }
 
-    public void download_doublePenetration_gangbang(){
+    public void download_doublePenetration_gangbang() {
         downloadIncategories("double-penetration", "gangbang");
     }
 
-    public void download_creampie_orgy(){
+    public void download_creampie_orgy() {
         downloadIncategories("creampie", "orgy");
     }
 
-    public void download_orgy_doublePenetration(){
-        downloadIncategories("orgy","double-penetration" );
+    public void download_orgy_doublePenetration() {
+        downloadIncategories("orgy", "double-penetration");
     }
 
-    public void download_japanese_orgy(){
-        downloadIncategories("japanese","orgy" );
+    public void download_japanese_orgy() {
+        downloadIncategories("japanese", "orgy");
     }
 
 
-    public void download_doublePenetration_creampie(){
+    public void download_doublePenetration_creampie() {
         downloadIncategories("double-penetration", "creampie");
     }
 
-    public  void  download_gangbang_hentai (){
+    public void download_gangbang_hentai() {
         downloadIncategories("gangbang", "hentai");
     }
 
-    public void download_compilation_creampie(){
+    public void download_compilation_creampie() {
         downloadIncategories("compilation", "creampie");
     }
 

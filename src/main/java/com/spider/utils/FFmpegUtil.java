@@ -97,7 +97,7 @@ public class FFmpegUtil {
 
     public static void downloadM3U8(String url, String savePath) {
         try {
-            if(!new File(savePath).getParentFile().exists()){
+            if (!new File(savePath).getParentFile().exists()) {
                 new File(savePath).getParentFile().mkdirs();
             }
             String command = new File(FFmpegPath).getAbsolutePath() + "/ffmpeg -i \"" + url + "\" -c copy \"" + savePath + "\" ";
@@ -125,6 +125,6 @@ public class FFmpegUtil {
 //            long index0 = (long) (MultimediaInfo.getDuration() / (10 - i)) / 1000;
 //            videoSnapshot("D:\\javfinder\\Uncensored2019-01-06\\1Pondo 020618_641 Matsuoka Shura Beautiful man beauty big screaming 3P Squirting.mp4", "G:\\test", String.valueOf(i), index0, 1);
 //        }
-        downloadM3U8("https://cdn-khzy-i-bofang.com/20201125/PzvFliqu/index.m3u8","C:\\test\\test.mp4");
+        downloadM3U8("https://cdn-khzy-i-bofang.com/20201125/PzvFliqu/index.m3u8", "C:\\test\\test.mp4");
     }
 }

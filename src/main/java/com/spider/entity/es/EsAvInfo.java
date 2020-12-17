@@ -65,7 +65,7 @@ public class EsAvInfo {
     private List<Magnet> magnetList;
 
     // 预览图
-    private List<String>  previewImageUrlList;
+    private List<String> previewImageUrlList;
 
     // 保存的预览图文件
     private List<byte[]> previewImageList;
@@ -92,7 +92,7 @@ public class EsAvInfo {
     @Data
     @Setter
     @Getter
-    public static class Magnet{
+    public static class Magnet {
 
         //名称
         private String name;

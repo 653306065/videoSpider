@@ -4,6 +4,7 @@ import com.spider.utils.OKHttpUtils;
 import okhttp3.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.HashMap;
@@ -61,12 +62,12 @@ public class CallableDownloadThread implements Callable<Boolean> {
                 }
                 newheader.put("range", "bytes=" + startByte + "-" + endByte);
                 if (errorTime == 5) {
-                    MultithreadingDownload.downloadStatusMap.put(httpUrl,false);
+                    MultithreadingDownload.downloadStatusMap.put(httpUrl, false);
                     logger.info("错误次数过多停止下载,{}", errorTime);
                     return false;
                 }
                 Response response = OKHttpUtils.getResponse(httpUrl, newheader, isProxy);
-                if(Objects.isNull(response)||!response.isSuccessful()){
+                if (Objects.isNull(response) || !response.isSuccessful()) {
                     logger.info("网络连接失败");
                     errorTime++;
                     continue;
@@ -74,7 +75,7 @@ public class CallableDownloadThread implements Callable<Boolean> {
                 byte[] bytes = new byte[1024 * 1024 * 2];
                 raf = new RandomAccessFile(file, "rw");
                 raf.seek(startByte);
-                while (true&&MultithreadingDownload.downloadStatusMap.get(httpUrl)) {
+                while (true && MultithreadingDownload.downloadStatusMap.get(httpUrl)) {
                     int i = response.body().byteStream().read(bytes);
                     if (i == -1) {
                         break;

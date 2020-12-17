@@ -58,16 +58,16 @@ public class Javhihi extends BaseWeb {
                 String name = FileUtils.repairPath(movie.getString("name"));
                 String movieUrl = home + movie.getString("url");
 
-                if(Objects.nonNull(videoService.findByName(name+".mp4"))){
+                if (Objects.nonNull(videoService.findByName(name + ".mp4"))) {
                     logger.info(name + ",已存在");
                     continue;
                 }
 
-                if(Objects.nonNull(videoService.findBySourceUrl(movieUrl))){
+                if (Objects.nonNull(videoService.findBySourceUrl(movieUrl))) {
                     logger.info(name + ",已存在");
                     continue;
                 }
-                Document document = JsoupUtil.getDocument(movieUrl,enableProxy);
+                Document document = JsoupUtil.getDocument(movieUrl, enableProxy);
                 Element element = document.getElementsByClass("dropdown-toggle").get(0);
                 String href = element.attr("href");
                 String[] strArr = href.split("/");
@@ -83,12 +83,12 @@ public class Javhihi extends BaseWeb {
                     video.setCategories(movie.getJSONArray("categories").toJavaList(String.class));
                     video.setStarNames(movie.getJSONArray("pornstars").toJavaList(String.class));
                     video.setTags(movie.getJSONArray("tags").toJavaList(String.class));
-                    video.setName(name+".mp4");
+                    video.setName(name + ".mp4");
                     JSONArray jsonArray = apiJsonObject.getJSONArray("data");
                     JSONObject fileJson = jsonArray.getJSONObject(jsonArray.size() - 1);
                     String redirector = fileJson.getString("file");
                     String realUrl = OKHttpUtils.getRedirectUrl(redirector, enableProxy);
-                    if(Objects.isNull(realUrl)){
+                    if (Objects.isNull(realUrl)) {
                         logger.info("获取视频地址失败");
                         continue;
                     }

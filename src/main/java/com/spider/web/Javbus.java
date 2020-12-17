@@ -136,7 +136,7 @@ public class Javbus extends BaseWeb {
                     avInfo.setCreateDate(new Date());
                     list.add(avInfo);
                 });
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             page++;
@@ -205,7 +205,7 @@ public class Javbus extends BaseWeb {
             List<byte[]> byteList = waterfallList.stream().parallel().map(url -> {
                 byte[] bytes = OKHttpUtils.getBytes(url, enableProxy);
                 if (Objects.nonNull(bytes)) {
-                    String path = savePath + "av" + File.separator + avInfo.getCode().trim() + File.separator + System.currentTimeMillis()+UUID.randomUUID().toString().substring(0,4) + ".jpg";
+                    String path = savePath + "av" + File.separator + avInfo.getCode().trim() + File.separator + System.currentTimeMillis() + UUID.randomUUID().toString().substring(0, 4) + ".jpg";
                     FileUtils.byteToFile(bytes, path);
                 }
                 return bytes;
@@ -219,7 +219,7 @@ public class Javbus extends BaseWeb {
 
     public List<AvInfo.Magnet> getMagnetList(String url) {
         Document document = JsoupUtil.getDocument(url, enableProxy);
-        if(Objects.isNull(document)){
+        if (Objects.isNull(document)) {
             return null;
         }
         String scriptString = "";
@@ -299,8 +299,8 @@ public class Javbus extends BaseWeb {
                 if (Objects.nonNull(avInfo)) {
                     avInfoService.insert(avInfo);
                 }
-            }else{
-                logger.info("{},已存在",avInfo.getCode());
+            } else {
+                logger.info("{},已存在", avInfo.getCode());
             }
         });
     }
@@ -318,13 +318,13 @@ public class Javbus extends BaseWeb {
         List<AvInfo> list = avInfoService.findAll();
         list.stream().parallel().forEach(avInfo -> {
             try {
-                logger.info("{},开始获取磁力链接",avInfo.getCode());
+                logger.info("{},开始获取磁力链接", avInfo.getCode());
                 List<AvInfo.Magnet> magnetList = getMagnetList(avInfo.getSourceUrl());
-                if(magnetList.size()>0){
+                if (magnetList.size() > 0) {
                     avInfo.setMagnetList(magnetList);
                     avInfoService.updateById(avInfo);
                 }
-                logger.info("{},获取磁力链接完成",avInfo.getCode());
+                logger.info("{},获取磁力链接完成", avInfo.getCode());
             } catch (Exception e) {
                 e.printStackTrace();
             }

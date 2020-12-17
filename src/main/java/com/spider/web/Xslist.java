@@ -42,10 +42,10 @@ public class Xslist extends BaseWeb {
         actressesInfo.setXsListImageUrlList(imgList);
         List<byte[]> imgByteList = imgList.stream().parallel().map(imgUrl -> {
             byte[] imgByte = OKHttpUtils.getBytes(imgUrl, false);
-            if(Objects.nonNull(imgByte)){
+            if (Objects.nonNull(imgByte)) {
                 FileUtils.byteToFile(imgByte, "E:\\xslist\\" + name + "\\" + UUID.randomUUID() + ".jpg");
                 return imgByte;
-            }else{
+            } else {
                 return null;
             }
         }).collect(Collectors.toList());

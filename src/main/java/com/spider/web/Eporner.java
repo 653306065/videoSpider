@@ -26,7 +26,7 @@ import com.spider.utils.OKHttpUtils;
 import com.spider.utils.download.MultithreadingDownload;
 
 @Service
-public class Eporner extends BaseWeb{
+public class Eporner extends BaseWeb {
 
     @Value("${eporner.home}")
     private String homeUrl;
@@ -124,12 +124,12 @@ public class Eporner extends BaseWeb{
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String date = simpleDateFormat.format(new Date());
         String path = savePath + category + "\\" + date + "\\" + name + ".mp4";
-        Video video=new Video();
-        video.setName(name+".mp4");
+        Video video = new Video();
+        video.setName(name + ".mp4");
         video.setVideoUrl(videoUrl);
         video.setSourceUrl(path);
         video.setSavePath(path);
-        multithreadingDownload.videoDownload(video, null, enableProxy, thread,defaultSegmentSize);
+        multithreadingDownload.videoDownload(video, null, enableProxy, thread, defaultSegmentSize);
     }
 
     public void download4K() {

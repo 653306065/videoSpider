@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.elasticsearch.annotations.Document;
 import ws.schild.jave.MultimediaInfo;
+
 import java.util.Date;
 import java.util.List;
 
@@ -55,5 +56,5 @@ public class EsVideo {
 
     private String studio;
 
-    private Boolean censored=false;
+    private Boolean censored = false;
 }
