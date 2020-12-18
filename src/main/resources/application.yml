@@ -178,6 +178,9 @@ proxy:
 
 FFmpegPath: C:\\ffmpeg\\bin\\
 
+server:
+  port: 80
+
 spring:
   application:
     name: video-spider
@@ -191,3 +194,10 @@ spring:
     rest:
       uris: http://localhost:9200
       connection-timeout: 1s
+
+logging:
+  level:
+    root: info
+    org.mybatis: debug
+    java.sql: debug
+    org.springframework.web: trace
