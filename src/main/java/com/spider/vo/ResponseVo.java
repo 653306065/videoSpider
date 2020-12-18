@@ -17,11 +17,11 @@ public class ResponseVo<T> {
 
     private String msg;
 
-    public static <Object>ResponseVo succee() {
+    public static <Object> ResponseVo succee() {
         return ResponseVo.builder().code(0).msg("succee").build();
     }
 
-    public static <T>ResponseVo succee(T t) {
+    public static <T> ResponseVo succee(T t) {
         return ResponseVo.builder().code(0).data(t).msg("succee").build();
     }
 

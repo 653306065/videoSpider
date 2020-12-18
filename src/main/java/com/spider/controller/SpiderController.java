@@ -21,16 +21,11 @@ public class SpiderController {
     private ThreadPoolExecutor threadPoolExecutor;
 
     @RequestMapping("/start/javbangers")
-    public ResponseVo<Object> startJavbangers(@RequestParam(name="thread",defaultValue = "30") Integer thread){
-        if(Objects.nonNull(thread)){
+    public ResponseVo<Object> startJavbangers(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
+        if (Objects.nonNull(thread)) {
             javbangers.setThread(thread);
         }
-        threadPoolExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                javbangers.downloadUncensored();
-            }
-        });
+        threadPoolExecutor.execute(() -> javbangers.downloadUncensored());
         return ResponseVo.succee();
     }
 }

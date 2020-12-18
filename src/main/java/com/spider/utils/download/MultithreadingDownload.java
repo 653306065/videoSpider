@@ -76,10 +76,9 @@ public class MultithreadingDownload {
                     String speedStr = "0.0";
                     if (tmep < downloadByte.get()) {
                         double speed = ((downloadByte.get() - tmep) / 1024.0 / 1024) / (sleepTime / 1000.0);
-                        speedStr = getOmitValue(speed, 5)
-                        ;
+                        speedStr = getOmitValue(speed, 5);
                     }
-                    System.out.print("(" + getOmitValue(percentage, 5) + "%)," + fileSizeStr + "," + speedStr + "m/s");
+                    System.out.print("(" + getOmitValue(percentage, 5) + "%)," + fileSizeStr + "," + speedStr + "m/s" + " | " + file.getName());
                     tmep = downloadByte.get();
                     Thread.sleep(sleepTime);
                     if (executorService.isTerminated()) {
