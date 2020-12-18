@@ -195,7 +195,7 @@ spring:
       uris: http://localhost:9200
       connection-timeout: 1s
 
-logging:
+#logging:
   level:
     root: info
     org.mybatis: debug
