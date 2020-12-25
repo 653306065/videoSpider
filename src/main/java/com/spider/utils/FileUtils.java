@@ -185,19 +185,26 @@ public class FileUtils {
         file.delete();
     }
 
-    public static void FileCopy(String oldPath, String newPath) throws IOException {
-        InputStream in = new FileInputStream(oldPath);
-        OutputStream out = new FileOutputStream(newPath);
-        byte[] bytes = new byte[1024];
-        while (true) {
-            if (in.read(bytes) == -1) {
-                in.close();
-                out.flush();
-                out.close();
-                break;
-            } else {
-                out.write(bytes);
+    public static void FileCopy(String oldPath, String newPath) {
+        try {
+            if(!new File(newPath).exists()){
+                new File(newPath).getParentFile().mkdirs();
             }
+            InputStream in = new FileInputStream(oldPath);
+            OutputStream out = new FileOutputStream(newPath);
+            byte[] bytes = new byte[1024];
+            while (true) {
+                if (in.read(bytes) == -1) {
+                    in.close();
+                    out.flush();
+                    out.close();
+                    break;
+                } else {
+                    out.write(bytes);
+                }
+            }
+        }catch (Exception exception){
+            exception.printStackTrace();
         }
     }
 

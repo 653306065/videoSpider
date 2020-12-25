@@ -3,6 +3,7 @@ package com.spider.controller;
 import com.spider.vo.ResponseVo;
 import com.spider.web.Javbangers;
 import com.spider.web.Javbus;
+import com.spider.web.Shubao;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ public class SpiderController {
 
     @Autowired
     private ThreadPoolExecutor threadPoolExecutor;
+
+    @Autowired
+    private Shubao shubao;
 
     @ApiOperation("开始javbangers下载")
     @GetMapping("/start/javbangers")
@@ -55,6 +59,13 @@ public class SpiderController {
             javbus.setThread(thread);
         }
         threadPoolExecutor.execute(() -> javbus.saveAvInfoByActressesAll());
+        return ResponseVo.succee();
+    }
+
+    @ApiOperation("获取书包网的书" )
+    @GetMapping("/start/shubao")
+    public ResponseVo<Object> startShubao() {
+        threadPoolExecutor.execute(() -> shubao.getBookList());
         return ResponseVo.succee();
     }
 }
