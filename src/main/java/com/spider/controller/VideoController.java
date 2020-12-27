@@ -11,8 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -39,13 +42,19 @@ public class VideoController extends BaseController {
     @GetMapping("/clean/video")
     public ResponseVo<Object> cleanVideo(@RequestParam(required = false, defaultValue = "640") Integer height, @RequestParam(required = false, defaultValue = "640") Integer width) {
         AtomicLong size = new AtomicLong(0);
+        CopyOnWriteArrayList<String> copyOnWriteArrayList=new CopyOnWriteArrayList<>();
         videoService.findAll().stream().filter(video -> new File(video.getSavePath()).exists()).filter(video -> Objects.nonNull(video.getMultimediaInfo())).forEach(video -> {
             if (height * width > video.getMultimediaInfo().getVideo().getSize().getHeight() * video.getMultimediaInfo().getVideo().getSize().getWidth()) {
                 logger.info(video.getSavePath());
-                new File(video.getSavePath()).delete();
+                //new File(video.getSavePath()).delete();
                 size.addAndGet(video.getSize());
+                copyOnWriteArrayList.add(video.getSavePath());
             }
         });
-        return ResponseVo.succee(size.get() / 1024.0 / 1024 / 1024);
+        Map<String,Object> map=new HashMap<>();
+        map.put("fileSize",size.get() / 1024.0 / 1024 / 1024);
+        map.put("list",copyOnWriteArrayList);
+        map.put("listSize",copyOnWriteArrayList.size());
+        return ResponseVo.succee(map);
     }
 }

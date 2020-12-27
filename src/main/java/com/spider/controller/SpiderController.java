@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+import com.spider.web.Javrave;
 import java.util.Objects;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -31,6 +31,9 @@ public class SpiderController {
 
     @Autowired
     private Shubao shubao;
+
+    @Autowired
+    private Javrave javrave;
 
     @ApiOperation("开始javbangers下载")
     @GetMapping("/start/javbangers")
@@ -68,6 +71,15 @@ public class SpiderController {
         threadPoolExecutor.execute(() -> shubao.getBookList());
         return ResponseVo.succee();
     }
+
+
+    @ApiOperation("获取javrave的视频" )
+    @GetMapping("/start/javrave")
+    public ResponseVo<Object> startJavrave() {
+        threadPoolExecutor.execute(() -> javrave.downloadUncensored());
+        return ResponseVo.succee();
+    }
+
 }
 
 

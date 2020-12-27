@@ -28,7 +28,7 @@ public class FileController extends BaseController {
                                                @RequestParam("matchCount") Integer matchCount) {
         File sourcePathFile = new File(sourcePath);
         File targetPathFile = new File(targetPath);
-        if(!targetPathFile.exists()){
+        if (!targetPathFile.exists()) {
             targetPathFile.mkdirs();
         }
         File keyPathFile = new File(keyPath);
@@ -38,7 +38,8 @@ public class FileController extends BaseController {
         List<File> allBook = new ArrayList<>();
         FileUtils.getPathFileList(sourcePath, allBook);
         List<String> keyList = FileUtils.readTxt(keyPath, "UTF-8");
-        List< Map<String,Object>> result = allBook.stream().parallel().map(book -> {
+        List<Map<String, Object>> result = allBook.stream().map(book -> {
+            System.out.println("-----------------------------------------");
             Map<String, Object> map = new HashMap<>();
             AtomicInteger keyCount = new AtomicInteger(0);
             List<String> textList = new ArrayList<>();
@@ -49,23 +50,27 @@ public class FileController extends BaseController {
             textList.addAll(FileUtils.readTxt(book.getAbsolutePath(), "UTF-8"));
             textList.addAll(FileUtils.readTxt(book.getAbsolutePath(), "BIG5"));
             List<String> matchKey = new ArrayList<>();
-            List<String> matchLine=new ArrayList<>();
+            List<String> matchLine = new ArrayList<>();
             textList.stream().distinct().forEach(line -> {
-                keyList.stream().distinct().filter(key->!key.startsWith("#")).forEach(key -> {
+                keyList.stream().distinct().filter(key -> !key.startsWith("#")).forEach(key -> {
                     if (line.contains(key)) {
                         keyCount.incrementAndGet();
                         matchKey.add(key);
                         matchLine.add(line);
-                        logger.info("{},{},{}",book.getAbsolutePath(),key,line);
+                        System.out.println(book.getName() + "," + key + "," + line);
                     }
                 });
             });
-            if(keyCount.get()>matchCount){
+            if (keyCount.get() > matchCount) {
                 map.put("savePath", book.getAbsolutePath());
                 map.put("keyCount", keyCount.get());
                 map.put("matchKey", new HashSet<>(matchKey));
                 map.put("matchLine", new HashSet<>(matchLine));
-                FileUtils.FileCopy(book.getAbsolutePath(),targetPath+book.getName());
+                if (new File(targetPath + book.getName()).exists()) {
+                    book.delete();
+                } else {
+                    book.renameTo(new File(targetPath + book.getName()));
+                }
                 return map;
             }
             return null;
