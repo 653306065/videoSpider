@@ -341,4 +341,12 @@ public class Pornhub extends BaseWeb {
             return null;
         }
     }
+
+    public int getThread() {
+        return thread;
+    }
+
+    public void setThread(int thread) {
+        this.thread = thread;
+    }
 }

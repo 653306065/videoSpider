@@ -176,6 +176,10 @@ public class Javrave extends BaseWeb {
                             return;
                         }
                     }
+                    if(Objects.nonNull(videoService.findBySourceUrl(video.getSourceUrl()))){
+                        logger.info(video.getSourceUrl() + "已存在");
+                        return;
+                    }
                     if (Objects.nonNull(videoService.findByName(video.getName() + ".mp4"))) {
                         logger.info(video.getName() + "已存在");
                         return;
