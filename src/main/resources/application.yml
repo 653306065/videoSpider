@@ -194,6 +194,10 @@ spring:
     rest:
       uris: http://localhost:9200
       connection-timeout: 1s
+  servlet:
+    multipart:
+      maxFileSize: 10GB
+      maxRequestSize: 10GB
 
 #logging:
   level:

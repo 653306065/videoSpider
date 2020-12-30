@@ -1,14 +1,17 @@
 package com.spider.controller;
 
+import com.spider.entity.FaceInfo;
+import com.spider.utils.FaceUtil;
 import com.spider.vo.ResponseVo;
 import com.spider.web.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @Api(tags = "爬虫接口")
@@ -79,6 +82,17 @@ public class SpiderController {
         pornhub.setThread(thread);
         threadPoolExecutor.execute(() -> pornhub.download_compilation_creampie());
         return ResponseVo.succee();
+    }
+
+
+    @ApiOperation("获取图片的人脸信息" )
+    @PostMapping(value="/face/info",headers = "content-type=multipart/form-data",consumes = "multipart/*")
+    public ResponseVo<List<FaceInfo>> faceInfo(@ApiParam(value = "文件",required = true) MultipartFile file){
+        try {
+            return ResponseVo.succee(FaceUtil.faceInfo(file.getBytes())) ;
+        }catch (Exception e){
+            return ResponseVo.failure(-1,"获取文件失败");
+        }
     }
 
 }
