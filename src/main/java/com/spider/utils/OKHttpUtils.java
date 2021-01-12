@@ -22,7 +22,7 @@ public class OKHttpUtils {
             Proxy proxy = SpringContentUtil.getBean(Proxy.class);
             proxyHttpClient = new OkHttpClient.Builder().connectTimeout(30, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS).proxy(proxy).build();
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 
