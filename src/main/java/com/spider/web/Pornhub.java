@@ -3,14 +3,15 @@ package com.spider.web;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-
-import com.alibaba.fastjson.JSONArray;
 import com.spider.entity.Video;
+import com.spider.utils.OKHttpUtils;
+import com.spider.utils.download.HlsDownloader;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -50,9 +51,6 @@ public class Pornhub extends BaseWeb {
 
     @Value("${pornhub.incategoriesUrl}")
     private String incategoriesUrl;
-
-    @Autowired
-    private MultithreadingDownload multithreadingDownload;
 
     public Video getVideoByUrl(String url) {
         Document document = JsoupUtil.getDocument(url, enableProxy);
@@ -103,11 +101,18 @@ public class Pornhub extends BaseWeb {
             if (Objects.isNull(info)) {
                 break;
             }
-            if ("mp4".equals(info.getString("format")) && "1080".equals(info.getString("quality"))) {
-                String videoUrl = info.getString("videoUrl");
+            if ("hls".equals(info.getString("format")) && "1080".equals(info.getString("quality"))) {
+                String hlsUrl = info.getString("videoUrl");
+                String m3u8=OKHttpUtils.get(hlsUrl,enableProxy);
+                Pattern pattern = Pattern.compile(".*m3u8.*");
+                Matcher ma = pattern.matcher(m3u8);
+                String videoM3u8Url="";
+                while (ma.find()) {
+                    videoM3u8Url= hlsUrl.substring(0, hlsUrl.lastIndexOf("/") + 1) + ma.group();
+                }
                 String quality = info.getString("quality");
                 String format = info.getString("format");
-                video.setVideoUrl(videoUrl);
+                video.setVideoUrl(videoM3u8Url);
                 video.setQuality(quality);
                 video.setFormat(format);
             }
@@ -178,7 +183,9 @@ public class Pornhub extends BaseWeb {
                     if (Integer.valueOf(video.getQuality()) < 720) {
                         return;
                     }
-                    multithreadingDownload.videoDownload(video, null, enableProxy, thread, defaultSegmentSize);
+                    if(StringUtils.hasText(video.getVideoUrl())){
+                        HlsDownloader.builder().isProxy(enableProxy).threadQuantity(thread).savePath(path).m3u8Url(video.getVideoUrl()).build().download();
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -207,7 +214,9 @@ public class Pornhub extends BaseWeb {
                         if (Integer.valueOf(video.getQuality()) < 720) {
                             continue;
                         }
-                        multithreadingDownload.videoDownload(video, null, enableProxy, thread, defaultSegmentSize);
+                        if(StringUtils.hasText(video.getVideoUrl())){
+                            HlsDownloader.builder().isProxy(enableProxy).threadQuantity(thread).savePath(path).m3u8Url(video.getVideoUrl()).build().download();
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -254,7 +263,9 @@ public class Pornhub extends BaseWeb {
                     if (Integer.valueOf(video.getQuality()) < 720) {
                         continue;
                     }
-                    multithreadingDownload.videoDownload(video, null, enableProxy, thread, defaultSegmentSize);
+                    if(StringUtils.hasText(video.getVideoUrl())){
+                        HlsDownloader.builder().isProxy(enableProxy).threadQuantity(thread).savePath(path).m3u8Url(video.getVideoUrl()).build().download();
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -274,8 +285,9 @@ public class Pornhub extends BaseWeb {
                     Video video = getVideoByUrl(str);
                     String date = simpleDateFormat.format(new Date());
                     String path = savePath + categories + "+" + incategories + File.separator + date + File.separator + video.getName();
-                    video.setSavePath(path);
-                    multithreadingDownload.videoDownload(video, null, enableProxy, thread, defaultSegmentSize);
+                    if(StringUtils.hasText(video.getVideoUrl())){
+                        HlsDownloader.builder().isProxy(enableProxy).threadQuantity(thread).savePath(path).m3u8Url(video.getVideoUrl()).build().download();
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
