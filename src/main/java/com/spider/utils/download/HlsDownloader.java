@@ -3,44 +3,51 @@ package com.spider.utils.download;
 
 import com.spider.utils.FileUtils;
 import com.spider.utils.OKHttpUtils;
+import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import lombok.Builder;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+
+import java.io.*;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Builder
 public class HlsDownloader {
 
+    @Builder.Default
     private Logger logger = LoggerFactory.getLogger(HlsDownloader.class);
 
     public String m3u8Url;
 
     private List<String> tsListUrl;
 
-    private Integer threadQuantity = 10;
+    @Builder.Default
+    private int threadQuantity = 30;
 
     private String savePath;
 
+    @Builder.Default
     private boolean isProxy = false;
 
     private String rootUrl;
 
     private ExecutorService executorService;
 
+    @Builder.Default
     private Map<String, String> tempFileMap = new ConcurrentHashMap<String, String>();
 
     public void download() {
-        if (StringUtils.isBlank(rootUrl)) {
+        if (StringUtils.isNotBlank(m3u8Url)) {
             rootUrl = m3u8Url.substring(0, m3u8Url.lastIndexOf("/") + 1);
         }
         tsListUrl = getTsList();
@@ -50,21 +57,21 @@ public class HlsDownloader {
         }
         buildTask();
         executorService.shutdown();
-        while (true) {
-            if (executorService.isTerminated()) {
-                break;
-            }
-            try{
+        while (!executorService.isTerminated()) {
+            try {
                 Thread.sleep(1000);
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        if(tempFileMap.size()==tsListUrl.size()){
-
-        }else{
-            logger.info("分块下载失败");
+        if (tempFileMap.size() == tsListUrl.size()) {
+            mergeFile();
+            logger.info("文件合并完成");
+        } else {
+            logger.info("分块下载失败,{}/{}", tempFileMap.size(), tsListUrl.size());
         }
+        deleteTemp();
+        logger.info("删除临时文件");
     }
 
     private List<String> getTsList() {
@@ -82,26 +89,70 @@ public class HlsDownloader {
     }
 
     private void buildTask() {
-        executorService = Executors.newFixedThreadPool(threadQuantity);
-        AtomicInteger index = new AtomicInteger(0);
-        tsListUrl.forEach(ts -> {
+        executorService = Executors.newFixedThreadPool(this.threadQuantity);
+        String uuid = UUID.randomUUID().toString();
+        for (int i = 0; i < tsListUrl.size(); i++) {
+            final int index = i;
             executorService.execute(() -> {
-                byte[] bytes = OKHttpUtils.getBytes(rootUrl+ts, isProxy);
-                String tempPath = savePath + "/temp/" + index.get() + ".ts";
-                FileUtils.byteToFile(bytes, tempPath);
-                tempFileMap.put(ts, tempPath);
-                logger.info("{}/{},{}完成下载", tempFileMap.size(), tsListUrl.size(), tempPath);
+                int time = 0;
+                while (true) {
+                    if (downloadTs(uuid, index)) {
+                        break;
+                    }
+                    if (time > 3) {
+                        logger.info("index:{},下载失败", index);
+                        break;
+                    }
+                    time++;
+                }
             });
-            index.getAndIncrement();
-        });
+        }
+    }
+
+    private boolean downloadTs(String uuid, Integer index) {
+        byte[] bytes = OKHttpUtils.getBytes(rootUrl + tsListUrl.get(index), isProxy);
+        if (Objects.isNull(bytes)) {
+            return false;
+        }
+        File file = new File(savePath);
+        String tempPath = file.getParentFile().getAbsolutePath() + "/temp/" + uuid + "/" + index + ".ts";
+        FileUtils.byteToFile(bytes, tempPath);
+        tempFileMap.put(tsListUrl.get(index), tempPath);
+        logger.info("{}/{},{}完成下载", tempFileMap.size(), tsListUrl.size(), tempPath);
+        return true;
     }
 
     private void mergeFile() {
+        try {
+            File videoFile = new File(savePath);
+            FileOutputStream fileOutputStream = new FileOutputStream(videoFile);
+            byte[] bytes = new byte[1024 * 2];
+            for (String ts : tsListUrl) {
+                File file = new File(tempFileMap.get(ts));
+                FileInputStream fileInputStream = new FileInputStream(file);
+                while (true) {
+                    int index = fileInputStream.read(bytes);
+                    if (index == -1) {
+                        break;
+                    }
+                    fileOutputStream.write(bytes, 0, index);
+                    fileOutputStream.flush();
+                }
+                fileInputStream.close();
+            }
+            fileOutputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void deleteTemp(){
+        FileUtils.deleteDir(new File(tempFileMap.values().stream().collect(Collectors.toList()).get(0)).getParentFile().getParentFile().getAbsolutePath());
 
     }
 
     public static void main(String[] args) {
-        String m3u8 = "https://dv-h.phncdn.com/hls/videos/202011/01/365874011/,1080P_4000K,720P_4000K,480P_2000K,240P_400K,_365874011.mp4.urlset/index-f1-v1-a1.m3u8?ttl=1610446316&l=0&hash=5a3550b8f9915b9a3802a64858ab98fe";
-        HlsDownloader.builder().m3u8Url(m3u8).build().download();
+        String m3u8 = "https://dv-h.phncdn.com/hls/videos/202007/15/333255272/,1080P_4000K,720P_4000K,480P_2000K,240P_400K,_333255272.mp4.urlset/index-f3-v1-a1.m3u8?ttl=1610459084&l=0&hash=52c152513c8995afc4e7e14904e1bed5";
+        //HlsDownloader.builder().m3u8Url(m3u8).build().download();
     }
 }
