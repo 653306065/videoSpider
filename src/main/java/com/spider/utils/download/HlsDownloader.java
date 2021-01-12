@@ -46,6 +46,9 @@ public class HlsDownloader {
     @Builder.Default
     private Map<String, String> tempFileMap = new ConcurrentHashMap<String, String>();
 
+    @Builder.Default
+    private Integer time = 5;
+
     public void download() {
         if (StringUtils.isNotBlank(m3u8Url)) {
             rootUrl = m3u8Url.substring(0, m3u8Url.lastIndexOf("/") + 1);
@@ -94,16 +97,16 @@ public class HlsDownloader {
         for (int i = 0; i < tsListUrl.size(); i++) {
             final int index = i;
             executorService.execute(() -> {
-                int time = 0;
+                int taskTime = 0;
                 while (true) {
                     if (downloadTs(uuid, index)) {
                         break;
                     }
-                    if (time > 3) {
+                    if (taskTime > time) {
                         logger.info("index:{},下载失败", index);
                         break;
                     }
-                    time++;
+                    taskTime++;
                 }
             });
         }
@@ -146,7 +149,7 @@ public class HlsDownloader {
         }
     }
 
-    private void deleteTemp(){
+    private void deleteTemp() {
         FileUtils.deleteDir(new File(tempFileMap.values().stream().collect(Collectors.toList()).get(0)).getParentFile().getParentFile().getAbsolutePath());
 
     }
