@@ -3,19 +3,21 @@ package com.spider.utils.download;
 import com.spider.entity.Video;
 import com.spider.utils.FileUtils;
 import com.spider.utils.OKHttpUtils;
+import io.lindstrom.m3u8.model.MasterPlaylist;
+import io.lindstrom.m3u8.model.MediaPlaylist;
+import io.lindstrom.m3u8.model.MediaSegment;
+import io.lindstrom.m3u8.parser.MasterPlaylistParser;
+import io.lindstrom.m3u8.parser.MediaPlaylistParser;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Component
 @Scope("prototype")
@@ -25,7 +27,7 @@ public class HlsDownloader {
 
     public String m3u8Url;
 
-    private List<String> tsListUrl;
+    private MediaPlaylist mediaPlaylist;
 
     private int threadQuantity = 30;
 
@@ -41,12 +43,16 @@ public class HlsDownloader {
 
     private Integer time = 5;
 
+    private MasterPlaylistParser masterPlaylistParser = new MasterPlaylistParser();
+
+    private MediaPlaylistParser mediaPlaylistParser = new MediaPlaylistParser();
+
     private boolean download() {
         if (StringUtils.isNotBlank(m3u8Url)) {
             rootUrl = m3u8Url.substring(0, m3u8Url.lastIndexOf("/") + 1);
         }
-        tsListUrl = getTsList();
-        if (CollectionUtils.isEmpty(tsListUrl)) {
+        getTsList();
+        if (Objects.isNull(mediaPlaylist)) {
             logger.info("无法获取到TS列表");
             return false;
         }
@@ -54,22 +60,35 @@ public class HlsDownloader {
         executorService.shutdown();
         while (!executorService.isTerminated()) {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(500);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        if (tempFileMap.size() == tsListUrl.size()) {
+        if (tempFileMap.size() == mediaPlaylist.mediaSegments().size()) {
             mergeFile();
             logger.info("文件合并完成");
         } else {
-            logger.info("分块下载失败,{}/{}", tempFileMap.size(), tsListUrl.size());
+            logger.info("分块下载失败,{}/{}", tempFileMap.size(), mediaPlaylist.mediaSegments().size());
             return false;
         }
         deleteTemp();
         tempFileMap.clear();
         logger.info("删除临时文件");
         return true;
+    }
+
+    public MasterPlaylist getMasterPlaylist(String masterUrl, Boolean isProxy) {
+        String content = OKHttpUtils.get(masterUrl, isProxy);
+        if (Objects.isNull(content)) {
+            return null;
+        }
+        try {
+            return masterPlaylistParser.readPlaylist(content);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public Boolean download(String m3u8Url, String savePath, Integer threadQuantity, Boolean isProxy) {
@@ -94,24 +113,22 @@ public class HlsDownloader {
         return this.download();
     }
 
-    private List<String> getTsList() {
+    private void getTsList() {
         String content = OKHttpUtils.get(m3u8Url, this.isProxy);
         if (StringUtils.isBlank(content)) {
-            return null;
+            return;
         }
-        Pattern pattern = Pattern.compile(".*ts.*");
-        Matcher ma = pattern.matcher(content);
-        List<String> list = new ArrayList<String>();
-        while (ma.find()) {
-            list.add(ma.group());
+        try {
+            mediaPlaylist = mediaPlaylistParser.readPlaylist(content);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return list;
     }
 
     private void buildTask() {
         executorService = Executors.newFixedThreadPool(this.threadQuantity);
         String uuid = UUID.randomUUID().toString();
-        for (int i = 0; i < tsListUrl.size(); i++) {
+        for (int i = 0; i < mediaPlaylist.mediaSegments().size(); i++) {
             final int index = i;
             executorService.execute(() -> {
                 int taskTime = 0;
@@ -130,15 +147,21 @@ public class HlsDownloader {
     }
 
     private boolean downloadTs(String uuid, Integer index) {
-        byte[] bytes = OKHttpUtils.getBytes(rootUrl + tsListUrl.get(index), isProxy);
+        MediaSegment mediaSegment = mediaPlaylist.mediaSegments().get(index);
+        String url = mediaSegment.uri();
+        if (!url.startsWith("http")) {
+            url = rootUrl + mediaSegment.uri();
+        }
+        byte[] bytes = OKHttpUtils.getBytes(url, isProxy);
         if (Objects.isNull(bytes)) {
             return false;
         }
         File file = new File(savePath);
         String tempPath = file.getParentFile().getAbsolutePath() + "/temp/" + uuid + "/" + index + ".ts";
+        //todo HLS解密
         FileUtils.byteToFile(bytes, tempPath);
-        tempFileMap.put(tsListUrl.get(index), tempPath);
-        logger.info("{}/{},{}完成下载", tempFileMap.size(), tsListUrl.size(), tempPath);
+        tempFileMap.put(mediaPlaylist.mediaSegments().get(index).uri(), tempPath);
+        logger.info("{}/{},{}完成下载", tempFileMap.size(), mediaPlaylist.mediaSegments().size(), tempPath);
         return true;
     }
 
@@ -147,8 +170,8 @@ public class HlsDownloader {
             File videoFile = new File(savePath);
             FileOutputStream fileOutputStream = new FileOutputStream(videoFile);
             byte[] bytes = new byte[1024 * 2];
-            for (String ts : tsListUrl) {
-                File file = new File(tempFileMap.get(ts));
+            for (MediaSegment mediaSegment : mediaPlaylist.mediaSegments()) {
+                File file = new File(tempFileMap.get(mediaSegment.uri()));
                 FileInputStream fileInputStream = new FileInputStream(file);
                 while (true) {
                     int index = fileInputStream.read(bytes);
