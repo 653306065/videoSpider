@@ -1,62 +1,53 @@
 
 package com.spider.utils.download;
 
+import com.spider.entity.Video;
 import com.spider.utils.FileUtils;
 import com.spider.utils.OKHttpUtils;
-import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
-import lombok.Builder;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
-@Builder
+@Component
 public class HlsDownloader {
 
-    @Builder.Default
     private Logger logger = LoggerFactory.getLogger(HlsDownloader.class);
 
     public String m3u8Url;
 
     private List<String> tsListUrl;
 
-    @Builder.Default
     private int threadQuantity = 30;
 
     private String savePath;
 
-    @Builder.Default
     private boolean isProxy = false;
 
     private String rootUrl;
 
     private ExecutorService executorService;
 
-    @Builder.Default
-    private Map<String, String> tempFileMap = new ConcurrentHashMap<String, String>();
+    private Map<String, String> tempFileMap = new ConcurrentHashMap<>();
 
-    @Builder.Default
     private Integer time = 5;
 
-    public void download() {
+    public boolean download() {
         if (StringUtils.isNotBlank(m3u8Url)) {
             rootUrl = m3u8Url.substring(0, m3u8Url.lastIndexOf("/") + 1);
         }
         tsListUrl = getTsList();
         if (CollectionUtils.isEmpty(tsListUrl)) {
             logger.info("无法获取到TS列表");
-            return;
+            return false;
         }
         buildTask();
         executorService.shutdown();
@@ -72,9 +63,23 @@ public class HlsDownloader {
             logger.info("文件合并完成");
         } else {
             logger.info("分块下载失败,{}/{}", tempFileMap.size(), tsListUrl.size());
+            return false;
         }
         deleteTemp();
+        tempFileMap.clear();
         logger.info("删除临时文件");
+        return true;
+    }
+
+    public Boolean downloadByVideo(Video video, Integer threadQuantity, Boolean isProxy) {
+        if (Objects.isNull(video) || Objects.isNull(video.getVideoUrl()) || Objects.isNull(video.getSavePath()) || Objects.isNull(threadQuantity) || Objects.isNull(isProxy)) {
+            return false;
+        }
+        this.m3u8Url = video.getVideoUrl();
+        this.savePath = video.getSavePath();
+        this.threadQuantity = threadQuantity;
+        this.isProxy = isProxy;
+        return this.download();
     }
 
     private List<String> getTsList() {
@@ -150,8 +155,7 @@ public class HlsDownloader {
     }
 
     private void deleteTemp() {
-        FileUtils.deleteDir(new File(tempFileMap.values().stream().collect(Collectors.toList()).get(0)).getParentFile().getParentFile().getAbsolutePath());
-
+        FileUtils.deleteDir(new File(new ArrayList<>(tempFileMap.values()).get(0)).getParentFile().getParentFile().getAbsolutePath());
     }
 
     public static void main(String[] args) {

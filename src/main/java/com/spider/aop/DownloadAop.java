@@ -234,4 +234,15 @@ public class DownloadAop {
             e.printStackTrace();
         }
     }
+
+    @Pointcut("execution(* com.spider.utils.download.HlsDownloader.downloadByVideo(..))")
+    public void hlsDownloader_downloadByVideo() {
+
+    }
+
+    @Around(value = "hlsDownloader_downloadByVideo()")
+    public void aroundHlsDownloader_downloadByVideo(ProceedingJoinPoint joinPoint) {
+        aroundVideoDownload(joinPoint);
+    }
+
 }
