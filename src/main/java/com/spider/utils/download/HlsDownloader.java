@@ -48,6 +48,7 @@ public class HlsDownloader {
     private MediaPlaylistParser mediaPlaylistParser = new MediaPlaylistParser();
 
     private boolean download() {
+        tempFileMap.clear();
         if (StringUtils.isNotBlank(m3u8Url)) {
             rootUrl = m3u8Url.substring(0, m3u8Url.lastIndexOf("/") + 1);
         }
@@ -73,7 +74,6 @@ public class HlsDownloader {
             return false;
         }
         deleteTemp();
-        tempFileMap.clear();
         logger.info("删除临时文件");
         return true;
     }
