@@ -1,4 +1,3 @@
-
 package com.spider.utils.download;
 
 import com.spider.entity.Video;
@@ -7,6 +6,7 @@ import com.spider.utils.OKHttpUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import java.io.*;
@@ -18,6 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
+@Scope("prototype")
 public class HlsDownloader {
 
     private Logger logger = LoggerFactory.getLogger(HlsDownloader.class);
@@ -40,7 +41,7 @@ public class HlsDownloader {
 
     private Integer time = 5;
 
-    public boolean download() {
+    private boolean download() {
         if (StringUtils.isNotBlank(m3u8Url)) {
             rootUrl = m3u8Url.substring(0, m3u8Url.lastIndexOf("/") + 1);
         }
@@ -69,6 +70,17 @@ public class HlsDownloader {
         tempFileMap.clear();
         logger.info("删除临时文件");
         return true;
+    }
+
+    public Boolean download(String m3u8Url, String savePath, Integer threadQuantity, Boolean isProxy) {
+        if (Objects.isNull(m3u8Url) || Objects.isNull(savePath) || Objects.isNull(threadQuantity) || Objects.isNull(isProxy)) {
+            return false;
+        }
+        this.m3u8Url = m3u8Url;
+        this.savePath = savePath;
+        this.threadQuantity = threadQuantity;
+        this.isProxy = isProxy;
+        return this.download();
     }
 
     public Boolean downloadByVideo(Video video, Integer threadQuantity, Boolean isProxy) {
