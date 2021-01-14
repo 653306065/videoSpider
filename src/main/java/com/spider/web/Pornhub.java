@@ -12,6 +12,7 @@ import javax.script.ScriptException;
 import com.spider.entity.Video;
 import com.spider.utils.OKHttpUtils;
 import com.spider.utils.download.HlsDownloader;
+import io.lindstrom.m3u8.model.MasterPlaylist;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -22,6 +23,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.spider.utils.FileUtils;
 import com.spider.utils.JsoupUtil;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 @Service
@@ -105,12 +107,14 @@ public class Pornhub extends BaseWeb {
             }
             if ("hls".equals(info.getString("format")) && "1080".equals(info.getString("quality"))) {
                 String hlsUrl = info.getString("videoUrl");
-                String m3u8=OKHttpUtils.get(hlsUrl,enableProxy);
-                Pattern pattern = Pattern.compile(".*m3u8.*");
-                Matcher ma = pattern.matcher(m3u8);
-                String videoM3u8Url="";
-                while (ma.find()) {
-                    videoM3u8Url= hlsUrl.substring(0, hlsUrl.lastIndexOf("/") + 1) + ma.group();
+                MasterPlaylist masterPlaylist=hlsDownloader.getMasterPlaylist(hlsUrl,enableProxy);
+                String videoM3u8Url=null;
+                if(Objects.nonNull(masterPlaylist)&&!CollectionUtils.isEmpty(masterPlaylist.variants())){
+                    if(masterPlaylist.variants().get(0).uri().startsWith("http")){
+                        videoM3u8Url=masterPlaylist.variants().get(0).uri();
+                    }else{
+                        videoM3u8Url=hlsUrl.substring(0, hlsUrl.lastIndexOf("/") + 1)+masterPlaylist.variants().get(0).uri();
+                    }
                 }
                 String quality = info.getString("quality");
                 String format = info.getString("format");

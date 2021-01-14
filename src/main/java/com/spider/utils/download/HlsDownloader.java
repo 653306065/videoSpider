@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -103,7 +104,7 @@ public class HlsDownloader {
     }
 
     public Boolean downloadByVideo(Video video, Integer threadQuantity, Boolean isProxy) {
-        if (Objects.isNull(video) || Objects.isNull(video.getVideoUrl()) || Objects.isNull(video.getSavePath()) || Objects.isNull(threadQuantity) || Objects.isNull(isProxy)) {
+        if (Objects.isNull(video) || StringUtils.isBlank(video.getVideoUrl()) || StringUtils.isBlank(video.getSavePath()) || Objects.isNull(threadQuantity) || Objects.isNull(isProxy)) {
             return false;
         }
         this.m3u8Url = video.getVideoUrl();
