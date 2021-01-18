@@ -374,7 +374,9 @@ public class FileUtils {
     public static List<String> getSearchKeyList(String name) {
         List<String> list = new ArrayList<>();
         list.add(name);
-        name = getFileNameWithoutSuffix(name);
+        if(name.contains(".")){
+            name = getFileNameWithoutSuffix(name);
+        }
         String[] splitKeys = {"_", ",", "-", " "};
         String[] connectKeys = {"_", "-", " "};
         for (String splitKey : splitKeys) {

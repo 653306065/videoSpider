@@ -3,6 +3,7 @@ package com.spider.entity;
 import java.util.Date;
 import java.util.List;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -56,4 +57,5 @@ public class Video {
     private String studio;
 
     private Boolean censored = false;
+
 }
