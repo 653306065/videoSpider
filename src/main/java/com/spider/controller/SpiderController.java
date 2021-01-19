@@ -37,6 +37,9 @@ public class SpiderController {
     @Autowired
     private Pornhub pornhub;
 
+    @Autowired
+    private Hqporner hqporner;
+
     @ApiOperation("开始javbangers下载")
     @GetMapping("/start/javbangers")
     public ResponseVo<Object> startJavbangers(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
@@ -93,6 +96,22 @@ public class SpiderController {
         }catch (Exception e){
             return ResponseVo.failure(-1,"获取文件失败");
         }
+    }
+
+    @ApiOperation("hqporner 4k视频下载")
+    @GetMapping(value="/start/hqporner/4k")
+    public ResponseVo<List<FaceInfo>> hqporner4K(@RequestParam(name = "thread", defaultValue = "30") Integer thread){
+        hqporner.setThread(thread);
+        threadPoolExecutor.execute(() -> hqporner.download4k());
+        return ResponseVo.succee();
+    }
+
+    @ApiOperation("hqporner SexParties视频下载")
+    @GetMapping(value="/start/hqporner/SexParties")
+    public ResponseVo<List<FaceInfo>> hqpornerSexParties(@RequestParam(name = "thread", defaultValue = "30") Integer thread){
+        hqporner.setThread(thread);
+        threadPoolExecutor.execute(() -> hqporner.downloadSexParties());
+        return ResponseVo.succee();
     }
 
 }

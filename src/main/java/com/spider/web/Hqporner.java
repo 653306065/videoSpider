@@ -77,6 +77,10 @@ public class Hqporner extends BaseWeb{
         downloadByCategory("4k-porn");
     }
 
+    public void downloadSexParties(){
+        downloadByCategory("sex-parties");
+    }
+
     public void downloadByCategory(String category){
         int page=1;
         while (true){
@@ -90,12 +94,18 @@ public class Hqporner extends BaseWeb{
                     String date = simpleDateFormat.format(new Date());
                     video.setSavePath(savePath+"\\"+category+"\\"+date+"\\"+video.getName());
                     logger.info(video.getName());
-                    //downloadVideo(video);
+                    downloadVideo(video);
                 }
             });
             page++;
         }
     }
 
+    public Integer getThread() {
+        return thread;
+    }
 
+    public void setThread(Integer thread) {
+        this.thread = thread;
+    }
 }

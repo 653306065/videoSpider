@@ -12,9 +12,6 @@ import java.util.Objects;
 public class Application {
 
     public static void main(String[] args) {
-
-        ConfigurableApplicationContext context= SpringApplication.run(Application.class);
-        Hqporner Hqporner=context.getBean(Hqporner.class);
-        Hqporner.download4k();
+        SpringApplication.run(Application.class);
     }
 }
