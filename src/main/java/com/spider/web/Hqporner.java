@@ -89,12 +89,16 @@ public class Hqporner extends BaseWeb{
                 break;
             }
             urlList.forEach(url->{
-                Video video= getVideo(url);
-                if(Objects.nonNull(video)){
-                    String date = simpleDateFormat.format(new Date());
-                    video.setSavePath(savePath+"\\"+category+"\\"+date+"\\"+video.getName());
-                    logger.info(video.getName());
-                    downloadVideo(video);
+                try {
+                    Video video= getVideo(url);
+                    if(Objects.nonNull(video)){
+                        String date = simpleDateFormat.format(new Date());
+                        video.setSavePath(savePath+"\\"+category+"\\"+date+"\\"+video.getName());
+                        logger.info(video.getName());
+                        downloadVideo(video);
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
                 }
             });
             page++;
