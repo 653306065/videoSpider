@@ -57,9 +57,12 @@ public class Hqporner extends BaseWeb{
             return null;
         }
         List<String> urlList = Arrays.stream(iframeDocument.toString().split("'")).filter(text -> text.endsWith(".mp4")).map(text -> "https:" + text).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(urlList)){
+            return null;
+        }
         Video video=new Video();
         video.setName(name+".mp4");
-        video.setStarNames(Arrays.asList(startName));
+        video.setStarNames(Collections.singletonList(startName));
         video.setTags(tags);
         video.setCreateDate(new Date());
         video.setVideoUrl(urlList.get(urlList.size()-1));
@@ -71,7 +74,10 @@ public class Hqporner extends BaseWeb{
     }
 
     public void download4k(){
-        String category="4k-porn";
+        downloadByCategory("4k-porn");
+    }
+
+    public void downloadByCategory(String category){
         int page=1;
         while (true){
             List<String> urlList= getVideoList(category,page);
@@ -83,7 +89,8 @@ public class Hqporner extends BaseWeb{
                 if(Objects.nonNull(video)){
                     String date = simpleDateFormat.format(new Date());
                     video.setSavePath(savePath+"\\"+category+"\\"+date+"\\"+video.getName());
-                    downloadVideo(video);
+                    logger.info(video.getName());
+                    //downloadVideo(video);
                 }
             });
             page++;
