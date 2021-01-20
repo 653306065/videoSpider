@@ -33,7 +33,7 @@ public class FaceUtil {
         map.put("return_attributes", "beauty,age,gender");
         String json = OKHttpUtils.postFormObjectData(api, map, false);
         //logger.info(json);
-        if (!StringUtils.isEmpty(json)) {
+        if (StringUtils.hasText(json)) {
             JSONObject jsonObject = JSON.parseObject(json);
             JSONArray jsonArray = jsonObject.getJSONArray("faces");
             if (!CollectionUtils.isEmpty(jsonArray)) {
