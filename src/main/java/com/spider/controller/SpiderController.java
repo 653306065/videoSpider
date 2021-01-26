@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @Api(tags = "爬虫接口")
@@ -90,7 +91,7 @@ public class SpiderController extends BaseController{
                 List<String> urlList = xslist.getSearchList(actressesInfo.getName());
                 if(CollectionUtil.isNotEmpty(urlList)){
                     ActressesInfo info= xslist.getInfo(urlList.get(0));
-                    if(actressesInfo.getName().equals(info.getName())){
+                    if(Objects.nonNull(info)&&actressesInfo.getName().trim().equals(info.getName().trim())){
                         CopyOptions copyOptions=new CopyOptions();
                         copyOptions.setIgnoreNullValue(true);
                         BeanUtil.copyProperties(info,actressesInfo,copyOptions);

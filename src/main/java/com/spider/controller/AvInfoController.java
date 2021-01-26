@@ -2,6 +2,7 @@ package com.spider.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import com.spider.entity.ActressesInfo;
 import com.spider.entity.AvInfo;
 import com.spider.entity.FaceInfo;
 import com.spider.service.ActressesInfoService;
@@ -48,7 +49,8 @@ public class AvInfoController extends BaseController {
     @GetMapping("/save/actresses/faceInfo")
     public ResponseVo<List<AvInfo>> actressesFaceInfo() {
         threadPoolExecutor.execute(() -> {
-            actressesInfoService.findAll().stream().parallel().forEach(actressesInfo -> {
+            List<ActressesInfo> actressesInfoList = actressesInfoService.findAll();
+            actressesInfoList.stream().sequential().forEach(actressesInfo -> {
                 List<byte[]> phtotList = new ArrayList<>();
                 if (Objects.nonNull(actressesInfo.getJavbusPhoto())) {
                     phtotList.add(actressesInfo.getJavbusPhoto());
@@ -56,7 +58,18 @@ public class AvInfoController extends BaseController {
                 if (CollectionUtil.isNotEmpty(actressesInfo.getXsListImageList())) {
                     phtotList.addAll(actressesInfo.getXsListImageList());
                 }
-                List<FaceInfo> faceInfoList = phtotList.stream().parallel().flatMap(bytes -> Objects.requireNonNull(FaceUtil.faceInfo(bytes)).stream()).filter(Objects::nonNull).collect(Collectors.toList());
+                List<FaceInfo> faceInfoList = phtotList.stream().sequential().filter(Objects::nonNull).flatMap(bytes -> {
+                    List<FaceInfo> list = FaceUtil.faceInfo(bytes);
+                    if (CollectionUtil.isEmpty(list)) {
+                        return null;
+                    }
+                    try {
+                        Thread.sleep(350);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    return list.stream();
+                }).filter(Objects::nonNull).collect(Collectors.toList());
                 if (CollectionUtil.isNotEmpty(faceInfoList)) {
                     double femaleScore = faceInfoList.stream().mapToDouble(FaceInfo::getFemaleScore).average().getAsDouble();
                     double maleScore = faceInfoList.stream().mapToDouble(FaceInfo::getMaleScore).average().getAsDouble();
