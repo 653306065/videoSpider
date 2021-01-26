@@ -1,6 +1,11 @@
 package com.spider.controller;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
+import cn.hutool.core.collection.CollectionUtil;
+import com.spider.entity.ActressesInfo;
 import com.spider.entity.FaceInfo;
+import com.spider.service.ActressesInfoService;
 import com.spider.utils.FaceUtil;
 import com.spider.vo.ResponseVo;
 import com.spider.web.*;
@@ -10,14 +15,13 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @Api(tags = "爬虫接口")
 @RestController
 @RequestMapping("/api/spider")
-public class SpiderController {
+public class SpiderController extends BaseController{
 
     @Autowired
     private Javbangers javbangers;
@@ -40,6 +44,12 @@ public class SpiderController {
     @Autowired
     private Hqporner hqporner;
 
+    @Autowired
+    private Xslist xslist;
+
+    @Autowired
+    private ActressesInfoService actressesInfoService;
+
     @ApiOperation("开始javbangers下载")
     @GetMapping("/start/javbangers")
     public ResponseVo<Object> startJavbangers(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
@@ -56,7 +66,7 @@ public class SpiderController {
         return ResponseVo.succee();
     }
 
-    @ApiOperation("更新javbus的磁力" )
+    @ApiOperation("更新javbus的磁力")
     @GetMapping("/start/update/javbus/magnet")
     public ResponseVo<Object> updateJavBusMagnet(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
         javbus.setThread(thread);
@@ -64,15 +74,38 @@ public class SpiderController {
         return ResponseVo.succee();
     }
 
-    @ApiOperation("保存javbus的女优" )
-    @GetMapping("/start/update/javbus/actresses")
+    @ApiOperation("保存javbus的女优")
+    @GetMapping("/start/save/javbus/actresses")
     public ResponseVo<Object> saveJavBusActresses(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
         javbus.setThread(thread);
         threadPoolExecutor.execute(() -> javbus.saveAllUncensoredActressesInfo());
         return ResponseVo.succee();
     }
 
-    @ApiOperation("获取书包网的书" )
+    @ApiOperation("保存xslist的女优信息")
+    @GetMapping("/start/save/xslist/actresses")
+    public ResponseVo<Object> saveXslist(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
+        threadPoolExecutor.execute(() -> {
+            actressesInfoService.findAll().stream().parallel().forEach(actressesInfo -> {
+                List<String> urlList = xslist.getSearchList(actressesInfo.getName());
+                if(CollectionUtil.isNotEmpty(urlList)){
+                    ActressesInfo info= xslist.getInfo(urlList.get(0));
+                    if(actressesInfo.getName().equals(info.getName())){
+                        CopyOptions copyOptions=new CopyOptions();
+                        copyOptions.setIgnoreNullValue(true);
+                        BeanUtil.copyProperties(info,actressesInfo,copyOptions);
+                        actressesInfoService.updateById(actressesInfo);
+                        logger.info("{},信息获取完成",actressesInfo.getName());
+                    }
+                }
+            });
+            logger.info("获取xslist信息完成");
+        });
+        return ResponseVo.succee();
+    }
+
+
+    @ApiOperation("获取书包网的书")
     @GetMapping("/start/shubao")
     public ResponseVo<Object> startShubao() {
         threadPoolExecutor.execute(() -> shubao.getBookList());
@@ -80,43 +113,43 @@ public class SpiderController {
     }
 
 
-    @ApiOperation("获取javrave的视频" )
+    @ApiOperation("获取javrave的视频")
     @GetMapping("/start/javrave")
     public ResponseVo<Object> startJavrave() {
         threadPoolExecutor.execute(() -> javrave.downloadUncensored());
         return ResponseVo.succee();
     }
 
-    @ApiOperation("获取pornhub(compilation creampie)的视频" )
+    @ApiOperation("获取pornhub(compilation creampie)的视频")
     @GetMapping("/start/pornhub/compilation/creampie")
-    public ResponseVo<Object> startPornhub(@RequestParam(name = "thread", defaultValue = "30") Integer thread){
+    public ResponseVo<Object> startPornhub(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
         pornhub.setThread(thread);
         threadPoolExecutor.execute(() -> pornhub.download_compilation_creampie());
         return ResponseVo.succee();
     }
 
 
-    @ApiOperation("获取图片的人脸信息" )
-    @PostMapping(value="/face/info",headers = "content-type=multipart/form-data",consumes = "multipart/*")
-    public ResponseVo<List<FaceInfo>> faceInfo(@ApiParam(value = "文件",required = true) MultipartFile file){
+    @ApiOperation("获取图片的人脸信息")
+    @PostMapping(value = "/face/info", headers = "content-type=multipart/form-data", consumes = "multipart/*")
+    public ResponseVo<List<FaceInfo>> faceInfo(@ApiParam(value = "文件", required = true) MultipartFile file) {
         try {
-            return ResponseVo.succee(FaceUtil.faceInfo(file.getBytes())) ;
-        }catch (Exception e){
-            return ResponseVo.failure(-1,"获取文件失败");
+            return ResponseVo.succee(FaceUtil.faceInfo(file.getBytes()));
+        } catch (Exception e) {
+            return ResponseVo.failure(-1, "获取文件失败");
         }
     }
 
     @ApiOperation("hqporner 4k视频下载")
-    @GetMapping(value="/start/hqporner/4k")
-    public ResponseVo<List<FaceInfo>> hqporner4K(@RequestParam(name = "thread", defaultValue = "30") Integer thread){
+    @GetMapping(value = "/start/hqporner/4k")
+    public ResponseVo<List<FaceInfo>> hqporner4K(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
         hqporner.setThread(thread);
         threadPoolExecutor.execute(() -> hqporner.download4k());
         return ResponseVo.succee();
     }
 
     @ApiOperation("hqporner SexParties视频下载")
-    @GetMapping(value="/start/hqporner/SexParties")
-    public ResponseVo<List<FaceInfo>> hqpornerSexParties(@RequestParam(name = "thread", defaultValue = "30") Integer thread){
+    @GetMapping(value = "/start/hqporner/SexParties")
+    public ResponseVo<List<FaceInfo>> hqpornerSexParties(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
         hqporner.setThread(thread);
         threadPoolExecutor.execute(() -> hqporner.downloadSexParties());
         return ResponseVo.succee();

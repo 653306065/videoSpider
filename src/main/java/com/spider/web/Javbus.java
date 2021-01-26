@@ -60,6 +60,9 @@ public class Javbus extends BaseWeb {
     public List<ActressesInfo> getActressesInfoList(String category, int page) {
         String url = actressesListTemplate.replace("@{category}", category).replace("@{page}", String.valueOf(page));
         Document document = JsoupUtil.getDocument(url, enableProxy);
+        if(Objects.isNull(document)){
+            return null;
+        }
         Elements elements = document.getElementsByClass("avatar-box");
         return elements.stream().parallel().map(element -> {
             String infoUrl = element.attr("href");
@@ -79,8 +82,8 @@ public class Javbus extends BaseWeb {
                         FileUtils.byteToFile(imgBytes, path);
                     }
                     actressesInfo.setJavbusPhoto(imgBytes);
+                    actressesInfo.setJavbusPhotoUrl(imgUrl);
                 }
-                actressesInfo.setJavbusPhotoUrl(imgUrl);
                 actressesInfo.setName(name);
                 actressesInfo.setJavbusUrl(infoUrl);
                 actressesInfo.setCreateDate(new Date());

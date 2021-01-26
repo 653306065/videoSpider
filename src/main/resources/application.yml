@@ -140,7 +140,7 @@ javbus:
   actressesDetailsTemplate: ${javbus.home}/@{category}/star/@{name}
   avTemplate: ${javbus.home}/@{code}
   magnetApi: https://www.javbus.com/ajax/uncledatoolsbyajax.php?gid=@{gid}&lang=zh&uc=1
-  savePath: E:\javbus\
+  savePath: C:\javbus\
 
 javrave:
   home: https://javrave.club/

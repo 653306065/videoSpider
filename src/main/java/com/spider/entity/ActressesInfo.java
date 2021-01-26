@@ -75,4 +75,6 @@ public class ActressesInfo {
     //xsList网站的图片url
     private List<String> xsListImageUrlList;
 
+    //xsList介绍页
+    private String xsLisUrl;
 }

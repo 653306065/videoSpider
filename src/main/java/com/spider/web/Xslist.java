@@ -36,6 +36,7 @@ public class Xslist extends BaseWeb {
             return null;
         }
         ActressesInfo actressesInfo = new ActressesInfo();
+        actressesInfo.setXsLisUrl(url);
         String name = document.getElementById("gallery").getElementsByTag("img").get(0).attr("alt");
         actressesInfo.setName(name);
         List<String> imgList = document.getElementById("gallery").getElementsByTag("img").stream().filter(element -> !"https://xslist.org/assets/images/anonymous2.png".equals(element.attr("src"))).map(element -> element.attr("src")).collect(Collectors.toList());
@@ -43,7 +44,7 @@ public class Xslist extends BaseWeb {
         List<byte[]> imgByteList = imgList.stream().parallel().map(imgUrl -> {
             byte[] imgByte = OKHttpUtils.getBytes(imgUrl, false);
             if (Objects.nonNull(imgByte)) {
-                FileUtils.byteToFile(imgByte, "E:\\xslist\\" + name + "\\" + UUID.randomUUID() + ".jpg");
+                FileUtils.byteToFile(imgByte, "C:\\xslist\\" + name + "\\" + UUID.randomUUID() + ".jpg");
                 return imgByte;
             } else {
                 return null;
