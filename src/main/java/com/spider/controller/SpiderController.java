@@ -56,11 +56,19 @@ public class SpiderController {
         return ResponseVo.succee();
     }
 
-    @ApiOperation("更新javbus的avInfo" )
-    @GetMapping("/start/update/javbus/avInfo")
-    public ResponseVo<Object> updateJavBusAvInfo(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
+    @ApiOperation("更新javbus的磁力" )
+    @GetMapping("/start/update/javbus/magnet")
+    public ResponseVo<Object> updateJavBusMagnet(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
         javbus.setThread(thread);
-        threadPoolExecutor.execute(() -> javbus.saveAvInfoByActressesAll());
+        threadPoolExecutor.execute(() -> javbus.updateAVMagnetList());
+        return ResponseVo.succee();
+    }
+
+    @ApiOperation("保存javbus的女优" )
+    @GetMapping("/start/update/javbus/actresses")
+    public ResponseVo<Object> saveJavBusActresses(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
+        javbus.setThread(thread);
+        threadPoolExecutor.execute(() -> javbus.saveAllUncensoredActressesInfo());
         return ResponseVo.succee();
     }
 
