@@ -54,7 +54,7 @@ public class Kissjav extends BaseWeb {
         Elements elements = document.getElementsByClass("video");
         elements.stream().forEach(element -> {
             Video video = new Video();
-            if(element.getElementsByTag("a").size()!=0){
+            if (element.getElementsByTag("a").size() != 0) {
                 Element a = element.getElementsByTag("a").get(0);
                 String name = a.attr("title");
                 String source = home + a.attr("href");
@@ -97,6 +97,7 @@ public class Kissjav extends BaseWeb {
         while (true) {
             try {
                 List<Video> videoList = getVideoList(category, page);
+                A:
                 for (Video video : videoList) {
                     try {
                         logger.info("{},开始下载", video.getName());
@@ -104,6 +105,12 @@ public class Kissjav extends BaseWeb {
                         if (Objects.isNull(getVideo.getVideoUrl())) {
                             logger.info("{},获取下载地址失败", video.getName());
                             continue;
+                        }
+                        for (String key : filterKey) {
+                            if (getVideo.getName().contains(key)) {
+                                logger.info("{},有过滤字段", video.getName());
+                                continue A;
+                            }
                         }
                         getVideo.setName(FileUtils.repairPath(getVideo.getName()) + ".mp4");
                         String path = savePath + category + "\\" + simpleDateFormat.format(new Date()) + "\\" + getVideo.getName();
