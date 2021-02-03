@@ -54,12 +54,14 @@ public class Kissjav extends BaseWeb {
         Elements elements = document.getElementsByClass("video");
         elements.stream().forEach(element -> {
             Video video = new Video();
-            Element a = element.getElementsByTag("a").get(0);
-            String name = a.attr("title");
-            String source = home + a.attr("href");
-            video.setName(name);
-            video.setSourceUrl(source);
-            list.add(video);
+            if(element.getElementsByTag("a").size()!=0){
+                Element a = element.getElementsByTag("a").get(0);
+                String name = a.attr("title");
+                String source = home + a.attr("href");
+                video.setName(name);
+                video.setSourceUrl(source);
+                list.add(video);
+            }
         });
         return list;
     }
@@ -121,5 +123,13 @@ public class Kissjav extends BaseWeb {
 
     public void downloadJavUncensored() {
         downloadVideo("jav-uncensored");
+    }
+
+    public Integer getThread() {
+        return thread;
+    }
+
+    public void setThread(Integer thread) {
+        this.thread = thread;
     }
 }

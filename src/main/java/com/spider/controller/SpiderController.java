@@ -49,6 +49,9 @@ public class SpiderController extends BaseController{
     private Xslist xslist;
 
     @Autowired
+    private Kissjav kissjav;
+
+    @Autowired
     private ActressesInfoService actressesInfoService;
 
     @ApiOperation("开始javbangers下载")
@@ -153,6 +156,14 @@ public class SpiderController extends BaseController{
     public ResponseVo<List<FaceInfo>> hqpornerSexParties(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
         hqporner.setThread(thread);
         threadPoolExecutor.execute(() -> hqporner.downloadSexParties());
+        return ResponseVo.succee();
+    }
+
+    @ApiOperation("kissjav uncensored视频下载")
+    @GetMapping(value = "/start/kissjav/uncensored")
+    public ResponseVo<Object> test(@RequestParam(name = "thread", defaultValue = "30") Integer thread){
+        kissjav.setThread(thread);
+        threadPoolExecutor.execute(()-> kissjav.downloadJavUncensored());
         return ResponseVo.succee();
     }
 
