@@ -56,13 +56,16 @@ public class Javhuge extends BaseWeb {
         }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    public String getVideoInfo(String url) {
+    public Map<String, String> getVideoInfo(String url) {
         Document document = JsoupUtil.getDocument(url, enableProxy);
         if (Objects.isNull(document)) {
             return null;
         }
+        Map<String, String> map = new HashMap<>();
+        map.put("name", document.getElementsByClass("active").get(0).text());
         Element script = document.getElementsByTag("script").stream().filter(element -> element.data().contains("uul")).collect(Collectors.toList()).get(0);
-        return script.data().split("'")[1].replace("全集$", "").replace("在线播放$", "").replace("第01集$", "").replace("第1集$", "");
+        map.put("url", script.data().split("'")[1].replace("全集$", "").replace("在线播放$", "").replace("第01集$", "").replace("第1集$", ""));
+        return map;
     }
 
     public void download(String category) {
@@ -76,16 +79,17 @@ public class Javhuge extends BaseWeb {
                 list.stream().sequential().forEach(map -> {
                     String url = map.get("url");
                     String title = FileUtils.repairPath(map.get("title"));
-                    String masterM3u8 = getVideoInfo(url);
                     if (hasFilterKey(title)) {
                         logger.info("{},包含过滤字段", title);
                         return;
                     }
-                    String path = savePath + fileSeparator + category + fileSeparator + simpleDateFormat.format(new Date()) + fileSeparator + title + ".mp4";
+                    Map<String, String> videoInfo = getVideoInfo(url);
+                    String path = savePath + fileSeparator + category + fileSeparator + simpleDateFormat.format(new Date()) + fileSeparator + videoInfo.get("name") + ".mp4";
                     Video video = new Video();
-                    video.setName(title + ".mp4");
+                    video.setName(videoInfo.get("name") + ".mp4");
                     video.setSavePath(path);
                     video.setSourceUrl(url);
+                    String masterM3u8 = videoInfo.get("url");
                     MasterPlaylist masterPlaylist = hlsDownloader.getMasterPlaylist(masterM3u8, enableProxy);
                     if (Objects.nonNull(masterPlaylist)) {
                         String m3u8 = masterPlaylist.variants().get(0).uri();
