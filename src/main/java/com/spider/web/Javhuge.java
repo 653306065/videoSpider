@@ -11,19 +11,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class Javhuge extends BaseWeb{
+public class Javhuge extends BaseWeb {
 
     @Value("${javhuge.home}")
     private String home;
 
-    @Value("${javhuge.home}")
+    @Value("${javhuge.template}")
     private String template;
 
     @Value("${javhuge.savePath}")
@@ -40,7 +38,7 @@ public class Javhuge extends BaseWeb{
 
     public List<Map<String, String>> getVideoList(String category, Integer page) {
         String url = template.replace("@{category}", category).replace("@{page}", String.valueOf(page));
-        Document document = JsoupUtil.getDocument(url,enableProxy);
+        Document document = JsoupUtil.getDocument(url, enableProxy);
         if (Objects.isNull(document)) {
             return null;
         }
@@ -59,7 +57,7 @@ public class Javhuge extends BaseWeb{
     }
 
     public String getVideoInfo(String url) {
-        Document document = JsoupUtil.getDocument(url,enableProxy);
+        Document document = JsoupUtil.getDocument(url, enableProxy);
         if (Objects.isNull(document)) {
             return null;
         }
@@ -73,29 +71,29 @@ public class Javhuge extends BaseWeb{
             try {
                 List<Map<String, String>> list = getVideoList(category, page);
                 if (CollectionUtils.isEmpty(list)) {
-                    continue;
+                    break;
                 }
                 list.stream().sequential().forEach(map -> {
                     String url = map.get("url");
                     String title = FileUtils.repairPath(map.get("title"));
                     String masterM3u8 = getVideoInfo(url);
-                    if(hasFilterKey(title)){
+                    if (hasFilterKey(title)) {
                         logger.info("{},包含过滤字段", title);
                         return;
                     }
-                    String path = savePath + title + ".mp4";
+                    String path = savePath + fileSeparator + category + fileSeparator + simpleDateFormat.format(new Date()) + fileSeparator + title + ".mp4";
                     Video video = new Video();
-                    video.setName(title+".mp4");
+                    video.setName(title + ".mp4");
                     video.setSavePath(path);
                     video.setSourceUrl(url);
-                    MasterPlaylist masterPlaylist=hlsDownloader.getMasterPlaylist(masterM3u8,enableProxy);
-                    if(Objects.nonNull(masterPlaylist)){
-                        String m3u8=masterPlaylist.variants().get(0).uri();
-                        if(!m3u8.startsWith("http")){
-                            m3u8=masterM3u8.substring(0, masterM3u8.lastIndexOf("/") + 1)+m3u8;
+                    MasterPlaylist masterPlaylist = hlsDownloader.getMasterPlaylist(masterM3u8, enableProxy);
+                    if (Objects.nonNull(masterPlaylist)) {
+                        String m3u8 = masterPlaylist.variants().get(0).uri();
+                        if (!m3u8.startsWith("http")) {
+                            m3u8 = masterM3u8.substring(0, masterM3u8.lastIndexOf("/") + 1) + m3u8;
                         }
                         video.setVideoUrl(m3u8);
-                        hlsDownloader.downloadByVideo(video,thread,enableProxy);
+                        hlsDownloader.downloadByVideo(video, thread, enableProxy);
                     }
                 });
             } catch (Exception e) {
