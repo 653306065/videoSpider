@@ -1,9 +1,8 @@
 package com.spider.web;
 
 import com.spider.entity.Video;
-import com.spider.utils.FFmpegUtil;
+import com.spider.utils.FileUtils;
 import com.spider.utils.JsoupUtil;
-import com.spider.utils.MD5Util;
 import com.spider.utils.download.HlsDownloader;
 import io.lindstrom.m3u8.model.MasterPlaylist;
 import org.jsoup.nodes.Document;
@@ -12,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,15 +77,15 @@ public class Javhuge extends BaseWeb{
                 }
                 list.stream().sequential().forEach(map -> {
                     String url = map.get("url");
-                    String title = map.get("title");
+                    String title = FileUtils.repairPath(map.get("title"));
                     String masterM3u8 = getVideoInfo(url);
                     if(hasFilterKey(title)){
                         logger.info("{},包含过滤字段", title);
                         return;
                     }
-                    String path = savePath + title.trim() + ".mp4";
+                    String path = savePath + title + ".mp4";
                     Video video = new Video();
-                    video.setName(title.trim());
+                    video.setName(title+".mp4");
                     video.setSavePath(path);
                     video.setSourceUrl(url);
                     MasterPlaylist masterPlaylist=hlsDownloader.getMasterPlaylist(masterM3u8,enableProxy);
