@@ -48,9 +48,6 @@ public class Javbangers extends BaseWeb {
     @Autowired
     private VideoService videoService;
 
-    @Value("${filterKey}")
-    private List<String> filterKey;
-
     @Autowired
     private MultithreadingDownload multithreadingDownload;
 
@@ -167,11 +164,9 @@ public class Javbangers extends BaseWeb {
                 videoList = videoList.stream().filter(v -> Objects.nonNull(v.getSourceUrl())).collect(Collectors.toList());
                 A:
                 for (Video video : videoList) {
-                    for (String key : filterKey) {
-                        if (video.getName().contains(key) || video.getName().contains(key.toLowerCase()) || video.getName().contains(key.toUpperCase()) || video.getName().toLowerCase().contains(key) || video.getName().toUpperCase().contains(key)) {
-                            logger.info("{},的名称有过滤字段", video.getName());
-                            continue A;
-                        }
+                    if (hasFilterKey(video.getName())) {
+                        logger.info("{},含有过滤字段", video.getName());
+                        continue;
                     }
                     Video findVideo = videoService.findOnekeyValue("sourceUrl", video.getSourceUrl());
                     if (Objects.nonNull(findVideo)) {

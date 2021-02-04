@@ -1,5 +1,6 @@
 package com.spider.web;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.spider.entity.Video;
@@ -45,9 +46,6 @@ public class Javrave extends BaseWeb {
 
     @Autowired
     private MultithreadingDownload multithreadingDownload;
-
-    @Value("${filterKey}")
-    private List<String> filterKey;
 
     /**
      * 获取视频的源地址列表
@@ -169,12 +167,13 @@ public class Javrave extends BaseWeb {
         while (true) {
             try {
                 List<Video> list = getVideoList(category, page);
-                list.stream().forEach(video -> {
-                    for (String key : filterKey) {
-                        if (video.getName().contains(key)) {
-                            logger.info("{},的名称有过滤字段", video.getName());
-                            return;
-                        }
+                if(CollectionUtil.isEmpty(list)){
+                    break;
+                }
+                list.forEach(video -> {
+                    if (hasFilterKey(video.getName())) {
+                        logger.info("{},含有过滤字段", video.getName());
+                        return;
                     }
                     if(Objects.nonNull(videoService.findBySourceUrl(video.getSourceUrl()))){
                         logger.info(video.getSourceUrl() + "已存在");

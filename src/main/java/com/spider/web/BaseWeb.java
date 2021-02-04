@@ -1,5 +1,7 @@
 package com.spider.web;
 
+import com.spider.service.AvInfoService;
+import com.spider.service.VideoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,4 +20,19 @@ public abstract class BaseWeb {
 
     @Value("${filterKey}")
     protected List<String> filterKey;
+
+    @Autowired
+    protected AvInfoService avInfoService;
+
+    @Autowired
+    protected VideoService videoService;
+
+    protected boolean hasFilterKey(String name) {
+        for (String key : filterKey) {
+            if (name.contains(key)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

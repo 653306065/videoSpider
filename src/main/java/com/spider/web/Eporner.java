@@ -125,6 +125,10 @@ public class Eporner extends BaseWeb {
         String date = simpleDateFormat.format(new Date());
         String path = savePath + category + "\\" + date + "\\" + name + ".mp4";
         Video video = new Video();
+        if (hasFilterKey(name)) {
+            logger.info("{},含有过滤字段", name);
+            return;
+        }
         video.setName(name + ".mp4");
         video.setVideoUrl(videoUrl);
         video.setSourceUrl(path);

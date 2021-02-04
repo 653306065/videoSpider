@@ -70,6 +70,10 @@ public class Hqporner extends BaseWeb{
     }
 
     private void downloadVideo(Video video) {
+        if (hasFilterKey(video.getName())) {
+            logger.info("{},含有过滤字段", video.getName());
+            return;
+        }
         multithreadingDownload.videoDownload(video,null,enableProxy,thread,defaultSegmentSize);
     }
 
