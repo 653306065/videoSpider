@@ -1,7 +1,9 @@
 package com.spider.controller;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.spider.entity.AvInfo;
 import com.spider.entity.Video;
+import com.spider.service.AvInfoService;
 import com.spider.service.VideoService;
 import com.spider.service.es.EsVideoService;
 import com.spider.utils.FFmpegUtil;
@@ -12,6 +14,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ws.schild.jave.MultimediaInfo;
+
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -28,6 +31,9 @@ public class VideoController extends BaseController {
 
     @Autowired
     private VideoService videoService;
+
+    @Autowired
+    private AvInfoService avInfoService;
 
     @ApiOperation("根据关键字搜索视频")
     @GetMapping("/search/{value}")
@@ -56,6 +62,25 @@ public class VideoController extends BaseController {
         return ResponseVo.succee(map);
     }
 
+    @ApiOperation("同步视频code")
+    @GetMapping("/sync/code")
+    public ResponseVo<Object> syncCode() {
+        List<AvInfo> avInfoList = avInfoService.findAll();
+        Set<String> codeSet= avInfoList.stream().map(AvInfo::getCode).collect(Collectors.toSet());
+        List<Video> videoList = videoService.findAll();
+        videoList.stream().filter(video -> Objects.isNull(video.getAvCode())).parallel().forEach(video -> {
+             for(String code:codeSet){
+                 if(video.getName().contains(code)){
+                     video.setAvCode(code);
+                     videoService.updateById(video);
+                     break;
+                 }
+             }
+        });
+        return ResponseVo.succee();
+    }
+
+
     @ApiOperation("获取视频截图")
     @GetMapping(value = "/screenshot")
     public ResponseVo<List<String>> getVideoScreenshot(@RequestParam("videoPath") String videoPath,
@@ -65,11 +90,11 @@ public class VideoController extends BaseController {
         if (Objects.isNull(multimediaInfo)) {
             return ResponseVo.failure(-1, "文件非视频");
         }
-        File file=new File(screenshotPath);
-        if(!file.exists()){
+        File file = new File(screenshotPath);
+        if (!file.exists()) {
             file.mkdirs();
         }
-        if(!file.isDirectory()){
+        if (!file.isDirectory()) {
             return ResponseVo.failure(-1, "截图路径不是文件夹");
         }
         for (int i = 0; i < count; i++) {
