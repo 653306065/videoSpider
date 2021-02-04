@@ -111,8 +111,9 @@ public class MultithreadingDownload {
                 } else {
                     long endTime = System.currentTimeMillis();
                     logger.info("----" + path + ",下载完成----");
-                    logger.info("耗时:" + (endTime - startTime) / 1000 / 60.0 + "分钟");
-                    logger.info("平均速度:{}m/s", getOmitValue(info.getContentLength() / 1024.0 / 1024 / (endTime - startTime) / 1000, 5));
+                    logger.info("耗时:" + (endTime - startTime) / 1000.0 / 60.0 + "分钟");
+                    double avg = (info.getContentLength() / 1024.0 / 1024.0) / ((endTime - startTime) / 1000.0);
+                    logger.info("平均速度:{}m/s", getOmitValue(avg, 5));
                 }
                 return result;
             }
