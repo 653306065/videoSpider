@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -157,7 +158,7 @@ public class HlsDownloader {
             return false;
         }
         File file = new File(savePath);
-        String tempPath = file.getParentFile().getAbsolutePath() + "/temp/" + uuid + "/" + index + ".ts";
+        String tempPath = file.getParentFile().getAbsolutePath() + File.separator + "temp" + File.separator + uuid + File.separator + index + ".ts";
         //todo HLS解密
         FileUtils.byteToFile(bytes, tempPath);
         tempFileMap.put(mediaSegment.uri(), tempPath);
