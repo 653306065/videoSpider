@@ -1,32 +1,26 @@
 package com.spider.web;
 
 import com.spider.entity.Video;
-import com.spider.service.AvInfoService;
-import com.spider.service.VideoService;
 import com.spider.utils.FFmpegUtil;
 import com.spider.utils.JsoupUtil;
 import com.spider.utils.MD5Util;
+import com.spider.utils.download.HlsDownloader;
+import io.lindstrom.m3u8.model.MasterPlaylist;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
-public class Javhuge {
-
-    static Logger logger = LoggerFactory.getLogger(Javhuge.class);
+public class Javhuge extends BaseWeb{
 
     @Value("${javhuge.home}")
     private String home;
@@ -37,19 +31,18 @@ public class Javhuge {
     @Value("${javhuge.savePath}")
     private String savePath;
 
-    @Value("${filterKey}")
-    private List<String> filterKey;
+    @Value("${javhuge.thread}")
+    private Integer thread;
+
+    @Value("${javhuge.enableProxy}")
+    private boolean enableProxy;
 
     @Autowired
-    VideoService videoService;
-
-    @Autowired
-    AvInfoService avInfoService;
-
+    private HlsDownloader hlsDownloader;
 
     public List<Map<String, String>> getVideoList(String category, Integer page) {
         String url = template.replace("@{category}", category).replace("@{page}", String.valueOf(page));
-        Document document = JsoupUtil.getDocument(url);
+        Document document = JsoupUtil.getDocument(url,enableProxy);
         if (Objects.isNull(document)) {
             return null;
         }
@@ -68,7 +61,7 @@ public class Javhuge {
     }
 
     public String getVideoInfo(String url) {
-        Document document = JsoupUtil.getDocument(url);
+        Document document = JsoupUtil.getDocument(url,enableProxy);
         if (Objects.isNull(document)) {
             return null;
         }
@@ -84,45 +77,28 @@ public class Javhuge {
                 if (CollectionUtils.isEmpty(list)) {
                     continue;
                 }
-                list.stream().parallel().forEach(map -> {
+                list.stream().sequential().forEach(map -> {
                     String url = map.get("url");
                     String title = map.get("title");
-                    String m3u8 = getVideoInfo(url);
-                    for (String key : filterKey) {
-                        if (title.contains(key)) {
-                            logger.info("{},包含过滤字段:{}", title, key);
-                            return;
-                        }
-                    }
-                    AtomicReference<String> avCode = new AtomicReference<>(null);
-                    AvInfoService.codeTransformMap.entrySet().stream().forEach(entry -> {
-                        entry.getValue().stream().forEach(code -> {
-                            if (title.contains(code)) {
-                                logger.info("{},的code为{}", title, entry.getKey());
-                                avCode.set(entry.getKey());
-                            }
-                        });
-                    });
-
-                    if (Objects.nonNull(avCode.get())) {
-                        Video video = videoService.findOnekeyValue("avCode", avCode.get());
-                        if (Objects.nonNull(video)) {
-                            logger.info("{},的视频已存在,savePath:{}", title, video.getSavePath());
-                            return;
-                        }
+                    String masterM3u8 = getVideoInfo(url);
+                    if(hasFilterKey(title)){
+                        logger.info("{},包含过滤字段", title);
+                        return;
                     }
                     String path = savePath + title.trim() + ".mp4";
-                    FFmpegUtil.downloadM3U8(m3u8, path);
                     Video video = new Video();
                     video.setName(title.trim());
                     video.setSavePath(path);
-                    video.setSourceUrl(m3u8);
-                    video.setVideoUrl(m3u8);
-                    video.setAvCode(avCode.get());
-                    video.setFormat("mp4");
-                    video.setMd5(MD5Util.md5(new File(path)));
-                    videoService.insert(video);
-                    logger.info("{},保存完成", title);
+                    video.setSourceUrl(url);
+                    MasterPlaylist masterPlaylist=hlsDownloader.getMasterPlaylist(masterM3u8,enableProxy);
+                    if(Objects.nonNull(masterPlaylist)){
+                        String m3u8=masterPlaylist.variants().get(0).uri();
+                        if(!m3u8.startsWith("http")){
+                            m3u8=masterM3u8.substring(0, masterM3u8.lastIndexOf("/") + 1)+m3u8;
+                        }
+                        video.setVideoUrl(m3u8);
+                        hlsDownloader.downloadByVideo(video,thread,enableProxy);
+                    }
                 });
             } catch (Exception e) {
                 e.printStackTrace();

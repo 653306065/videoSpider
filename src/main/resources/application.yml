@@ -75,7 +75,7 @@ avMovie:
 
 pornhub:
   home: https://www.pornhub.com
-  savePath: E:\pornhub\
+  savePath: C:\pornhub\
   searchUrl: https://www.pornhub.com/video/search?search=@{key}&hd=1&page=@{page}&p=professional&min_duration=10
   channels: https://pornhub.com/channels/@{channelName}/videos?o=da&page=@{page}
   categories:
@@ -155,6 +155,8 @@ javhuge:
   home: http://javhuge.com/
   template: http://javhuge.com/vod/show/class/@{category}/id/22/page/@{page}
   savePath: C:\javhuge\
+  thread: 30
+  enableProxy: true
 
 hqporner:
   home: https://hqporner.com
