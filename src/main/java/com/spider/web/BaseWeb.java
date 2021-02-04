@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,6 +29,8 @@ public abstract class BaseWeb {
 
     @Autowired
     protected VideoService videoService;
+
+    protected String fileSeparator =File.separator;
 
     @PostConstruct
     public void initFilterKey() {

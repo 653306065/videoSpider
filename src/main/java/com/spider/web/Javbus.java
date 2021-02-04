@@ -78,7 +78,7 @@ public class Javbus extends BaseWeb {
                 if (!"https://images.javbus.com/actress/nowprinting.gif".equals(imgUrl)) {
                     byte[] imgBytes = OKHttpUtils.getBytes(imgUrl, enableProxy);
                     if (Objects.nonNull(imgBytes)) {
-                        String path = savePath + "actresses" + File.separator + FileUtils.repairPath(name) + ".jpg";
+                        String path = savePath + "actresses" + fileSeparator + FileUtils.repairPath(name) + ".jpg";
                         FileUtils.byteToFile(imgBytes, path);
                     }
                     actressesInfo.setJavbusPhoto(imgBytes);

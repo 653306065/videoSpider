@@ -189,7 +189,7 @@ public class Javrave extends BaseWeb {
                     }
                     String date = simpleDateFormat.format(new Date());
                     getVideo.setName(FileUtils.repairPath(getVideo.getName()) + ".mp4");
-                    String videoSavePath = savePath + category + File.separator + date + File.separator + getVideo.getName();
+                    String videoSavePath = savePath + category + fileSeparator + date + fileSeparator + getVideo.getName();
                     getVideo.setSavePath(videoSavePath);
                     multithreadingDownload.videoDownload(getVideo, null, enableProxy, thread, defaultSegmentSize);
                 });

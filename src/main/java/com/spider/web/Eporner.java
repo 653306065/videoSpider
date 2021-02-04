@@ -123,7 +123,7 @@ public class Eporner extends BaseWeb {
         String name = FileUtils.repairPath(map.get("name"));
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String date = simpleDateFormat.format(new Date());
-        String path = savePath + category + "\\" + date + "\\" + name + ".mp4";
+        String path = savePath + category + fileSeparator + date + fileSeparator + name + ".mp4";
         Video video = new Video();
         if (hasFilterKey(name)) {
             logger.info("{},含有过滤字段", name);

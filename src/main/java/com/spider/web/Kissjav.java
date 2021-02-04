@@ -113,7 +113,7 @@ public class Kissjav extends BaseWeb {
                             continue;
                         }
                         getVideo.setName(FileUtils.repairPath(getVideo.getName()) + ".mp4");
-                        String path = savePath + category + "\\" + simpleDateFormat.format(new Date()) + "\\" + getVideo.getName();
+                        String path = savePath + category + fileSeparator + simpleDateFormat.format(new Date()) + fileSeparator + getVideo.getName();
                         getVideo.setSavePath(path);
                         multithreadingDownload.videoDownload(getVideo, null, enableProxy, thread, defaultSegmentSize);
                         logger.info("{},下载完成", video.getName());

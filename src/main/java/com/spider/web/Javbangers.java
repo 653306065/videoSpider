@@ -184,7 +184,7 @@ public class Javbangers extends BaseWeb {
                         continue;
                     }
                     String date = simpleDateFormat.format(new Date());
-                    String videoSavePath = savePath + categories + File.separator + date + File.separator + video.getName();
+                    String videoSavePath = savePath + categories + fileSeparator + date + fileSeparator + video.getName();
                     video.setSavePath(videoSavePath);
                     multithreadingDownload.videoDownload(video, null, enableProxy, thread, defaultSegmentSize);
                 }

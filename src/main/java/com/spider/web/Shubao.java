@@ -38,7 +38,7 @@ public class Shubao extends BaseWeb {
                             String id = href.split("_")[1].substring(0, href.split("_")[1].length() - 1);
                             String bookUrl = downloadUrl.replace("@{id}", id);
                             byte[] bookBytes = OKHttpUtils.getBytes(bookUrl);
-                            FileUtils.byteToFile(bookBytes, "C://书包//" + name + ".txt");
+                            FileUtils.byteToFile(bookBytes, "C:" + fileSeparator + "书包" + fileSeparator + name + ".txt");
                             System.out.println(name + ",下载完成");
                         }
                     });

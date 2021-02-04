@@ -97,7 +97,7 @@ public class Hqporner extends BaseWeb{
                     Video video= getVideo(url);
                     if(Objects.nonNull(video)){
                         String date = simpleDateFormat.format(new Date());
-                        video.setSavePath(savePath+"\\"+category+"\\"+date+"\\"+video.getName());
+                        video.setSavePath(savePath+fileSeparator+category+fileSeparator+date+fileSeparator+video.getName());
                         logger.info(video.getName());
                         downloadVideo(video);
                     }

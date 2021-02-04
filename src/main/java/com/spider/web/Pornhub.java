@@ -187,7 +187,7 @@ public class Pornhub extends BaseWeb {
                 try {
                     Video video = getVideoByUrl(value);
                     String date = simpleDateFormat.format(new Date());
-                    String path = savePath + "channels" + File.separator + channels + File.separator + date + File.separator + video.getName();
+                    String path = savePath + "channels" + fileSeparator + channels + fileSeparator + date + fileSeparator + video.getName();
                     video.setSavePath(path);
                     if (Integer.parseInt(video.getQuality()) < 720) {
                         return;
@@ -267,7 +267,7 @@ public class Pornhub extends BaseWeb {
                 for (String str : list) {
                     Video video = getVideoByUrl(str);
                     String date = simpleDateFormat.format(new Date());
-                    String path = savePath + categoriesName + File.separator + date + File.separator + video.getName();
+                    String path = savePath + categoriesName + fileSeparator + date + fileSeparator + video.getName();
                     video.setSavePath(path);
                     if (Integer.parseInt(video.getQuality()) < 720) {
                         continue;
