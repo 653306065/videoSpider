@@ -6,8 +6,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+
+import javax.annotation.PostConstruct;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class BaseWeb {
 
@@ -25,6 +28,12 @@ public abstract class BaseWeb {
 
     @Autowired
     protected VideoService videoService;
+
+    @PostConstruct
+    public void initFilterKey() {
+        filterKey.addAll(filterKey.stream().map(String::toLowerCase).collect(Collectors.toList()));
+        filterKey.addAll(filterKey.stream().map(String::toUpperCase).collect(Collectors.toList()));
+    }
 
     protected boolean hasFilterKey(String name) {
         for (String key : filterKey) {
