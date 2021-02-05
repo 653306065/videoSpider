@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+
 import com.spider.entity.Video;
 import com.spider.utils.OKHttpUtils;
 import com.spider.utils.download.HlsDownloader;
@@ -107,13 +108,13 @@ public class Pornhub extends BaseWeb {
             }
             if ("hls".equals(info.getString("format")) && "1080".equals(info.getString("quality"))) {
                 String hlsUrl = info.getString("videoUrl");
-                MasterPlaylist masterPlaylist=hlsDownloader.getMasterPlaylist(hlsUrl,enableProxy);
-                String videoM3u8Url=null;
-                if(Objects.nonNull(masterPlaylist)&&!CollectionUtils.isEmpty(masterPlaylist.variants())){
-                    if(masterPlaylist.variants().get(0).uri().startsWith("http")){
-                        videoM3u8Url=masterPlaylist.variants().get(0).uri();
-                    }else{
-                        videoM3u8Url=hlsUrl.substring(0, hlsUrl.lastIndexOf("/") + 1)+masterPlaylist.variants().get(0).uri();
+                MasterPlaylist masterPlaylist = hlsDownloader.getMasterPlaylist(hlsUrl, enableProxy);
+                String videoM3u8Url = null;
+                if (Objects.nonNull(masterPlaylist) && !CollectionUtils.isEmpty(masterPlaylist.variants())) {
+                    if (masterPlaylist.variants().get(0).uri().startsWith("http")) {
+                        videoM3u8Url = masterPlaylist.variants().get(0).uri();
+                    } else {
+                        videoM3u8Url = hlsUrl.substring(0, hlsUrl.lastIndexOf("/") + 1) + masterPlaylist.variants().get(0).uri();
                     }
                 }
                 String quality = info.getString("quality");
@@ -164,7 +165,7 @@ public class Pornhub extends BaseWeb {
     public List<String> getChannelsVideoList(String url) {
         List<String> list = new ArrayList<String>();
         Document document = JsoupUtil.getDocument(url, enableProxy);
-        if(Objects.isNull(document)){
+        if (Objects.isNull(document)) {
             return list;
         }
         Element element = document.getElementById("showAllChanelVideos");
@@ -192,8 +193,8 @@ public class Pornhub extends BaseWeb {
                     if (Integer.parseInt(video.getQuality()) < 720) {
                         return;
                     }
-                    if(StringUtils.hasText(video.getVideoUrl())){
-                        hlsDownloader.downloadByVideo(video,thread,enableProxy);
+                    if (StringUtils.hasText(video.getVideoUrl())) {
+                        hlsDownloader.downloadByVideo(video, thread, enableProxy);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -223,8 +224,8 @@ public class Pornhub extends BaseWeb {
                         if (Integer.parseInt(video.getQuality()) < 720) {
                             continue;
                         }
-                        if(StringUtils.hasText(video.getVideoUrl())){
-                            hlsDownloader.downloadByVideo(video,thread,enableProxy);
+                        if (StringUtils.hasText(video.getVideoUrl())) {
+                            hlsDownloader.downloadByVideo(video, thread, enableProxy);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -272,8 +273,8 @@ public class Pornhub extends BaseWeb {
                     if (Integer.parseInt(video.getQuality()) < 720) {
                         continue;
                     }
-                    if(StringUtils.hasText(video.getVideoUrl())){
-                        hlsDownloader.downloadByVideo(video,thread,enableProxy);
+                    if (StringUtils.hasText(video.getVideoUrl())) {
+                        hlsDownloader.downloadByVideo(video, thread, enableProxy);
                     }
                 }
             } catch (Exception e) {
@@ -295,8 +296,8 @@ public class Pornhub extends BaseWeb {
                     String date = simpleDateFormat.format(new Date());
                     String path = savePath + categories + "+" + incategories + File.separator + date + File.separator + video.getName();
                     video.setSavePath(path);
-                    if(StringUtils.hasText(video.getVideoUrl())){
-                        hlsDownloader.downloadByVideo(video,thread,enableProxy);
+                    if (StringUtils.hasText(video.getVideoUrl())) {
+                        hlsDownloader.downloadByVideo(video, thread, enableProxy);
                     }
                 }
             } catch (Exception e) {

@@ -14,7 +14,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class Hqporner extends BaseWeb{
+public class Hqporner extends BaseWeb {
 
     @Value("${hqporner.home}")
     private String home;
@@ -57,15 +57,15 @@ public class Hqporner extends BaseWeb{
             return null;
         }
         List<String> urlList = Arrays.stream(iframeDocument.toString().split("'")).filter(text -> text.endsWith(".mp4")).map(text -> "https:" + text).collect(Collectors.toList());
-        if(CollectionUtils.isEmpty(urlList)){
+        if (CollectionUtils.isEmpty(urlList)) {
             return null;
         }
-        Video video=new Video();
-        video.setName(name+".mp4");
+        Video video = new Video();
+        video.setName(name + ".mp4");
         video.setStarNames(Collections.singletonList(startName));
         video.setTags(tags);
         video.setCreateDate(new Date());
-        video.setVideoUrl(urlList.get(urlList.size()-1));
+        video.setVideoUrl(urlList.get(urlList.size() - 1));
         return video;
     }
 
@@ -74,34 +74,34 @@ public class Hqporner extends BaseWeb{
             logger.info("{},含有过滤字段", video.getName());
             return;
         }
-        multithreadingDownload.videoDownload(video,null,enableProxy,thread,defaultSegmentSize);
+        multithreadingDownload.videoDownload(video, null, enableProxy, thread, defaultSegmentSize);
     }
 
-    public void download4k(){
+    public void download4k() {
         downloadByCategory("4k-porn");
     }
 
-    public void downloadSexParties(){
+    public void downloadSexParties() {
         downloadByCategory("sex-parties");
     }
 
-    public void downloadByCategory(String category){
-        int page=1;
-        while (true){
-            List<String> urlList= getVideoList(category,page);
-            if(CollectionUtils.isEmpty(urlList)){
+    public void downloadByCategory(String category) {
+        int page = 1;
+        while (true) {
+            List<String> urlList = getVideoList(category, page);
+            if (CollectionUtils.isEmpty(urlList)) {
                 break;
             }
-            urlList.forEach(url->{
+            urlList.forEach(url -> {
                 try {
-                    Video video= getVideo(url);
-                    if(Objects.nonNull(video)){
+                    Video video = getVideo(url);
+                    if (Objects.nonNull(video)) {
                         String date = simpleDateFormat.format(new Date());
-                        video.setSavePath(savePath+fileSeparator+category+fileSeparator+date+fileSeparator+video.getName());
+                        video.setSavePath(savePath + fileSeparator + category + fileSeparator + date + fileSeparator + video.getName());
                         logger.info(video.getName());
                         downloadVideo(video);
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             });

@@ -97,6 +97,9 @@ public class Javfull extends BaseWeb {
                 break;
             }
             videoList.forEach(video -> {
+                if (hasFilterKey(video.getName())) {
+                    return;
+                }
                 Video getVideo = getVideo(video);
                 getVideo.setName(FileUtils.repairPath(video.getName()) + ".mp4");
                 String path = this.savePath + category + fileSeparator + simpleDateFormat.format(new Date()) + fileSeparator + video.getName();

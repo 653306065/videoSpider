@@ -167,7 +167,7 @@ public class Javrave extends BaseWeb {
         while (true) {
             try {
                 List<Video> list = getVideoList(category, page);
-                if(CollectionUtil.isEmpty(list)){
+                if (CollectionUtil.isEmpty(list)) {
                     break;
                 }
                 list.forEach(video -> {
@@ -175,7 +175,7 @@ public class Javrave extends BaseWeb {
                         logger.info("{},含有过滤字段", video.getName());
                         return;
                     }
-                    if(Objects.nonNull(videoService.findBySourceUrl(video.getSourceUrl()))){
+                    if (Objects.nonNull(videoService.findBySourceUrl(video.getSourceUrl()))) {
                         logger.info(video.getSourceUrl() + "已存在");
                         return;
                     }

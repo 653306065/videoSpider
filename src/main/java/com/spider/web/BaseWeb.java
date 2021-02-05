@@ -34,7 +34,7 @@ public abstract class BaseWeb {
     @Autowired
     MultithreadingDownload multithreadingDownload;
 
-    protected String fileSeparator =File.separator;
+    protected String fileSeparator = File.separator;
 
     @PostConstruct
     public void initFilterKey() {

@@ -66,16 +66,16 @@ public class VideoController extends BaseController {
     @GetMapping("/sync/code")
     public ResponseVo<Object> syncCode() {
         List<AvInfo> avInfoList = avInfoService.findAll();
-        Set<String> codeSet= avInfoList.stream().map(AvInfo::getCode).collect(Collectors.toSet());
+        Set<String> codeSet = avInfoList.stream().map(AvInfo::getCode).collect(Collectors.toSet());
         List<Video> videoList = videoService.findAll();
         videoList.stream().filter(video -> Objects.isNull(video.getAvCode())).parallel().forEach(video -> {
-             for(String code:codeSet){
-                 if(video.getName().contains(code)){
-                     video.setAvCode(code);
-                     videoService.updateById(video);
-                     break;
-                 }
-             }
+            for (String code : codeSet) {
+                if (video.getName().contains(code)) {
+                    video.setAvCode(code);
+                    videoService.updateById(video);
+                    break;
+                }
+            }
         });
         return ResponseVo.succee();
     }

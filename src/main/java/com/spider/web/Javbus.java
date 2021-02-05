@@ -60,7 +60,7 @@ public class Javbus extends BaseWeb {
     public List<ActressesInfo> getActressesInfoList(String category, int page) {
         String url = actressesListTemplate.replace("@{category}", category).replace("@{page}", String.valueOf(page));
         Document document = JsoupUtil.getDocument(url, enableProxy);
-        if(Objects.isNull(document)){
+        if (Objects.isNull(document)) {
             return null;
         }
         Elements elements = document.getElementsByClass("avatar-box");

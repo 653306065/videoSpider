@@ -15,6 +15,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -22,7 +23,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Api(tags = "爬虫接口")
 @RestController
 @RequestMapping("/api/spider")
-public class SpiderController extends BaseController{
+public class SpiderController extends BaseController {
 
     @Autowired
     private Javbangers javbangers;
@@ -95,14 +96,14 @@ public class SpiderController extends BaseController{
         threadPoolExecutor.execute(() -> {
             actressesInfoService.findAll().stream().parallel().forEach(actressesInfo -> {
                 List<String> urlList = xslist.getSearchList(actressesInfo.getName());
-                if(CollectionUtil.isNotEmpty(urlList)){
-                    ActressesInfo info= xslist.getInfo(urlList.get(0));
-                    if(Objects.nonNull(info)&&actressesInfo.getName().trim().equals(info.getName().trim())){
-                        CopyOptions copyOptions=new CopyOptions();
+                if (CollectionUtil.isNotEmpty(urlList)) {
+                    ActressesInfo info = xslist.getInfo(urlList.get(0));
+                    if (Objects.nonNull(info) && actressesInfo.getName().trim().equals(info.getName().trim())) {
+                        CopyOptions copyOptions = new CopyOptions();
                         copyOptions.setIgnoreNullValue(true);
-                        BeanUtil.copyProperties(info,actressesInfo,copyOptions);
+                        BeanUtil.copyProperties(info, actressesInfo, copyOptions);
                         actressesInfoService.updateById(actressesInfo);
-                        logger.info("{},信息获取完成",actressesInfo.getName());
+                        logger.info("{},信息获取完成", actressesInfo.getName());
                     }
                 }
             });
@@ -164,25 +165,25 @@ public class SpiderController extends BaseController{
 
     @ApiOperation("kissjav uncensored视频下载")
     @GetMapping(value = "/start/kissjav/uncensored")
-    public ResponseVo<Object> kissjavUncensored(@RequestParam(name = "thread", defaultValue = "30") Integer thread){
+    public ResponseVo<Object> kissjavUncensored(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
         kissjav.setThread(thread);
-        threadPoolExecutor.execute(()-> kissjav.downloadJavUncensored());
+        threadPoolExecutor.execute(() -> kissjav.downloadJavUncensored());
         return ResponseVo.succee();
     }
 
     @ApiOperation("javhuge uncensored视频下载")
     @GetMapping(value = "/start/javhuge/uncensored")
-    public ResponseVo<Object> javhugeUncensored(@RequestParam(name = "thread", defaultValue = "30") Integer thread){
+    public ResponseVo<Object> javhugeUncensored(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
         kissjav.setThread(thread);
-        threadPoolExecutor.execute(()-> javhuge.download("步兵无码"));
+        threadPoolExecutor.execute(() -> javhuge.download("步兵无码"));
         return ResponseVo.succee();
     }
 
     @ApiOperation("javhuge 破解无码视频下载")
     @GetMapping(value = "/start/javhuge/break/uncensored")
-    public ResponseVo<Object> test(@RequestParam(name = "thread", defaultValue = "30") Integer thread){
+    public ResponseVo<Object> test(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
         kissjav.setThread(thread);
-        threadPoolExecutor.execute(()-> javhuge.download("无码破解"));
+        threadPoolExecutor.execute(() -> javhuge.download("无码破解"));
         return ResponseVo.succee();
     }
 

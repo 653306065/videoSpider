@@ -187,7 +187,7 @@ public class FileUtils {
 
     public static void FileCopy(String oldPath, String newPath) {
         try {
-            if(!new File(newPath).exists()){
+            if (!new File(newPath).exists()) {
                 new File(newPath).getParentFile().mkdirs();
             }
             InputStream in = new FileInputStream(oldPath);
@@ -203,7 +203,7 @@ public class FileUtils {
                     out.write(bytes);
                 }
             }
-        }catch (Exception exception){
+        } catch (Exception exception) {
             exception.printStackTrace();
         }
     }
@@ -374,7 +374,7 @@ public class FileUtils {
     public static List<String> getSearchKeyList(String name) {
         List<String> list = new ArrayList<>();
         list.add(name);
-        if(name.contains(".")){
+        if (name.contains(".")) {
             name = getFileNameWithoutSuffix(name);
         }
         String[] splitKeys = {"_", ",", "-", " "};
