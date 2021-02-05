@@ -73,9 +73,6 @@ public class Javhuge extends BaseWeb {
         while (true) {
             try {
                 List<Map<String, String>> list = getVideoList(category, page);
-                if (CollectionUtils.isEmpty(list)) {
-                    break;
-                }
                 list.stream().sequential().forEach(map -> {
                     String url = map.get("url");
                     String title = FileUtils.repairPath(map.get("title"));
@@ -102,6 +99,9 @@ public class Javhuge extends BaseWeb {
                 });
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+            if(page>defaultEndPage){
+                break;
             }
             page++;
         }
