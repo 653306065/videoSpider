@@ -154,7 +154,7 @@ javfull:
 javhuge:
   home: http://javhuge.com/
   template: http://javhuge.com/vod/show/class/@{category}/id/22/page/@{page}
-  savePath: D:\javhuge\
+  savePath: C:\javhuge\
   thread: 30
   enableProxy: false
 

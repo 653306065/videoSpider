@@ -133,9 +133,17 @@ public class SpiderController extends BaseController {
 
     @ApiOperation("获取pornhub(compilation creampie)的视频")
     @GetMapping("/start/pornhub/compilation/creampie")
-    public ResponseVo<Object> startPornhub(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
+    public ResponseVo<Object> startPornhubCompilationCreampie(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
         pornhub.setThread(thread);
         threadPoolExecutor.execute(() -> pornhub.download_compilation_creampie());
+        return ResponseVo.succee();
+    }
+
+    @ApiOperation("获取pornhub(doublePenetration)的视频")
+    @GetMapping("/start/pornhub/doublePenetration")
+    public ResponseVo<Object> startPornhubDoublePenetration(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
+        pornhub.setThread(thread);
+        threadPoolExecutor.execute(() -> pornhub.downloadDoublePenetration());
         return ResponseVo.succee();
     }
 

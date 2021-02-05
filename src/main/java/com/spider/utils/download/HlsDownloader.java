@@ -26,29 +26,44 @@ public class HlsDownloader {
 
     private Logger logger = LoggerFactory.getLogger(HlsDownloader.class);
 
+    //M3U8url
     public String m3u8Url;
 
+    //TS 列表
     private MediaPlaylist mediaPlaylist;
 
+    //线程数
     private int threadQuantity = 30;
 
+    //保存地址
     private String savePath;
 
+    //收费使用代理
     private boolean isProxy = false;
 
+    //根路径
     private String rootUrl;
 
+    //线程池
     private ExecutorService executorService;
 
+    //TS列表的临时文件位置
     private Map<String, String> tempFileMap = new ConcurrentHashMap<>();
 
+    //重试次数
     private Integer time = 5;
 
+    //任务状态
+    private volatile boolean taskStatus;
+
+    //播放列表转化器
     private MasterPlaylistParser masterPlaylistParser = new MasterPlaylistParser();
 
+    //TS列表转换器
     private MediaPlaylistParser mediaPlaylistParser = new MediaPlaylistParser();
 
     private boolean download() {
+        taskStatus=true;
         tempFileMap.clear();
         if (StringUtils.isNotBlank(m3u8Url)) {
             rootUrl = m3u8Url.substring(0, m3u8Url.lastIndexOf("/") + 1);
@@ -133,11 +148,12 @@ public class HlsDownloader {
             final int index = i;
             executorService.execute(() -> {
                 int taskTime = 0;
-                while (true) {
+                while (taskStatus) {
                     if (downloadTs(uuid, index)) {
                         break;
                     }
                     if (taskTime > time) {
+                        taskStatus=false;
                         logger.info("index:{},下载失败", index);
                         break;
                     }
