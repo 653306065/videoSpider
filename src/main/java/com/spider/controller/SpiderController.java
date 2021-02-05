@@ -58,6 +58,9 @@ public class SpiderController extends BaseController {
     @Autowired
     private Javhuge javhuge;
 
+    @Autowired
+    private Javfull javfull;
+
     @ApiOperation("开始javbangers下载")
     @GetMapping("/start/javbangers")
     public ResponseVo<Object> startJavbangers(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
@@ -181,9 +184,17 @@ public class SpiderController extends BaseController {
 
     @ApiOperation("javhuge 破解无码视频下载")
     @GetMapping(value = "/start/javhuge/break/uncensored")
-    public ResponseVo<Object> test(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
+    public ResponseVo<Object> javhugeBreakUncensored(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
         kissjav.setThread(thread);
         threadPoolExecutor.execute(() -> javhuge.download("无码破解"));
+        return ResponseVo.succee();
+    }
+
+    @ApiOperation("javfull uncensored视频下载")
+    @GetMapping(value = "/start/javfull/uncensored")
+    public ResponseVo<Object> test(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
+        kissjav.setThread(thread);
+        threadPoolExecutor.execute(() -> javfull.downloadByCategory("uncensored"));
         return ResponseVo.succee();
     }
 

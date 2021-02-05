@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 public class Javfull extends BaseWeb {
@@ -42,6 +43,9 @@ public class Javfull extends BaseWeb {
         try {
             String url = template.replace("@{category}", category).replace("@{page}", String.valueOf(page));
             String html = OKHttpUtils.get(url, enableProxy);
+            if (Objects.isNull(html)) {
+                return null;
+            }
             HtmlCleaner hc = new HtmlCleaner();
             TagNode tn = hc.clean(html);
             String videoXpath = "//div[@class='post thumb-border']";
@@ -67,6 +71,9 @@ public class Javfull extends BaseWeb {
     public Video getVideo(Video video) {
         try {
             String html = OKHttpUtils.get(video.getSourceUrl(), enableProxy);
+            if (Objects.isNull(html)) {
+                return null;
+            }
             HtmlCleaner hc = new HtmlCleaner();
             TagNode tn = hc.clean(html);
             Object[] objects = tn.evaluateXPath("//div[@class='play-button']/@data-link");
@@ -92,20 +99,24 @@ public class Javfull extends BaseWeb {
     public void downloadByCategory(String category) {
         int i = 0;
         while (true) {
-            List<Video> videoList = getVideoList(category, i);
-            if (CollectionUtil.isEmpty(videoList)) {
+            try {
+                List<Video> videoList = getVideoList(category, i);
+                videoList.forEach(video -> {
+                    if (hasFilterKey(video.getName())) {
+                        return;
+                    }
+                    Video getVideo = getVideo(video);
+                    getVideo.setName(FileUtils.repairPath(video.getName()) + ".mp4");
+                    String path = this.savePath + category + fileSeparator + simpleDateFormat.format(new Date()) + fileSeparator + video.getName();
+                    getVideo.setSavePath(path);
+                    multithreadingDownload.videoDownload(getVideo, null, enableProxy, thread, defaultSegmentSize);
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (i > defaultEndPage) {
                 break;
             }
-            videoList.forEach(video -> {
-                if (hasFilterKey(video.getName())) {
-                    return;
-                }
-                Video getVideo = getVideo(video);
-                getVideo.setName(FileUtils.repairPath(video.getName()) + ".mp4");
-                String path = this.savePath + category + fileSeparator + simpleDateFormat.format(new Date()) + fileSeparator + video.getName();
-                getVideo.setSavePath(path);
-                multithreadingDownload.videoDownload(getVideo, null, enableProxy, thread, defaultSegmentSize);
-            });
             i++;
         }
     }

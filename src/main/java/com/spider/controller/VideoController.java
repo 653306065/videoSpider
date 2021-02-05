@@ -50,7 +50,7 @@ public class VideoController extends BaseController {
         videoService.findAll().stream().filter(video -> new File(video.getSavePath()).exists()).filter(video -> Objects.nonNull(video.getMultimediaInfo())).forEach(video -> {
             if (height * width > video.getMultimediaInfo().getVideo().getSize().getHeight() * video.getMultimediaInfo().getVideo().getSize().getWidth()) {
                 logger.info(video.getSavePath());
-                //new File(video.getSavePath()).delete();
+                new File(video.getSavePath()).delete();
                 size.addAndGet(video.getSize());
                 copyOnWriteArrayList.add(video.getSavePath());
             }

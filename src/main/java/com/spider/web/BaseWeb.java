@@ -36,6 +36,8 @@ public abstract class BaseWeb {
 
     protected String fileSeparator = File.separator;
 
+    protected Integer defaultEndPage=500;
+
     @PostConstruct
     public void initFilterKey() {
         filterKey.addAll(filterKey.stream().map(String::toLowerCase).collect(Collectors.toList()));
