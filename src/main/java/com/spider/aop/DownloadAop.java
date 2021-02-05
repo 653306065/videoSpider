@@ -15,6 +15,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ws.schild.jave.MultimediaInfo;
 
@@ -42,6 +43,9 @@ public class DownloadAop {
     @Autowired
     private AvInfoService avInfoService;
 
+    @Value("${filterKey}")
+    List<String> filterKeyList;
+
     @Pointcut("execution(* com.spider.utils.download.MultithreadingDownload.videoDownload(..))")
     public void multithreadingDownload_videoDownload() {
 
@@ -55,6 +59,15 @@ public class DownloadAop {
             logger.info("视频地址为空");
             return;
         }
+
+        //过滤关键字
+        for (String key : filterKeyList) {
+            if (video.getName().contains(key)) {
+                logger.info("{},包含过滤字段:{}", video.getName(), key);
+                return;
+            }
+        }
+
         String name = video.getName();
         List<String> list = FileUtils.getSearchKeyList(name);
         AvInfo avInfo = null;

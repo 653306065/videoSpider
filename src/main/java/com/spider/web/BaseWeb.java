@@ -2,6 +2,7 @@ package com.spider.web;
 
 import com.spider.service.AvInfoService;
 import com.spider.service.VideoService;
+import com.spider.utils.download.MultithreadingDownload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,9 @@ public abstract class BaseWeb {
 
     @Autowired
     protected VideoService videoService;
+
+    @Autowired
+    MultithreadingDownload multithreadingDownload;
 
     protected String fileSeparator =File.separator;
 
