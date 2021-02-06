@@ -7,6 +7,8 @@ import com.spider.service.AvInfoService;
 import com.spider.utils.FileUtils;
 import com.spider.utils.JsoupUtil;
 import com.spider.utils.OKHttpUtils;
+import org.htmlcleaner.HtmlCleaner;
+import org.htmlcleaner.TagNode;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -14,6 +16,7 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
@@ -48,6 +51,9 @@ public class Javbus extends BaseWeb {
 
     @Value("${javbus.magnetApi}")
     private String magnetApi;
+
+    @Value("${javbus.uncensoredPage}")
+    private String uncensoredPage;
 
     @Autowired
     private ActressesInfoService actressesInfoService;
@@ -354,6 +360,72 @@ public class Javbus extends BaseWeb {
             page++;
         }
         logger.info("信息保存完成");
+    }
+
+
+    public void saveNewAvInfo() {
+        int page = 1;
+        int endPage = 100;
+        while (true) {
+            try {
+                List<AvInfo> list = new CopyOnWriteArrayList<>();
+                String url = uncensoredPage.replace("@{page}", String.valueOf(page));
+                Document document = JsoupUtil.getDocument(url, enableProxy);
+                Elements elements = document.getElementsByClass("movie-box");
+                if (Objects.isNull(elements) || elements.size() == 0) {
+                    break;
+                }
+                elements.stream().parallel().forEach(element -> {
+                    AvInfo avInfo = new AvInfo();
+                    String avUrl = element.attr("href");
+                    avInfo.setSourceUrl(avUrl);
+                    Elements imgs = element.getElementsByTag("img");
+                    if (Objects.nonNull(imgs) && imgs.size() != 0) {
+                        Element img = imgs.get(0);
+                        String imgSrc = img.attr("src");
+                        avInfo.setThumbUrl(imgSrc);
+                        String title = img.attr("title");
+                        avInfo.setName(title);
+                        byte[] imgBytes = OKHttpUtils.getBytes(imgSrc, enableProxy);
+                        if (Objects.nonNull(imgBytes)) {
+                            avInfo.setThumb(imgBytes);
+                        }
+                    }
+                    Elements dates = element.getElementsByTag("date");
+                    if (dates.size() == 2) {
+                        String code = dates.get(0).text();
+                        avInfo.setCode(code);
+                        String date = dates.get(1).text();
+                        if (Objects.nonNull(date)) {
+                            try {
+                                avInfo.setPublishDate(simpleDateFormat.parse(date));
+                            } catch (Exception e) {
+                                //e.printStackTrace();
+                            }
+                        }
+                    }
+                    avInfo.setCreateDate(new Date());
+                    list.add(avInfo);
+                });
+                list.stream().parallel().forEach(avInfo -> {
+                    if(CollectionUtils.isEmpty(avInfoService.findBykeyValue("code",avInfo.getCode())) ){
+                        AvInfo getAvInfo = getAvInfo(avInfo);
+                        if (Objects.nonNull(getAvInfo)) {
+                            avInfoService.insert(getAvInfo);
+                        }
+                    }else{
+                        logger.info("{},已存在",avInfo.getCode());
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            page++;
+            if (page > endPage) {
+                break;
+            }
+        }
+        logger.info("更新完成");
     }
 
 

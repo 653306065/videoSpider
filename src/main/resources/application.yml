@@ -131,6 +131,7 @@ javbus:
   thread: 10
   actressesListTemplate: ${javbus.home}/@{category}/actresses/@{page}
   actressesDetailsTemplate: ${javbus.home}/@{category}/star/@{name}
+  uncensoredPage: https://www.javbus.com/uncensored/page/@{page}
   avTemplate: ${javbus.home}/@{code}
   magnetApi: https://www.javbus.com/ajax/uncledatoolsbyajax.php?gid=@{gid}&lang=zh&uc=1
   savePath: C:\javbus\

@@ -77,6 +77,15 @@ public class SpiderController extends BaseController {
         return ResponseVo.succee();
     }
 
+
+    @ApiOperation("获取最新javbus的avInfo")
+    @GetMapping("/start/save/javbus/new/avInfo")
+    public ResponseVo<Object> saveJavBusNewAvInfo(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
+        javbus.setThread(thread);
+        threadPoolExecutor.execute(() -> javbus.saveNewAvInfo());
+        return ResponseVo.succee();
+    }
+
     @ApiOperation("更新javbus的磁力")
     @GetMapping("/start/update/javbus/magnet")
     public ResponseVo<Object> updateJavBusMagnet(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
