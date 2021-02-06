@@ -1,8 +1,11 @@
 package com.spider.web;
 
+import com.spider.entity.Video;
 import com.spider.service.AvInfoService;
 import com.spider.service.VideoService;
+import com.spider.utils.FileUtils;
 import com.spider.utils.download.MultithreadingDownload;
+import org.aspectj.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +15,7 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public abstract class BaseWeb {
@@ -36,7 +40,7 @@ public abstract class BaseWeb {
 
     protected String fileSeparator = File.separator;
 
-    protected Integer defaultEndPage=500;
+    protected Integer defaultEndPage = 500;
 
     @PostConstruct
     public void initFilterKey() {
@@ -49,6 +53,24 @@ public abstract class BaseWeb {
             if (name.contains(key)) {
                 return true;
             }
+        }
+        return false;
+    }
+
+    protected boolean videoExistVerify(Video video) {
+        if (Objects.nonNull(video.getName()) && Objects.nonNull(videoService.findOnekeyValue("name", video.getName()))) {
+            return true;
+        }
+        if (Objects.nonNull(video.getName())) {
+            List<String> keyList = FileUtils.getSearchKeyList(video.getName());
+            for (String key : keyList) {
+                if (Objects.nonNull(videoService.findOnekeyValue("avCode", key))) {
+                    return true;
+                }
+            }
+        }
+        if (Objects.nonNull(video.getSourceUrl()) && Objects.nonNull(videoService.findOnekeyValue("sourceUrl", video.getSourceUrl()))) {
+            return true;
         }
         return false;
     }

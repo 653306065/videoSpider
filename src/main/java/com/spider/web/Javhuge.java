@@ -5,6 +5,7 @@ import com.spider.utils.FileUtils;
 import com.spider.utils.JsoupUtil;
 import com.spider.utils.download.HlsDownloader;
 import io.lindstrom.m3u8.model.MasterPlaylist;
+import org.elasticsearch.common.recycler.Recycler;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +70,7 @@ public class Javhuge extends BaseWeb {
     }
 
     public void download(String category) {
-        int page = 1;
+        int page = 251;
         while (true) {
             try {
                 List<Map<String, String>> list = getVideoList(category, page);
@@ -80,12 +81,17 @@ public class Javhuge extends BaseWeb {
                         logger.info("{},包含过滤字段", title);
                         return;
                     }
+                    Video video = new Video();
+                    video.setSourceUrl(url);
+                    video.setName(title);
+                    if (videoExistVerify(video)) {
+                        logger.info("{},已存在", title);
+                        return;
+                    }
                     Map<String, String> videoInfo = getVideoInfo(url);
                     String path = savePath + fileSeparator + category + fileSeparator + simpleDateFormat.format(new Date()) + fileSeparator + videoInfo.get("name") + ".mp4";
-                    Video video = new Video();
                     video.setName(videoInfo.get("name") + ".mp4");
                     video.setSavePath(path);
-                    video.setSourceUrl(url);
                     String masterM3u8 = videoInfo.get("url");
                     MasterPlaylist masterPlaylist = hlsDownloader.getMasterPlaylist(masterM3u8, enableProxy);
                     if (Objects.nonNull(masterPlaylist)) {
@@ -100,10 +106,10 @@ public class Javhuge extends BaseWeb {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            if(page>defaultEndPage){
+            if (page > defaultEndPage) {
                 break;
             }
-            page++;
+            page--;
         }
     }
 
