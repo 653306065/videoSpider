@@ -1,6 +1,7 @@
 package com.spider.controller;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.spider.constant.Constant;
 import com.spider.entity.AvInfo;
 import com.spider.entity.Video;
 import com.spider.service.AvInfoService;
@@ -8,10 +9,12 @@ import com.spider.service.VideoService;
 import com.spider.service.es.EsVideoService;
 import com.spider.utils.FFmpegUtil;
 import com.spider.utils.FileUtils;
+import com.spider.utils.MD5Util;
 import com.spider.vo.ResponseVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import ws.schild.jave.MultimediaInfo;
 
@@ -104,5 +107,94 @@ public class VideoController extends BaseController {
         List<File> fileList = new ArrayList<>();
         FileUtils.getPathFileList(screenshotPath, fileList);
         return ResponseVo.succee(fileList.stream().map(File::getAbsolutePath).collect(Collectors.toList()));
+    }
+
+    @ApiOperation("保存目标地址的视频信息")
+    @GetMapping(value = "/save/info")
+    public ResponseVo<Object> savePathVideoInfo(@RequestParam("path") String path) {
+        List<File> fileList = new ArrayList<>();
+        FileUtils.getPathFileList(path, fileList);
+        List<File> videoList = fileList.stream().filter(file -> {
+            String name = file.getName();
+            for (String format : Constant.videoFormat) {
+                if (name.endsWith(format)) {
+                    return true;
+                }
+            }
+            return false;
+        }).collect(Collectors.toList());
+        videoList.stream().forEach(file -> {
+            if (Objects.isNull(videoService.findByName(file.getName()))) {
+                String md5 = MD5Util.md5(file);
+                Video findVideo = videoService.findByMd5(md5);
+                if (Objects.isNull(findVideo)) {
+                    Video video = new Video();
+                    video.setName(file.getName());
+                    video.setSavePath(file.getAbsolutePath());
+                    video.setMd5(md5);
+                    video.setSize(file.length());
+                    video.setCreateDate(new Date());
+                    video.setMultimediaInfo(FFmpegUtil.getVideoInfo(file));
+                    video.setSizeStr(file.length() / 1024.0 / 1024 + "MB");
+                    List<String> keyList = FileUtils.getSearchKeyList(video.getName());
+                    for (String key : keyList) {
+                        AvInfo avInfo = avInfoService.findOnekeyValue("code", key);
+                        if (Objects.nonNull(avInfo)) {
+                            video.setAvCode(avInfo.getCode());
+                        }
+                    }
+                    if (Objects.nonNull(video.getAvCode())) {
+                        Video avVideo = videoService.findOnekeyValue("avCode", video.getAvCode());
+                        if (Objects.nonNull(avVideo)) {
+                            logger.info("{}已存在,{}存在的,目标:{}", video.getAvCode(), avVideo.getSavePath(), file.getAbsolutePath());
+                            file.delete();
+                        }
+                    }
+                    videoService.insert(video);
+                    logger.info("{},保存完成", video.getSavePath());
+                } else {
+                    logger.info("{}存在的,目标:{}", findVideo.getSavePath(), file.getAbsolutePath());
+                    file.delete();
+                }
+            }
+        });
+        return ResponseVo.succee();
+    }
+
+    @ApiOperation("清空MD5一样的视频")
+    @GetMapping("/clean/same/md5/video")
+    public ResponseVo<Object> cleanSameMd5Video() {
+        List<Video> videoList = videoService.findAll();
+        Map<String, List<Video>> videoMap = videoList.stream().filter(video -> Objects.nonNull(video.getMd5())).collect(Collectors.groupingBy(Video::getMd5));
+        for (Map.Entry<String, List<Video>> entry : videoMap.entrySet()) {
+            if (entry.getValue().size() > 1) {
+                List<Video> sameList = entry.getValue().stream().skip(1).limit(entry.getValue().size() - 1).collect(Collectors.toList());
+                sameList.stream().forEach(video -> {
+                    new File(video.getSavePath()).delete();
+                    logger.info("{},删除成功", video.getSavePath());
+                });
+            }
+        }
+        logger.info("清空视频完成");
+        return ResponseVo.succee();
+    }
+
+    @ApiOperation("清空code一样的视频")
+    @GetMapping("/clean/same/code/video")
+    public ResponseVo<Object> cleanSameCodeVideo() {
+        List<Video> videoList = videoService.findAll();
+        Map<String, List<Video>> videoMap = videoList.stream().filter(video -> Objects.nonNull(video.getAvCode())).collect(Collectors.groupingBy(Video::getAvCode));
+        for (Map.Entry<String, List<Video>> entry : videoMap.entrySet()) {
+            List<Video> codeList = entry.getValue().stream().filter(video -> new File(video.getSavePath()).exists()).collect(Collectors.toList());
+            if (codeList.size() > 1) {
+                codeList.stream().forEach(video -> {
+                    //new File(video.getSavePath()).delete();
+                    logger.info("{},{},删除成功", video.getAvCode(), video.getSavePath());
+                });
+                logger.info("-----------------");
+            }
+        }
+        logger.info("清空视频完成");
+        return ResponseVo.succee();
     }
 }

@@ -19,11 +19,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ws.schild.jave.MultimediaInfo;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Component
 @Aspect
@@ -45,6 +47,12 @@ public class DownloadAop {
 
     @Value("${filterKey}")
     List<String> filterKeyList;
+
+    @PostConstruct
+    public void initFilterKey() {
+        filterKeyList.addAll(filterKeyList.stream().map(String::toLowerCase).collect(Collectors.toList()));
+        filterKeyList.addAll(filterKeyList.stream().map(String::toUpperCase).collect(Collectors.toList()));
+    }
 
     @Pointcut("execution(* com.spider.utils.download.MultithreadingDownload.videoDownload(..))")
     public void multithreadingDownload_videoDownload() {

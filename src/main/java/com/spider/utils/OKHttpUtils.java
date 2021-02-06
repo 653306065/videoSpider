@@ -13,14 +13,14 @@ import java.util.concurrent.TimeUnit;
 
 public class OKHttpUtils {
 
-    static OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(3, TimeUnit.SECONDS).readTimeout(3, TimeUnit.SECONDS).build();
+    static OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(6, TimeUnit.SECONDS).readTimeout(6, TimeUnit.SECONDS).build();
 
     static OkHttpClient proxyHttpClient = null;
 
     static {
         try {
             Proxy proxy = SpringContentUtil.getBean(Proxy.class);
-            proxyHttpClient = new OkHttpClient.Builder().connectTimeout(3, TimeUnit.SECONDS).readTimeout(3, TimeUnit.SECONDS).proxy(proxy).build();
+            proxyHttpClient = new OkHttpClient.Builder().connectTimeout(6, TimeUnit.SECONDS).readTimeout(6, TimeUnit.SECONDS).proxy(proxy).build();
         } catch (Exception e) {
             //e.printStackTrace();
         }

@@ -163,13 +163,10 @@ public class Javrave extends BaseWeb {
      * @param category
      */
     public void downloadVideo(String category) {
-        int page = 1;
+        int page = 1176;
         while (true) {
             try {
                 List<Video> list = getVideoList(category, page);
-                if (CollectionUtil.isEmpty(list)) {
-                    break;
-                }
                 list.forEach(video -> {
                     if (hasFilterKey(video.getName())) {
                         logger.info("{},含有过滤字段", video.getName());
@@ -196,7 +193,10 @@ public class Javrave extends BaseWeb {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            page++;
+//            if(page>1200){
+//                break;
+//            }
+            page--;
         }
     }
 
