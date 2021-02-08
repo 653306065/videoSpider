@@ -72,6 +72,9 @@ public abstract class BaseWeb {
         if (Objects.nonNull(video.getSourceUrl()) && Objects.nonNull(videoService.findOnekeyValue("sourceUrl", video.getSourceUrl()))) {
             return true;
         }
+        if (Objects.nonNull(video.getAvCode()) && Objects.nonNull(videoService.findOnekeyValue("avCode", video.getAvCode()))) {
+            return true;
+        }
         return false;
     }
 }

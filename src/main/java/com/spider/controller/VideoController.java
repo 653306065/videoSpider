@@ -46,12 +46,32 @@ public class VideoController extends BaseController {
     }
 
     @ApiOperation("清空低于指定分辨率的视频")
-    @GetMapping("/clean/video")
+    @GetMapping("/clean/resolutionRatio/video")
     public ResponseVo<Object> cleanVideo(@RequestParam(required = false, defaultValue = "640") Integer height, @RequestParam(required = false, defaultValue = "640") Integer width) {
         AtomicLong size = new AtomicLong(0);
         CopyOnWriteArrayList<String> copyOnWriteArrayList = new CopyOnWriteArrayList<>();
         videoService.findAll().stream().filter(video -> new File(video.getSavePath()).exists()).filter(video -> Objects.nonNull(video.getMultimediaInfo())).forEach(video -> {
             if (height * width > video.getMultimediaInfo().getVideo().getSize().getHeight() * video.getMultimediaInfo().getVideo().getSize().getWidth()) {
+                logger.info(video.getSavePath());
+                new File(video.getSavePath()).delete();
+                size.addAndGet(video.getSize());
+                copyOnWriteArrayList.add(video.getSavePath());
+            }
+        });
+        Map<String, Object> map = new HashMap<>();
+        map.put("fileSize", size.get() / 1024.0 / 1024 / 1024);
+        map.put("list", copyOnWriteArrayList);
+        map.put("listSize", copyOnWriteArrayList.size());
+        return ResponseVo.succee(map);
+    }
+
+    @ApiOperation("清空低于指定分钟数的视频")
+    @GetMapping("/clean/time/video")
+    public ResponseVo<Object> cleanTimeVideo(@RequestParam(required = false, defaultValue = "10") Integer minute) {
+        AtomicLong size = new AtomicLong(0);
+        CopyOnWriteArrayList<String> copyOnWriteArrayList = new CopyOnWriteArrayList<>();
+        videoService.findAll().stream().filter(video -> new File(video.getSavePath()).exists()).filter(video -> Objects.nonNull(video.getMultimediaInfo())).forEach(video -> {
+            if (video.getMultimediaInfo().getDuration()<1000*60*minute) {
                 logger.info(video.getSavePath());
                 new File(video.getSavePath()).delete();
                 size.addAndGet(video.getSize());
@@ -196,5 +216,13 @@ public class VideoController extends BaseController {
         }
         logger.info("清空视频完成");
         return ResponseVo.succee();
+    }
+
+    @ApiOperation("获取下载视频的总大小")
+    @GetMapping("/total/size")
+    public ResponseVo<Object> getVideoTotalSize() {
+        List<Video> videoList = videoService.findAll();
+        long totalSize = videoList.stream().filter(video -> Objects.nonNull(video.getSize())).mapToLong(Video::getSize).sum();
+        return ResponseVo.succee(totalSize / 1024.0 / 1024 / 1024);
     }
 }

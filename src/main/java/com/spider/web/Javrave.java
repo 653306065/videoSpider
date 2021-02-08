@@ -172,14 +172,11 @@ public class Javrave extends BaseWeb {
                         logger.info("{},含有过滤字段", video.getName());
                         return;
                     }
-                    if (Objects.nonNull(videoService.findBySourceUrl(video.getSourceUrl()))) {
-                        logger.info(video.getSourceUrl() + "已存在");
+                    if(videoExistVerify(video)){
+                        logger.info("{},已存在", video.getName());
                         return;
                     }
-                    if (Objects.nonNull(videoService.findByName(video.getName() + ".mp4"))) {
-                        logger.info(video.getName() + "已存在");
-                        return;
-                    }
+
                     Video getVideo = getVideoInfo(video.getSourceUrl());
                     if (Objects.isNull(getVideo)) {
                         return;
