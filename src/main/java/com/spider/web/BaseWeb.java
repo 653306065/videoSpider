@@ -61,6 +61,12 @@ public abstract class BaseWeb {
         if (Objects.nonNull(video.getName()) && Objects.nonNull(videoService.findOnekeyValue("name", video.getName()))) {
             return true;
         }
+        if (Objects.nonNull(video.getName()) && Objects.nonNull(videoService.findOnekeyValue("name", video.getName().toLowerCase()))) {
+            return true;
+        }
+        if (Objects.nonNull(video.getName()) && Objects.nonNull(videoService.findOnekeyValue("name", video.getName().toUpperCase()))) {
+            return true;
+        }
         if (Objects.nonNull(video.getName())) {
             List<String> keyList = FileUtils.getSearchKeyList(video.getName());
             for (String key : keyList) {

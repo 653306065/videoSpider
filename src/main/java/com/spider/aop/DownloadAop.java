@@ -147,39 +147,38 @@ public class DownloadAop {
                 return;
             }
             String md5 = FileUtils.getMD5(videoFile);
-            if (Objects.isNull(videoService.findByMd5(md5))) {
-                video.setMd5(md5);
-                MultimediaInfo info = FFmpegUtil.getVideoInfo(videoFile);
-                logger.info("videoInfo:{}", JSON.toJSONString(info));
-                video.setSize(videoFile.length());
-                video.setSizeStr(videoFile.length() / 1024.0 / 1024 + "MB");
-                video.setMultimediaInfo(info);
-                video.setCreateDate(new Date());
-                if (Objects.nonNull(avInfo)) {
-                    video.setAvCode(avInfo.getCode());
-                }
-                videoService.insert(video);
+            if (Objects.nonNull(videoService.findByMd5(md5))) {
+                logger.info("{},文件MD5验证失败", video.getName());
+                new File(video.getSavePath()).delete();
+            }
+            video.setMd5(md5);
+            MultimediaInfo info = FFmpegUtil.getVideoInfo(videoFile);
+            logger.info("videoInfo:{}", JSON.toJSONString(info));
+            video.setSize(videoFile.length());
+            video.setSizeStr(videoFile.length() / 1024.0 / 1024 + "MB");
+            video.setMultimediaInfo(info);
+            video.setCreateDate(new Date());
+            if (Objects.nonNull(avInfo)) {
+                video.setAvCode(avInfo.getCode());
+            }
+            videoService.insert(video);
+            if (Objects.nonNull(avInfo)) {
+                avInfo.setVideoId(video.getId());
+                avInfo.setHasVideo(true);
+                avInfo.setVideoSavePath(video.getSavePath());
+                avInfoService.updateById(avInfo);
+            }
+
+            if (Objects.nonNull(video.getAvCode())) {
+                avInfo = avInfoService.findOnekeyValue("code", video.getAvCode());
                 if (Objects.nonNull(avInfo)) {
                     avInfo.setVideoId(video.getId());
                     avInfo.setHasVideo(true);
                     avInfo.setVideoSavePath(video.getSavePath());
                     avInfoService.updateById(avInfo);
                 }
-
-                if (Objects.nonNull(video.getAvCode())) {
-                    avInfo = avInfoService.findOnekeyValue("code", video.getAvCode());
-                    if (Objects.nonNull(avInfo)) {
-                        avInfo.setVideoId(video.getId());
-                        avInfo.setHasVideo(true);
-                        avInfo.setVideoSavePath(video.getSavePath());
-                        avInfoService.updateById(avInfo);
-                    }
-                }
-                logger.info("{},文件信息保存完成", video.getName());
-            } else {
-                logger.info("{},文件MD5验证失败", video.getName());
-                new File(video.getSavePath()).delete();
             }
+            logger.info("{},文件信息保存完成", video.getName());
         } catch (Throwable e) {
             e.printStackTrace();
         }

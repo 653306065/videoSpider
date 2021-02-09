@@ -90,4 +90,9 @@ public abstract class BaseService<T> {
     public void insert(T t) {
         mongoTemplate.insert(t);
     }
+
+    public void removeById(String id) {
+        Query query = new Query(Criteria.where("id").is(id));
+        mongoTemplate.remove(query,clazz);
+    }
 }

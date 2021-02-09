@@ -162,8 +162,7 @@ public class Javbangers extends BaseWeb {
             try {
                 List<Video> videoList = getVideoListByUrl(categories, page);
                 videoList = videoList.stream().filter(v -> Objects.nonNull(v.getSourceUrl())).collect(Collectors.toList());
-                A:
-                for (Video video : videoList) {
+                A:for (Video video : videoList) {
                     if (hasFilterKey(video.getName())) {
                         logger.info("{},含有过滤字段", video.getName());
                         continue;

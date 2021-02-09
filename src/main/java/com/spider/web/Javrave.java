@@ -163,7 +163,7 @@ public class Javrave extends BaseWeb {
      * @param category
      */
     public void downloadVideo(String category) {
-        int page = 1000;
+        int page = 1;
         while (true) {
             try {
                 List<Video> list = getVideoList(category, page);
@@ -190,10 +190,10 @@ public class Javrave extends BaseWeb {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-//            if(page>1200){
-//                break;
-//            }
-            page--;
+            if(page>1300){
+                break;
+            }
+            page++;
         }
     }
 
