@@ -6,18 +6,17 @@ import com.spider.entity.ActressesInfo;
 import com.spider.entity.AvInfo;
 import com.spider.entity.FaceInfo;
 import com.spider.service.ActressesInfoService;
+import com.spider.service.AvInfoService;
 import com.spider.service.es.EsAvInfoService;
 import com.spider.utils.FaceUtil;
 import com.spider.vo.ResponseVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -36,6 +35,9 @@ public class AvInfoController extends BaseController {
 
     @Autowired
     private ThreadPoolExecutor threadPoolExecutor;
+
+    @Autowired
+    private AvInfoService avInfoService;
 
     @ApiOperation("根据关键字搜索")
     @GetMapping("/search/{value}")
@@ -84,5 +86,16 @@ public class AvInfoController extends BaseController {
             });
         });
         return ResponseVo.succee();
+    }
+
+    @ApiOperation("获取av的磁力链接")
+    @GetMapping("/code/{code}/magnet/list")
+    public ResponseVo<Object> findAVCodeMagnetList(@PathVariable("code") String code) {
+        List<AvInfo> avInfoList = avInfoService.findByRegex("code", code);
+        List<AvInfo.Magnet> magnetList = avInfoList.stream().filter(avInfo -> CollectionUtil.isNotEmpty(avInfo.getMagnetList())).map(avInfo -> {
+            AvInfo.Magnet magnet = avInfo.getMagnetList().stream().max(Comparator.comparing(AvInfo.Magnet::getSize)).get();
+            return magnet;
+        }).collect(Collectors.toList());
+        return ResponseVo.succee(magnetList);
     }
 }

@@ -147,15 +147,15 @@ public class DownloadAop {
                 return;
             }
             String md5 = FileUtils.getMD5(videoFile);
+            video.setSize(videoFile.length());
+            video.setSizeStr(videoFile.length() / 1024.0 / 1024 + "MB");
+            MultimediaInfo info = FFmpegUtil.getVideoInfo(videoFile);
             if (Objects.nonNull(videoService.findByMd5(md5))) {
                 logger.info("{},文件MD5验证失败", video.getName());
                 new File(video.getSavePath()).delete();
             }
             video.setMd5(md5);
-            MultimediaInfo info = FFmpegUtil.getVideoInfo(videoFile);
             logger.info("videoInfo:{}", JSON.toJSONString(info));
-            video.setSize(videoFile.length());
-            video.setSizeStr(videoFile.length() / 1024.0 / 1024 + "MB");
             video.setMultimediaInfo(info);
             video.setCreateDate(new Date());
             if (Objects.nonNull(avInfo)) {
