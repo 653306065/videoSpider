@@ -48,6 +48,12 @@ public class DownloadAop {
     @Value("${filterKey}")
     List<String> filterKeyList;
 
+    @Value("${video.minWidth}")
+    private Integer minWidth;
+
+    @Value("${video.minHeight}")
+    private Integer minHeight;
+
     @PostConstruct
     public void initFilterKey() {
         filterKeyList.addAll(filterKeyList.stream().map(String::toLowerCase).collect(Collectors.toList()));
@@ -179,6 +185,10 @@ public class DownloadAop {
                 }
             }
             logger.info("{},文件信息保存完成", video.getName());
+            if(info.getVideo().getSize().getHeight()*info.getVideo().getSize().getWidth()<minWidth*minHeight){
+                new File(video.getSavePath()).delete();
+                logger.info("{},视频尺寸小于{}*{},删除成功",video.getSavePath(),minHeight,minWidth);
+            }
         } catch (Throwable e) {
             e.printStackTrace();
         }
