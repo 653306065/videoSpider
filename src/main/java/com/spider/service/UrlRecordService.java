@@ -3,6 +3,7 @@ package com.spider.service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -35,13 +36,11 @@ public class UrlRecordService {
     }
 
     public void insertList(List<String> urlList) {
-        List<UrlRecord> urlRecordList = new ArrayList<UrlRecord>();
-        for (String url : urlList) {
+        mongoTemplate.insertAll(urlList.stream().map(url -> {
             UrlRecord record = new UrlRecord();
             record.setDate(new Date());
             record.setUrl(url);
-            urlRecordList.add(record);
-        }
-        mongoTemplate.insertAll(urlRecordList);
+            return record;
+        }).collect(Collectors.toList()));
     }
 }

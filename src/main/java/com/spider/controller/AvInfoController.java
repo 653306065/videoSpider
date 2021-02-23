@@ -92,10 +92,7 @@ public class AvInfoController extends BaseController {
     @GetMapping("/code/{code}/magnet/list")
     public ResponseVo<Object> findAVCodeMagnetList(@PathVariable("code") String code) {
         List<AvInfo> avInfoList = avInfoService.findByRegex("code", code);
-        List<AvInfo.Magnet> magnetList = avInfoList.stream().filter(avInfo -> CollectionUtil.isNotEmpty(avInfo.getMagnetList())).map(avInfo -> {
-            AvInfo.Magnet magnet = avInfo.getMagnetList().stream().max(Comparator.comparing(AvInfo.Magnet::getSize)).get();
-            return magnet;
-        }).collect(Collectors.toList());
+        List<AvInfo.Magnet> magnetList = avInfoList.stream().filter(avInfo -> CollectionUtil.isNotEmpty(avInfo.getMagnetList())).map(avInfo -> avInfo.getMagnetList().stream().max(Comparator.comparing(AvInfo.Magnet::getSize)).get()).collect(Collectors.toList());
         return ResponseVo.succee(magnetList);
     }
 }

@@ -143,7 +143,7 @@ public class VideoController extends BaseController {
             }
             return false;
         }).collect(Collectors.toList());
-        videoList.stream().forEach(file -> {
+        videoList.forEach(file -> {
             if (Objects.isNull(videoService.findByName(file.getName()))) {
                 String md5 = MD5Util.md5(file);
                 Video findVideo = videoService.findByMd5(md5);
@@ -191,7 +191,7 @@ public class VideoController extends BaseController {
         for (Map.Entry<String, List<Video>> entry : videoMap.entrySet()) {
             if (entry.getValue().size() > 1) {
                 List<Video> sameList = entry.getValue().stream().skip(1).limit(entry.getValue().size() - 1).collect(Collectors.toList());
-                sameList.stream().forEach(video -> {
+                sameList.forEach(video -> {
                     new File(video.getSavePath()).delete();
                     logger.info("{},删除成功", video.getSavePath());
                 });
