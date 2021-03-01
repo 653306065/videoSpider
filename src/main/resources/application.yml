@@ -166,6 +166,15 @@ hqporner:
   thread: 30
   savePath: E:\hqporner\
 
+netflav:
+  home: https://netflav.com/
+  listTemplate: https://netflav.com/@{category}?page=@{page}
+  videoTemplate: https://netflav.com/video?id=@{videoId}
+  videoInfoApi: https://netflav.com/api98/video/v2/retrieveVideo/@{videoId}
+  fileApiTemplate: https://www.avple.video/api/source/@{key}
+  enableProxy: true
+  thread: 30
+  savePath: C:\netflav\
 
 video:
   minWidth: 640

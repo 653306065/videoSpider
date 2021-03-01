@@ -61,6 +61,9 @@ public class SpiderController extends BaseController {
     @Autowired
     private Javfull javfull;
 
+    @Autowired
+    private Netflav netflav;
+
     @ApiOperation("开始javbangers下载")
     @GetMapping("/start/javbangers")
     public ResponseVo<Object> startJavbangers(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
@@ -209,9 +212,17 @@ public class SpiderController extends BaseController {
 
     @ApiOperation("javfull uncensored视频下载")
     @GetMapping(value = "/start/javfull/uncensored")
-    public ResponseVo<Object> test(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
+    public ResponseVo<Object> javfullUncensored(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
         kissjav.setThread(thread);
         threadPoolExecutor.execute(() -> javfull.downloadByCategory("uncensored"));
+        return ResponseVo.succee();
+    }
+
+    @ApiOperation("netflav 无码视频下载")
+    @GetMapping(value = "/start/netflav/uncensored")
+    public ResponseVo<Object> netflavUncensored(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
+        netflav.setThread(thread);
+        threadPoolExecutor.execute(() -> netflav.downloadUncensoredVideo());
         return ResponseVo.succee();
     }
 
