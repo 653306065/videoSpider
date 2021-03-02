@@ -1,11 +1,13 @@
 package com.spider.web;
 
+import cn.hutool.crypto.digest.MD5;
 import com.spider.entity.ActressesInfo;
 import com.spider.entity.AvInfo;
 import com.spider.service.ActressesInfoService;
 import com.spider.service.AvInfoService;
 import com.spider.utils.FileUtils;
 import com.spider.utils.JsoupUtil;
+import com.spider.utils.MD5Util;
 import com.spider.utils.OKHttpUtils;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
@@ -209,12 +211,12 @@ public class Javbus extends BaseWeb {
         }
         Element waterfall = document.getElementById("sample-waterfall");
         if (Objects.nonNull(waterfall)) {
-            List<String> waterfallList = waterfall.getElementsByClass("sample-box").stream().map(element -> element.attr("href")).collect(Collectors.toList());
+            List<String> waterfallList = waterfall.getElementsByClass("sample-box").stream().map(element -> element.attr("href")).filter(StringUtils::hasText).collect(Collectors.toList());
             avInfo.setPreviewImageUrlList(waterfallList);
             List<byte[]> byteList = waterfallList.stream().parallel().map(url -> {
                 byte[] bytes = OKHttpUtils.getBytes(url, enableProxy);
                 if (Objects.nonNull(bytes)) {
-                    String path = savePath + "av" + File.separator + avInfo.getCode().trim() + File.separator + System.currentTimeMillis() + UUID.randomUUID().toString().substring(0, 4) + ".jpg";
+                    String path = savePath + "av" + File.separator + avInfo.getCode().trim() + File.separator + md5.digestHex(bytes) + ".jpg";
                     FileUtils.byteToFile(bytes, path);
                 }
                 return bytes;

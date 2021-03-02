@@ -1,5 +1,6 @@
 package com.spider.web;
 
+import cn.hutool.crypto.digest.MD5;
 import com.spider.entity.Video;
 import com.spider.service.AvInfoService;
 import com.spider.service.VideoService;
@@ -41,6 +42,8 @@ public abstract class BaseWeb {
     protected String fileSeparator = File.separator;
 
     protected Integer defaultEndPage = 500;
+
+    protected MD5 md5 = MD5.create();
 
     @PostConstruct
     public void initFilterKey() {
