@@ -32,9 +32,6 @@ public class SpiderController extends BaseController {
     private Javbus javbus;
 
     @Autowired
-    private ThreadPoolExecutor threadPoolExecutor;
-
-    @Autowired
     private Shubao shubao;
 
     @Autowired

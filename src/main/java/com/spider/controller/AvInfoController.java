@@ -8,6 +8,7 @@ import com.spider.entity.FaceInfo;
 import com.spider.service.ActressesInfoService;
 import com.spider.service.AvInfoService;
 import com.spider.service.es.EsAvInfoService;
+import com.spider.utils.BaiduTranslateUtil;
 import com.spider.utils.FaceUtil;
 import com.spider.vo.ResponseVo;
 import io.swagger.annotations.Api;
@@ -32,9 +33,6 @@ public class AvInfoController extends BaseController {
 
     @Autowired
     private ActressesInfoService actressesInfoService;
-
-    @Autowired
-    private ThreadPoolExecutor threadPoolExecutor;
 
     @Autowired
     private AvInfoService avInfoService;
@@ -94,5 +92,21 @@ public class AvInfoController extends BaseController {
         List<AvInfo> avInfoList = avInfoService.findByRegex("code", code);
         List<AvInfo.Magnet> magnetList = avInfoList.stream().filter(avInfo -> CollectionUtil.isNotEmpty(avInfo.getMagnetList())).map(avInfo -> avInfo.getMagnetList().stream().max(Comparator.comparing(AvInfo.Magnet::getSize)).get()).collect(Collectors.toList());
         return ResponseVo.succee(magnetList);
+    }
+
+    @ApiOperation("翻译名称")
+    @GetMapping("/translate/name")
+    public ResponseVo<Object> findAVCodeMagnetList() {
+        threadPoolExecutor.execute(() -> {
+            avInfoService.findByexists("translateName",false).stream().parallel().forEach(avInfo -> {
+                String translateName = BaiduTranslateUtil.translate(avInfo.getName(), "auto", "zh");
+                if (Objects.nonNull(translateName)) {
+                    logger.info("{}->{}",avInfo.getName(),translateName);
+                    avInfo.setTranslateName(translateName);
+                    avInfoService.updateById(avInfo);
+                }
+            });
+        });
+        return ResponseVo.succee();
     }
 }
