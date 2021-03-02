@@ -209,7 +209,7 @@ public class Javbus extends BaseWeb {
         }
         Element waterfall = document.getElementById("sample-waterfall");
         if (Objects.nonNull(waterfall)) {
-            List<String> waterfallList = waterfall.getElementsByTag("img").stream().map(element -> element.attr("src")).collect(Collectors.toList());
+            List<String> waterfallList = waterfall.getElementsByClass("sample-box").stream().map(element -> element.attr("href")).collect(Collectors.toList());
             avInfo.setPreviewImageUrlList(waterfallList);
             List<byte[]> byteList = waterfallList.stream().parallel().map(url -> {
                 byte[] bytes = OKHttpUtils.getBytes(url, enableProxy);
