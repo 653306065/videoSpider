@@ -185,9 +185,9 @@ public class DownloadAop {
                 }
             }
             logger.info("{},文件信息保存完成", video.getName());
-            if(info.getVideo().getSize().getHeight()*info.getVideo().getSize().getWidth()<minWidth*minHeight){
+            if (info.getVideo().getSize().getHeight() * info.getVideo().getSize().getWidth() < minWidth * minHeight) {
                 new File(video.getSavePath()).delete();
-                logger.info("{},视频尺寸小于{}*{},删除成功",video.getSavePath(),minHeight,minWidth);
+                logger.info("{},视频尺寸小于{}*{},删除成功", video.getSavePath(), minHeight, minWidth);
             }
         } catch (Throwable e) {
             e.printStackTrace();

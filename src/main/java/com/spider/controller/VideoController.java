@@ -40,7 +40,7 @@ public class VideoController extends BaseController {
 
     @ApiOperation("根据关键字搜索视频")
     @GetMapping("/search/{value}")
-    public ResponseVo<List<Video>> search(@PathVariable(value = "value", required = true) String value) {
+    public ResponseVo<List<Video>> search(@PathVariable(value = "value") String value) {
         List<Video> list = esVideoService.searchByValue(value).stream().map(esAvInfoSearchHit -> BeanUtil.toBean(esAvInfoSearchHit.getContent(), Video.class)).collect(Collectors.toList());
         return ResponseVo.succee(list);
     }
@@ -71,7 +71,7 @@ public class VideoController extends BaseController {
         AtomicLong size = new AtomicLong(0);
         CopyOnWriteArrayList<String> copyOnWriteArrayList = new CopyOnWriteArrayList<>();
         videoService.findAll().stream().filter(video -> !video.getSavePath().contains("里番")).filter(video -> new File(video.getSavePath()).exists()).filter(video -> Objects.nonNull(video.getMultimediaInfo())).forEach(video -> {
-            if (video.getMultimediaInfo().getDuration() < 1000 * 60 * minute) {
+            if (video.getMultimediaInfo().getDuration() < 1000L * 60 * minute) {
                 logger.info(video.getSavePath());
                 new File(video.getSavePath()).delete();
                 size.addAndGet(video.getSize());
@@ -121,13 +121,14 @@ public class VideoController extends BaseController {
             return ResponseVo.failure(-1, "截图路径不是文件夹");
         }
         for (int i = 0; i < count; i++) {
-            long index0 = (long) (multimediaInfo.getDuration() / (10 - i)) / 1000;
+            long index0 = multimediaInfo.getDuration() / (10 - i) / 1000;
             FFmpegUtil.videoSnapshot(videoPath, screenshotPath, String.valueOf(i), index0, 1);
         }
         List<File> fileList = new ArrayList<>();
         FileUtils.getPathFileList(screenshotPath, fileList);
         return ResponseVo.succee(fileList.stream().map(File::getAbsolutePath).collect(Collectors.toList()));
     }
+
 
     @ApiOperation("保存目标地址的视频信息")
     @GetMapping(value = "/save/info")
@@ -209,8 +210,8 @@ public class VideoController extends BaseController {
         for (Map.Entry<String, List<Video>> entry : videoMap.entrySet()) {
             List<Video> codeList = entry.getValue().stream().filter(video -> new File(video.getSavePath()).exists()).collect(Collectors.toList());
             if (codeList.size() > 1) {
-                codeList.stream().forEach(video -> {
-                    //new File(video.getSavePath()).delete();
+                codeList.forEach(video -> {
+                    new File(video.getSavePath()).delete();
                     logger.info("{},{},删除成功", video.getAvCode(), video.getSavePath());
                 });
                 logger.info("-----------------");

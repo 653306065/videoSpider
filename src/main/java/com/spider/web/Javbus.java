@@ -410,13 +410,13 @@ public class Javbus extends BaseWeb {
                     list.add(avInfo);
                 });
                 list.stream().parallel().forEach(avInfo -> {
-                    if(CollectionUtils.isEmpty(avInfoService.findBykeyValue("code",avInfo.getCode())) ){
+                    if (CollectionUtils.isEmpty(avInfoService.findBykeyValue("code", avInfo.getCode()))) {
                         AvInfo getAvInfo = getAvInfo(avInfo);
                         if (Objects.nonNull(getAvInfo)) {
                             avInfoService.insert(getAvInfo);
                         }
-                    }else{
-                        logger.info("{},已存在",avInfo.getCode());
+                    } else {
+                        logger.info("{},已存在", avInfo.getCode());
                     }
                 });
             } catch (Exception e) {

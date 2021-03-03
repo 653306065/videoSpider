@@ -93,6 +93,6 @@ public abstract class BaseService<T> {
 
     public void removeById(String id) {
         Query query = new Query(Criteria.where("id").is(id));
-        mongoTemplate.remove(query,clazz);
+        mongoTemplate.remove(query, clazz);
     }
 }

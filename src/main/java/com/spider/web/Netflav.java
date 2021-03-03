@@ -99,12 +99,12 @@ public class Netflav extends BaseWeb {
                 video.setName(FileUtils.repairPath(video.getName()) + ".mp4");
                 String path = this.savePath + category + fileSeparator + simpleDateFormat.format(new Date()) + fileSeparator + video.getName();
                 video.setSavePath(path);
-                if(hasFilterKey(video.getName())){
-                    logger.info("{},有过滤字段",video.getName());
+                if (hasFilterKey(video.getName())) {
+                    logger.info("{},有过滤字段", video.getName());
                     return;
                 }
                 video.setVideoUrl(getFileUrl(video.getVideoUrl()));
-                if(Objects.isNull(video.getVideoUrl())){
+                if (Objects.isNull(video.getVideoUrl())) {
                     return;
                 }
                 multithreadingDownload.videoDownload(video, null, enableProxy, thread, defaultSegmentSize);

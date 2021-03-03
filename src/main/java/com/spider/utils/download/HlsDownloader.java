@@ -63,7 +63,7 @@ public class HlsDownloader {
     private MediaPlaylistParser mediaPlaylistParser = new MediaPlaylistParser();
 
     private boolean download() {
-        taskStatus=true;
+        taskStatus = true;
         tempFileMap.clear();
         if (StringUtils.isNotBlank(m3u8Url)) {
             rootUrl = m3u8Url.substring(0, m3u8Url.lastIndexOf("/") + 1);
@@ -153,7 +153,7 @@ public class HlsDownloader {
                         break;
                     }
                     if (taskTime > time) {
-                        taskStatus=false;
+                        taskStatus = false;
                         logger.info("index:{},下载失败", index);
                         break;
                     }

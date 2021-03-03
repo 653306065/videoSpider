@@ -101,7 +101,7 @@ public class AvInfoController extends BaseController {
     public ResponseVo<Object> findAVCodeMagnetList() {
         threadPoolExecutor.execute(() -> {
             ForkJoinPool forkJoinPool = new ForkJoinPool(10);
-            forkJoinPool.submit(()-> avInfoService.findByexists("translateName", true).parallelStream().forEach(avInfo -> {
+            forkJoinPool.submit(() -> avInfoService.findByexists("translateName", true).parallelStream().forEach(avInfo -> {
                 try {
                     String translateName = BaiduTranslateUtil.translate(avInfo.getName(), "auto", "zh");
                     if (Objects.nonNull(translateName)) {

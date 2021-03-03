@@ -172,7 +172,7 @@ public class Javrave extends BaseWeb {
                         logger.info("{},含有过滤字段", video.getName());
                         return;
                     }
-                    if(videoExistVerify(video)){
+                    if (videoExistVerify(video)) {
                         logger.info("{},已存在", video.getName());
                         return;
                     }
@@ -190,7 +190,7 @@ public class Javrave extends BaseWeb {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            if(page>1300){
+            if (page > 1300) {
                 break;
             }
             page++;
