@@ -116,7 +116,6 @@ public class AvInfoController extends BaseController {
                     e.printStackTrace();
                 }
             }));
-
         });
         return ResponseVo.succee();
     }
