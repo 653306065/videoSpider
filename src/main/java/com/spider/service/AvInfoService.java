@@ -29,9 +29,8 @@ public class AvInfoService extends BaseService<AvInfo> {
 
     @PostConstruct
     public void initializeCodeList() {
-        MongoCursor<Document> data = mongoTemplate.getCollection(mongoTemplate.getCollectionName(clazz)).find().projection(new BasicDBObject("code", 1)).iterator();
-        while (data.hasNext()) {
-            codeList.add(data.next().getString("code"));
+        for (Document document : mongoTemplate.getCollection(mongoTemplate.getCollectionName(clazz)).find().projection(new BasicDBObject("code", 1))) {
+            codeList.add(document.getString("code"));
         }
         codeList.forEach(code -> {
             List<String> list = new ArrayList<>();

@@ -1,6 +1,5 @@
 package com.spider.utils;
 
-import java.net.Proxy;
 import java.util.Map;
 import java.util.Objects;
 
@@ -8,11 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import com.spider.utils.SpringContentUtil;
-
 public class JsoupUtil {
-
-    private static Proxy proxy = SpringContentUtil.getBean(Proxy.class);
 
     public static Document getDocument(String url) {
         String html = OKHttpUtils.get(url, false);

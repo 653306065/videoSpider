@@ -30,8 +30,7 @@ public class ProxyConf {
 
     @Bean
     public Proxy getProxy() {
-        Proxy proxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(socksHost, socksPort));
-        return proxy;
+        return new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(socksHost, socksPort));
     }
 
     @PostConstruct
