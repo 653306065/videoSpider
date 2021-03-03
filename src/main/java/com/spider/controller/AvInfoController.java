@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
@@ -98,14 +100,23 @@ public class AvInfoController extends BaseController {
     @GetMapping("/translate/name")
     public ResponseVo<Object> findAVCodeMagnetList() {
         threadPoolExecutor.execute(() -> {
-            avInfoService.findByexists("translateName",false).stream().parallel().forEach(avInfo -> {
-                String translateName = BaiduTranslateUtil.translate(avInfo.getName(), "auto", "zh");
-                if (Objects.nonNull(translateName)) {
-                    logger.info("{}->{}",avInfo.getName(),translateName);
-                    avInfo.setTranslateName(translateName);
-                    avInfoService.updateById(avInfo);
+            ForkJoinPool forkJoinPool = new ForkJoinPool(10);
+            forkJoinPool.submit(()-> avInfoService.findByexists("translateName", true).parallelStream().forEach(avInfo -> {
+                try {
+                    String translateName = BaiduTranslateUtil.translate(avInfo.getName(), "auto", "zh");
+                    if (Objects.nonNull(translateName)) {
+                        logger.info("{}->{}", avInfo.getName(), translateName);
+                        avInfo.setTranslateName(translateName);
+                        avInfoService.updateById(avInfo);
+                    } else {
+                        logger.info("{},翻译失败", avInfo.getName());
+                    }
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-            });
+            }));
+
         });
         return ResponseVo.succee();
     }
