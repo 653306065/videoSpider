@@ -25,6 +25,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 
 @Service
@@ -317,12 +318,15 @@ public class Javbus extends BaseWeb {
     }
 
     public void saveAvInfoByActressesAll() {
-        actressesInfoService.findAll().stream().parallel().forEach(actressesInfo -> {
-            logger.info("----------{},开始获取---------", actressesInfo.getName());
-            saveAvInfoByActresses(actressesInfo.getJavbusUrl());
-            logger.info("----------{},所有获取完成---------", actressesInfo.getName());
+        ForkJoinPool forkJoinPool=new ForkJoinPool(thread);
+        forkJoinPool.submit(()->{
+            actressesInfoService.findAll().stream().parallel().forEach(actressesInfo -> {
+                logger.info("----------{},开始获取---------", actressesInfo.getName());
+                saveAvInfoByActresses(actressesInfo.getJavbusUrl());
+                logger.info("----------{},所有获取完成---------", actressesInfo.getName());
+            });
+            logger.info("----------保存完成-------------");
         });
-        logger.info("----------保存完成-------------");
     }
 
     public void updateAVMagnetList() {

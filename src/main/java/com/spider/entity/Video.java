@@ -20,6 +20,8 @@ public class Video {
 
     private String name;
 
+    private String translateName;
+
     private Long size;
 
     private String sizeStr;

@@ -7,6 +7,7 @@ import com.spider.entity.Video;
 import com.spider.service.AvInfoService;
 import com.spider.service.VideoService;
 import com.spider.service.es.EsVideoService;
+import com.spider.utils.BaiduTranslateUtil;
 import com.spider.utils.FFmpegUtil;
 import com.spider.utils.FileUtils;
 import com.spider.utils.MD5Util;
@@ -21,6 +22,8 @@ import ws.schild.jave.MultimediaInfo;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -227,5 +230,30 @@ public class VideoController extends BaseController {
         List<Video> videoList = videoService.findAll();
         long totalSize = videoList.stream().filter(video -> Objects.nonNull(video.getSize())).mapToLong(Video::getSize).sum();
         return ResponseVo.succee(totalSize / 1024.0 / 1024 / 1024);
+    }
+
+    @ApiOperation("翻译名称")
+    @GetMapping("/translate/name")
+    public ResponseVo<Object> translateName() {
+        threadPoolExecutor.execute(() -> {
+            ForkJoinPool forkJoinPool = new ForkJoinPool(10);
+            List<Video> videoList = videoService.findAll();
+            forkJoinPool.submit(() -> videoList.parallelStream().forEach(video -> {
+                String translateName = BaiduTranslateUtil.translate(video.getName().replace("mp4", ""), "auto", "zh");
+                if (Objects.nonNull(translateName)) {
+                    video.setTranslateName(translateName);
+                    logger.info("{}->{}",video.getName(),translateName);
+                    videoService.updateById(video);
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    logger.info("{},翻译失败", video.getName());
+                }
+            }));
+        });
+        return ResponseVo.succee();
     }
 }
