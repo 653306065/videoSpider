@@ -15,10 +15,9 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ForkJoinPool;
 
 @Api(tags = "爬虫接口")
 @RestController
@@ -106,20 +105,24 @@ public class SpiderController extends BaseController {
     @GetMapping("/start/save/xslist/actresses")
     public ResponseVo<Object> saveXslist(@RequestParam(name = "thread", defaultValue = "30") Integer thread) {
         threadPoolExecutor.execute(() -> {
-            actressesInfoService.findAll().stream().parallel().forEach(actressesInfo -> {
-                List<String> urlList = xslist.getSearchList(actressesInfo.getName());
-                if (CollectionUtil.isNotEmpty(urlList)) {
-                    ActressesInfo info = xslist.getInfo(urlList.get(0));
-                    if (Objects.nonNull(info) && actressesInfo.getName().trim().equals(info.getName().trim())) {
-                        CopyOptions copyOptions = new CopyOptions();
-                        copyOptions.setIgnoreNullValue(true);
-                        BeanUtil.copyProperties(info, actressesInfo, copyOptions);
-                        actressesInfoService.updateById(actressesInfo);
-                        logger.info("{},信息获取完成", actressesInfo.getName());
+            ForkJoinPool forkJoinPool=new ForkJoinPool(thread);
+            forkJoinPool.submit(()->{
+                actressesInfoService.findAll().stream().parallel().forEach(actressesInfo -> {
+                    List<String> urlList = xslist.getSearchList(actressesInfo.getName());
+                    if (CollectionUtil.isNotEmpty(urlList)) {
+                        ActressesInfo info = xslist.getInfo(urlList.get(0));
+                        if (Objects.nonNull(info) && actressesInfo.getName().trim().equals(info.getName().trim())) {
+                            CopyOptions copyOptions = new CopyOptions();
+                            copyOptions.setIgnoreNullValue(true);
+                            BeanUtil.copyProperties(info, actressesInfo, copyOptions);
+                            actressesInfoService.updateById(actressesInfo);
+                            logger.info("{},信息获取完成", actressesInfo.getName());
+                        }
                     }
-                }
+                });
+                logger.info("获取xslist信息完成");
             });
-            logger.info("获取xslist信息完成");
+
         });
         return ResponseVo.succee();
     }
@@ -159,7 +162,7 @@ public class SpiderController extends BaseController {
 
     @ApiOperation("获取图片的人脸信息")
     @PostMapping(value = "/face/info", headers = "content-type=multipart/form-data", consumes = "multipart/*")
-    public ResponseVo<List<FaceInfo>> faceInfo(@ApiParam(value = "文件", required = true) MultipartFile file) {
+    public ResponseVo<List<FaceInfo>> faceInfo(@ApiParam(value = "文件") MultipartFile file) {
         try {
             return ResponseVo.succee(FaceUtil.faceInfo(file.getBytes()));
         } catch (Exception e) {

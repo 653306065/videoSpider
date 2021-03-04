@@ -41,7 +41,7 @@ public class AvInfoController extends BaseController {
 
     @ApiOperation("根据关键字搜索")
     @GetMapping("/search/{value}")
-    public ResponseVo<List<AvInfo>> search(@PathVariable(value = "value", required = true) String value) {
+    public ResponseVo<List<AvInfo>> search(@PathVariable(value = "value") String value) {
         List<AvInfo> list = esAvInfoService.searchByValue(value).stream().map(esAvInfoSearchHit -> BeanUtil.toBean(esAvInfoSearchHit.getContent(), AvInfo.class)).collect(Collectors.toList());
         return ResponseVo.succee(list);
     }
