@@ -104,11 +104,6 @@ by114:
   template: https://www.by114.pw/forum-@{type}-@{page}.html
   savePath: C:\by114\
 
-proxyrarbg:
-  home: https://proxyrarbg.org/torrents.php
-  template: https://proxyrarbg.org/torrents.php?category=@{category}&page=@{page}
-  savePath: C:\proxyrarbg\
-
 javbangers:
   home: https://www.javbangers.com/
   template: https://www.javbangers.com/categories/@{categories}/?mode=async&function=get_block&block_id=list_videos_common_videos_list&sort_by=post_date&from=@{page}&_=@{time}

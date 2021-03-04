@@ -21,11 +21,9 @@ import ws.schild.jave.MultimediaInfo;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 @Aspect
@@ -189,6 +187,7 @@ public class DownloadAop {
                 new File(video.getSavePath()).delete();
                 logger.info("{},视频尺寸小于{}*{},删除成功", video.getSavePath(), minHeight, minWidth);
             }
+            urlRecordService.insertList(Stream.of(video.getSourceUrl(),video.getVideoUrl()).filter(Objects::nonNull).collect(Collectors.toList()));
         } catch (Throwable e) {
             e.printStackTrace();
         }
