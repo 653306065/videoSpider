@@ -105,6 +105,7 @@ public abstract class BaseWeb implements ApplicationRunner {
         return false;
     }
 
+    @Override
     public void run(ApplicationArguments args) {
         Environment environment = SpringContentUtil.getApplicationContext().getEnvironment();
         String name = this.getClass().getSimpleName().toLowerCase();
@@ -118,7 +119,7 @@ public abstract class BaseWeb implements ApplicationRunner {
             home = environment.getProperty(name + ".home");
         }
         if (environment.containsProperty(name + ".savePath")) {
-            savePath = environment.getProperty(name + ".enableProxy");
+            savePath = environment.getProperty(name + ".savePath");
         }
     }
 
