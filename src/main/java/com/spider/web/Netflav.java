@@ -19,9 +19,6 @@ import java.util.stream.Collectors;
 @Component
 public class Netflav extends BaseWeb {
 
-    @Value("${netflav.home}")
-    private String home;
-
     @Value("${netflav.listTemplate}")
     private String listTemplate;
 
@@ -33,15 +30,6 @@ public class Netflav extends BaseWeb {
 
     @Value("${netflav.fileApiTemplate}")
     private String fileApiTemplate;
-
-    @Value("${netflav.enableProxy}")
-    private Boolean enableProxy;
-
-    @Value("${netflav.thread}")
-    private Integer thread;
-
-    @Value("${netflav.savePath}")
-    private String savePath;
 
     public List<Video> getVideoList(String category, Integer page) {
         String listUrl = listTemplate.replace("@{category}", category).replace("@{page}", String.valueOf(page));

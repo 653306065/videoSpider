@@ -1,16 +1,11 @@
 package com.spider.web;
 
-import cn.hutool.crypto.digest.MD5;
 import com.spider.entity.ActressesInfo;
 import com.spider.entity.AvInfo;
 import com.spider.service.ActressesInfoService;
-import com.spider.service.AvInfoService;
 import com.spider.utils.FileUtils;
 import com.spider.utils.JsoupUtil;
-import com.spider.utils.MD5Util;
 import com.spider.utils.OKHttpUtils;
-import org.htmlcleaner.HtmlCleaner;
-import org.htmlcleaner.TagNode;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -20,9 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ForkJoinPool;
@@ -30,15 +23,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class Javbus extends BaseWeb {
-
-    @Value("${javbus.home}")
-    private String home;
-
-    @Value("${javbus.enableProxy}")
-    private Boolean enableProxy;
-
-    @Value("${javbus.thread}")
-    private Integer thread;
 
     @Value("${javbus.actressesListTemplate}")
     private String actressesListTemplate;
@@ -49,9 +33,6 @@ public class Javbus extends BaseWeb {
     @Value("${javbus.avTemplate}")
     private String avTemplate;
 
-    @Value("${javbus.savePath}")
-    private String savePath;
-
     @Value("${javbus.magnetApi}")
     private String magnetApi;
 
@@ -60,11 +41,6 @@ public class Javbus extends BaseWeb {
 
     @Autowired
     private ActressesInfoService actressesInfoService;
-
-    @Autowired
-    private AvInfoService avInfoService;
-
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     public List<ActressesInfo> getActressesInfoList(String category, int page) {
         String url = actressesListTemplate.replace("@{category}", category).replace("@{page}", String.valueOf(page));
@@ -318,8 +294,8 @@ public class Javbus extends BaseWeb {
     }
 
     public void saveAvInfoByActressesAll() {
-        ForkJoinPool forkJoinPool=new ForkJoinPool(thread);
-        forkJoinPool.submit(()->{
+        ForkJoinPool forkJoinPool = new ForkJoinPool(thread);
+        forkJoinPool.submit(() -> {
             actressesInfoService.findAll().stream().parallel().forEach(actressesInfo -> {
                 logger.info("----------{},开始获取---------", actressesInfo.getName());
                 saveAvInfoByActresses(actressesInfo.getJavbusUrl());

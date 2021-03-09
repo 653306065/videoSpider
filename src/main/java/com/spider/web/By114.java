@@ -10,19 +10,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
-import com.alibaba.fastjson.JSON;
 import com.spider.entity.By114BT;
 import com.spider.utils.FileUtils;
 import com.spider.utils.JsoupUtil;
@@ -30,18 +24,10 @@ import com.spider.utils.OKHttpUtils;
 import com.spider.service.By114BTService;
 
 @Service
-public class By114 {
-
-    private Logger logger = LoggerFactory.getLogger(By114.class);
+public class By114 extends BaseWeb {
 
     @Value("${by114.template}")
     private String template;
-
-    @Value("${by114.home}")
-    private String home;
-
-    @Value("${by114.savePath}")
-    private String savePath;
 
     @Autowired
     private By114BTService by114BTService;

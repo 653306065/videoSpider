@@ -16,23 +16,8 @@ import java.util.stream.Collectors;
 @Service
 public class Hqporner extends BaseWeb {
 
-    @Value("${hqporner.home}")
-    private String home;
-
     @Value("${hqporner.template}")
     private String template;
-
-    @Value("${hqporner.enableProxy}")
-    private Boolean enableProxy;
-
-    @Value("${hqporner.savePath}")
-    private String savePath;
-
-    @Autowired
-    private MultithreadingDownload multithreadingDownload;
-
-    @Value("${hqporner.thread}")
-    private Integer thread;
 
     public List<String> getVideoList(String category, Integer page) {
         String url = template.replace("@{category}", category).replace("@{page}", String.valueOf(page));

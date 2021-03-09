@@ -20,28 +20,11 @@ import java.util.*;
 @Component
 public class Kissjav extends BaseWeb {
 
-    @Value("${kissjav.home}")
-    private String home;
-
-    @Value("${kissjav.savePath}")
-    private String savePath;
-
     @Value("${kissjav.template}")
     private String template;
 
-    @Value("${kissjav.thread}")
-    private Integer thread;
-
-    @Value("${kissjav.enableProxy}")
-    private Boolean enableProxy;
-
     @Value("${kissjav.cookie}")
     private String cookie;
-
-    @Autowired
-    private MultithreadingDownload multithreadingDownload;
-
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     public List<Video> getVideoList(String category, Integer page) {
         List<Video> list = new ArrayList<>();
@@ -66,7 +49,7 @@ public class Kissjav extends BaseWeb {
         return list;
     }
 
-    public Video getVideoInfo(String url) throws Exception {
+    public Video getVideoInfo(String url)  {
         Video video = new Video();
         video.setSourceUrl(url);
         Document document = JsoupUtil.getDocument(url, enableProxy);

@@ -14,12 +14,6 @@ import com.spider.utils.JsoupUtil;
 @Service
 public class AvMovie {
 
-    @Value("${avMovie.home}")
-    private String home;
-
-    @Value("${avMovie.savePath}")
-    private String savePath;
-
     @Value("${avMovie.uncensored}")
     private String uncensored;
 

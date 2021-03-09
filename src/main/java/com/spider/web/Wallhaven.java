@@ -21,19 +21,13 @@ import com.spider.utils.JsoupUtil;
 import com.spider.utils.download.ImageDownload;
 
 @Service
-public class Wallhaven {
+public class Wallhaven extends BaseWeb {
 
     @Value("${wallhaven.imageApi}")
     private String imageApi;
 
     @Value("${wallhaven.cookie}")
     private String cookie;
-
-    @Value("${wallhaven.savePath}")
-    private String savePath;
-
-    @Value("${wallhaven.enableProxy}")
-    private Boolean enableProxy;
 
     @Autowired
     ImageDownload imageDownload;

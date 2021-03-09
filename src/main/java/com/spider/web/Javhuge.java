@@ -19,23 +19,8 @@ import java.util.stream.Collectors;
 @Service
 public class Javhuge extends BaseWeb {
 
-    @Value("${javhuge.home}")
-    private String home;
-
     @Value("${javhuge.template}")
     private String template;
-
-    @Value("${javhuge.savePath}")
-    private String savePath;
-
-    @Value("${javhuge.thread}")
-    private Integer thread;
-
-    @Value("${javhuge.enableProxy}")
-    private boolean enableProxy;
-
-    @Autowired
-    private HlsDownloader hlsDownloader;
 
     public List<Map<String, String>> getVideoList(String category, Integer page) {
         String url = template.replace("@{category}", category).replace("@{page}", String.valueOf(page));

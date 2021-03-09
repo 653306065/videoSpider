@@ -22,7 +22,7 @@ import com.spider.utils.OKHttpUtils;
 import com.spider.utils.download.ImageDownload;
 
 @Service
-public class Pixiv {
+public class Pixiv extends BaseWeb {
 
     private Logger logger = LoggerFactory.getLogger(Pixiv.class);
 
@@ -32,23 +32,11 @@ public class Pixiv {
     @Value("${pixiv.cookie}")
     private String cookie;
 
-    @Value("${pixiv.home}")
-    private String home;
-
     @Autowired
     Proxy proxy;
 
-    @Value("${pixiv.savePath}")
-    private String savePath;
-
     @Autowired
     ImageDownload imageDownload;
-
-    @Value("${pixiv.thread}")
-    private int thread;
-
-    @Value("${pixiv.enableProxy}")
-    private Boolean enableProxy;
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 

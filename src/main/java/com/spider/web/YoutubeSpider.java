@@ -37,19 +37,11 @@ import com.spider.utils.OKHttpUtils;
 @Component
 public class YoutubeSpider extends BaseWeb {
 
-    @Value("${youtube.savePath}")
-    private String savePath;
 
-    @Value("${youtube.home}")
-    private String home;
-
-    @Value("${youtube.thread}")
-    private Integer thread;
-
-    @Value("${youtube.api}")
+    @Value("${youtubeSpider.api}")
     private String api;
 
-    @Value("${youtube.googleApi.key}")
+    @Value("${youtubeSpider.googleApi.key}")
     private String key;
 
     @Autowired
@@ -57,10 +49,6 @@ public class YoutubeSpider extends BaseWeb {
 
     @Autowired
     YouTube youTube;
-
-    @Value("${youtube.enableProxy}")
-    private Boolean enableProxy;
-
 
     public String getApiToken() {
         Document document = JsoupUtil.getDocumentByProxy(home);

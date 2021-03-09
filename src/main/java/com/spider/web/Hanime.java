@@ -24,9 +24,7 @@ import com.spider.utils.OKHttpUtils;
 import com.spider.utils.download.ImageDownload;
 
 @Service
-public class Hanime {
-
-    private Logger logger = LoggerFactory.getLogger(Hanime.class);
+public class Hanime extends BaseWeb {
 
     @Value("${hanime.imageApi}")
     private String imageApi;
@@ -34,17 +32,8 @@ public class Hanime {
     @Autowired
     Proxy proxy;
 
-    @Value("${hanime.thread}")
-    private int thread;
-
-    @Value("${hanime.enableProxy}")
-    private Boolean enableProxy;
-
     @Autowired
     ImageDownload imageDownload;
-
-    @Value("${hanime.savePath}")
-    private String savePath;
 
     @Value("${hanime.videoListApi}")
     private String videoListApi;
@@ -57,9 +46,6 @@ public class Hanime {
 
     @Value("${hanime.auth_expires}")
     private String auth_expires;
-
-    @Autowired
-    private MultithreadingDownload multithreadingDownload;
 
     public void downloadImage(String type) {
         int offset = 0;

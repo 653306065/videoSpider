@@ -25,34 +25,11 @@ import java.util.stream.Collectors;
 @Component
 public class Javbangers extends BaseWeb {
 
-    @Value("${javbangers.home}")
-    private String home;
-
     @Value("${javbangers.template}")
     private String template;
 
-    @Value("${javbangers.savePath}")
-    private String savePath;
-
     @Value("${javbangers.cookie}")
     private String cookie;
-
-    @Value("${javbangers.enableProxy}")
-    private Boolean enableProxy;
-
-    @Value("${javbangers.thread}")
-    private Integer thread;
-
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-    @Autowired
-    private VideoService videoService;
-
-    @Autowired
-    private MultithreadingDownload multithreadingDownload;
-
-    @Autowired
-    private AvInfoService avInfoService;
 
     public List<Video> getVideoListByUrl(String categories, Integer page) {
         String listUrl = template.replace("@{categories}", categories).replace("@{page}", String.valueOf(page)).replace("@{time}", String.valueOf(System.currentTimeMillis()));

@@ -20,4 +20,8 @@ public class SpringContentUtil implements ApplicationContextAware {
         return applicationContext.getBean(t);
     }
 
+    public static ApplicationContext getApplicationContext() {
+        return applicationContext;
+    }
+
 }

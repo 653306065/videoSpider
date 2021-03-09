@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ws.schild.jave.MultimediaInfo;
-
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.*;
@@ -187,7 +186,7 @@ public class DownloadAop {
                 new File(video.getSavePath()).delete();
                 logger.info("{},视频尺寸小于{}*{},删除成功", video.getSavePath(), minHeight, minWidth);
             }
-            urlRecordService.insertList(Stream.of(video.getSourceUrl(),video.getVideoUrl()).filter(Objects::nonNull).collect(Collectors.toList()));
+            urlRecordService.insertList(Stream.of(video.getSourceUrl(), video.getVideoUrl()).filter(Objects::nonNull).collect(Collectors.toList()));
         } catch (Throwable e) {
             e.printStackTrace();
         }

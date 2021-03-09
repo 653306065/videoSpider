@@ -20,20 +20,8 @@ import java.util.Objects;
 @Component
 public class Javfull extends BaseWeb {
 
-    @Value("${javfull.home}")
-    private String home;
-
     @Value("${javfull.template}")
     private String template;
-
-    @Value("${javfull.savePath}")
-    private String savePath;
-
-    @Value("${javfull.enableProxy}")
-    private Boolean enableProxy;
-
-    @Value("${javfull.thread}")
-    private Integer thread;
 
     @Value("${javfull.api}")
     private String api;

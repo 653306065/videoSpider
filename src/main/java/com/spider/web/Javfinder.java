@@ -32,14 +32,8 @@ public class Javfinder extends BaseWeb {
 
     private Logger logger = LoggerFactory.getLogger(Javfinder.class);
 
-    @Value("${javfinder.home}")
-    private String home;
-
     @Value("${javfinder.category.Uncensored}")
     private String Uncensored;
-
-    @Value("${javfinder.savePath}")
-    private String savePath;
 
     @Autowired
     private MultithreadingDownload multithreadingDownload;
@@ -47,17 +41,11 @@ public class Javfinder extends BaseWeb {
     @Value("${javfinder.categoryTemplate}")
     private String categoryTemplate;
 
-    @Value("${javfinder.thread}")
-    private int thread;
-
     @Value("${javfinder.ignoreCode}")
     private String ignoreCode;
 
     @Value("${javfinder.category.Hot}")
     private String hot;
-
-    @Value("${javfinder.enableProxy}")
-    private Boolean enableProxy;
 
     @Autowired
     private UrlRecordService urlRecordService;

@@ -28,27 +28,12 @@ import com.spider.utils.download.MultithreadingDownload;
 @Service
 public class Eporner extends BaseWeb {
 
-    @Value("${eporner.home}")
-    private String homeUrl;
-
     @Value("${eporner.category.UHD}")
     private String UHDUrl;
 
     private final String categoryTemplate = "https://www.eporner.com/category/${category}/${page}/";
 
     String apiUrl = "https://www.eporner.com/xhr/video/${vid}?hash=${hash}&device=generic&domain=www.eporner.com&fallback=false&embed=false&supportedFormats=mp4&tech=Html5&_=1550911326158";
-
-    @Value("${eporner.savePath}")
-    private String savePath;
-
-    @Value("${eporner.thread}")
-    private int thread;
-
-    @Value("${eporner.enableProxy}")
-    private boolean enableProxy;
-
-    @Autowired
-    private MultithreadingDownload multithreadingDownload;
 
     public List<String> getDetailsList(String category, int page) {
         String realUrl = categoryTemplate.replace("${category}", category).replace("${page}", String.valueOf(page));
@@ -57,7 +42,7 @@ public class Eporner extends BaseWeb {
         Elements elements = document.getElementById("vidresults").getElementsByClass("hdy");
         List<String> urlList = new ArrayList<String>();
         for (Element element : elements) {
-            String detailsUrl = homeUrl + element.getElementsByTag("a").get(0).attr("href");
+            String detailsUrl = home + element.getElementsByTag("a").get(0).attr("href");
             urlList.add(detailsUrl);
         }
         return urlList;

@@ -24,26 +24,8 @@ import com.spider.utils.download.MultithreadingDownload;
 @Component
 public class Javhihi extends BaseWeb {
 
-    @Value("${javhihi.home}")
-    private String home;
-
     @Value("${javhihi.movie}")
     private String movie;
-
-    @Value("${javhihi.savePath}")
-    private String savePath;
-
-    @Value("${javhihi.thread}")
-    private int thread;
-
-    @Value("${javhihi.enableProxy}")
-    private Boolean enableProxy;
-
-    @Autowired
-    private MultithreadingDownload MultithreadingDownload;
-
-    @Autowired
-    private VideoService videoService;
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -105,7 +87,7 @@ public class Javhihi extends BaseWeb {
                     header.put("Connection", "keep-alive");
                     video.setVideoUrl(realUrl);
                     video.setSavePath(path);
-                    MultithreadingDownload.videoDownload(video, header, enableProxy, thread, defaultSegmentSize);
+                    multithreadingDownload.videoDownload(video, header, enableProxy, thread, defaultSegmentSize);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

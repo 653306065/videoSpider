@@ -5,13 +5,16 @@ import com.spider.entity.Video;
 import com.spider.service.AvInfoService;
 import com.spider.service.VideoService;
 import com.spider.utils.FileUtils;
+import com.spider.utils.SpringContentUtil;
+import com.spider.utils.download.HlsDownloader;
 import com.spider.utils.download.MultithreadingDownload;
-import org.aspectj.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.env.Environment;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -19,7 +22,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public abstract class BaseWeb {
+public abstract class BaseWeb implements ApplicationRunner {
 
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -37,13 +40,28 @@ public abstract class BaseWeb {
     protected VideoService videoService;
 
     @Autowired
-    MultithreadingDownload multithreadingDownload;
+    protected MultithreadingDownload multithreadingDownload;
+
+    @Autowired
+    protected HlsDownloader hlsDownloader;
 
     protected String fileSeparator = File.separator;
 
     protected Integer defaultEndPage = 500;
 
     protected MD5 md5 = MD5.create();
+
+    //配置线程数
+    protected Integer thread;
+
+    //是否开启代理
+    protected Boolean enableProxy;
+
+    //保存路径
+    protected String savePath;
+
+    //主页
+    protected String home;
 
     @PostConstruct
     public void initFilterKey() {
@@ -85,5 +103,55 @@ public abstract class BaseWeb {
             return true;
         }
         return false;
+    }
+
+    public void run(ApplicationArguments args) {
+        Environment environment = SpringContentUtil.getApplicationContext().getEnvironment();
+        String name = this.getClass().getSimpleName().toLowerCase();
+        if (environment.containsProperty(name + ".thread")) {
+            thread = Integer.valueOf(environment.getProperty(name + ".thread"));
+        }
+        if (environment.containsProperty(name + ".enableProxy")) {
+            enableProxy = Boolean.valueOf(environment.getProperty(name + ".enableProxy"));
+        }
+        if (environment.containsProperty(name + ".home")) {
+            home = environment.getProperty(name + ".home");
+        }
+        if (environment.containsProperty(name + ".savePath")) {
+            savePath = environment.getProperty(name + ".enableProxy");
+        }
+    }
+
+
+    public Integer getThread() {
+        return thread;
+    }
+
+    public void setThread(Integer thread) {
+        this.thread = thread;
+    }
+
+    public Boolean getEnableProxy() {
+        return enableProxy;
+    }
+
+    public void setEnableProxy(Boolean enableProxy) {
+        this.enableProxy = enableProxy;
+    }
+
+    public String getSavePath() {
+        return savePath;
+    }
+
+    public void setSavePath(String savePath) {
+        this.savePath = savePath;
+    }
+
+    public String getHome() {
+        return home;
+    }
+
+    public void setHome(String home) {
+        this.home = home;
     }
 }

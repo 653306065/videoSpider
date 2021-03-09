@@ -1,51 +1,27 @@
 package com.spider.web;
 
-import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.spider.entity.Video;
-import com.spider.service.VideoService;
 import com.spider.utils.FileUtils;
 import com.spider.utils.JsoupUtil;
 import com.spider.utils.OKHttpUtils;
-import com.spider.utils.download.MultithreadingDownload;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import java.io.File;
 import java.util.*;
 
 @Component
 public class Javrave extends BaseWeb {
 
-    @Value("${javrave.home}")
-    private String home;
-
     @Value("${javrave.template}")
     private String template;
 
-    @Value("${javrave.savePath}")
-    private String savePath;
-
-    @Value("${javrave.enableProxy}")
-    private Boolean enableProxy;
-
-    @Value("${javrave.thread}")
-    private Integer thread;
-
     @Value("${javrave.api}")
     private String api;
-
-    @Autowired
-    private VideoService videoService;
-
-    @Autowired
-    private MultithreadingDownload multithreadingDownload;
 
     /**
      * 获取视频的源地址列表

@@ -30,23 +30,11 @@ import org.springframework.util.StringUtils;
 @Service
 public class Pornhub extends BaseWeb {
 
-    @Value("${pornhub.savePath}")
-    private String savePath;
-
-    @Value("${pornhub.home}")
-    private String home;
-
     @Value("${pornhub.searchUrl}")
     private String searchUrl;
 
-    @Value("${pornhub.thread}")
-    private int thread;
-
     @Value("${pornhub.channels}")
     private String channelsTemplate;
-
-    @Value("${pornhub.enableProxy}")
-    private Boolean enableProxy;
 
     @Value("${pornhub.categoriesUrlByNum}")
     private String categoriesUrlByNum;
@@ -365,11 +353,4 @@ public class Pornhub extends BaseWeb {
         }
     }
 
-    public int getThread() {
-        return thread;
-    }
-
-    public void setThread(int thread) {
-        this.thread = thread;
-    }
 }

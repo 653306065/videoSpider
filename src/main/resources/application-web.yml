@@ -86,7 +86,7 @@ pornhub:
   thread: 30
   enableProxy: true
 
-youtube:
+youtubeSpider:
   home: https://www.findyoutube.net/
   api: https://www.findyoutube.net/result
   savePath: F:\youtube\
@@ -109,7 +109,7 @@ javbangers:
   template: https://www.javbangers.com/categories/@{categories}/?mode=async&function=get_block&block_id=list_videos_common_videos_list&sort_by=post_date&from=@{page}&_=@{time}
   savePath: E:\javbangers\
   cookie: _ga=GA1.2.1813706946.1611485984; kt_member=19a53e42c36918fb80fad447c7e2307c; PHPSESSID=83daf0d235a654c9b3dfbdd33d237079; kt_qparams=id=102615&dir=127-coco; kt_ips=219.78.10.178; kt_tcookie=1; kt_is_visited=1; _gid=GA1.2.1487211305.1612600872; _gat_gtag_UA_154629456_1=1
-  enableProxy: false
+  enableProxy: true
   thread: 30
 
 kissjav:
@@ -122,7 +122,7 @@ kissjav:
 
 javbus:
   home: https://www.javbus.com
-  enableProxy: false
+  enableProxy: true
   thread: 100
   actressesListTemplate: ${javbus.home}/@{category}/actresses/@{page}
   actressesDetailsTemplate: ${javbus.home}/@{category}/star/@{name}
@@ -135,7 +135,7 @@ javrave:
   home: https://javrave.club/
   template: https://javrave.club/cat/@{category}/page/@{page}/
   savePath: E:\javrave\
-  enableProxy: false
+  enableProxy: true
   thread: 30
   api: https://javideo.pw/api/source/@{key}
 
@@ -152,12 +152,12 @@ javhuge:
   template: http://javhuge.com/vod/show/class/@{category}/id/22/page/@{page}
   savePath: E:\javhuge\
   thread: 30
-  enableProxy: false
+  enableProxy: true
 
 hqporner:
   home: https://hqporner.com
   template: ${hqporner.home}/category/@{category}/@{page}
-  enableProxy: false
+  enableProxy: true
   thread: 30
   savePath: E:\hqporner\
 
@@ -167,7 +167,7 @@ netflav:
   videoTemplate: https://netflav.com/video?id=@{videoId}
   videoInfoApi: https://netflav.com/api98/video/v2/retrieveVideo/@{videoId}
   fileApiTemplate: https://www.avple.video/api/source/@{key}
-  enableProxy: false
+  enableProxy: true
   thread: 30
   savePath: E:\netflav\
 
