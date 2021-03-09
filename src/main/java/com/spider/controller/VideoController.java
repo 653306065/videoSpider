@@ -50,13 +50,15 @@ public class VideoController extends BaseController {
 
     @ApiOperation("清空低于指定分辨率的视频")
     @GetMapping("/clean/resolutionRatio/video")
-    public ResponseVo<Object> cleanVideo(@RequestParam(required = false, defaultValue = "640") Integer height, @RequestParam(required = false, defaultValue = "640") Integer width) {
+    public ResponseVo<Object> cleanVideo(@RequestParam(required = false, defaultValue = "640") Integer height, @RequestParam(required = false, defaultValue = "640") Integer width, @RequestParam(defaultValue = "false") Boolean isDelete) {
         AtomicLong size = new AtomicLong(0);
         CopyOnWriteArrayList<String> copyOnWriteArrayList = new CopyOnWriteArrayList<>();
         videoService.findAll().stream().filter(video -> !video.getSavePath().contains("里番")).filter(video -> new File(video.getSavePath()).exists()).filter(video -> Objects.nonNull(video.getMultimediaInfo())).forEach(video -> {
             if (height * width > video.getMultimediaInfo().getVideo().getSize().getHeight() * video.getMultimediaInfo().getVideo().getSize().getWidth()) {
                 logger.info(video.getSavePath());
-                new File(video.getSavePath()).delete();
+                if(isDelete){
+                    new File(video.getSavePath()).delete();
+                }
                 size.addAndGet(video.getSize());
                 copyOnWriteArrayList.add(video.getSavePath());
             }
@@ -70,13 +72,15 @@ public class VideoController extends BaseController {
 
     @ApiOperation("清空低于指定分钟数的视频")
     @GetMapping("/clean/time/video")
-    public ResponseVo<Object> cleanTimeVideo(@RequestParam(required = false, defaultValue = "10") Integer minute) {
+    public ResponseVo<Object> cleanTimeVideo(@RequestParam(required = false, defaultValue = "10") Integer minute,@RequestParam(defaultValue = "false") Boolean isDelete) {
         AtomicLong size = new AtomicLong(0);
         CopyOnWriteArrayList<String> copyOnWriteArrayList = new CopyOnWriteArrayList<>();
         videoService.findAll().stream().filter(video -> !video.getSavePath().contains("里番")).filter(video -> new File(video.getSavePath()).exists()).filter(video -> Objects.nonNull(video.getMultimediaInfo())).forEach(video -> {
             if (video.getMultimediaInfo().getDuration() < 1000L * 60 * minute) {
                 logger.info(video.getSavePath());
-                new File(video.getSavePath()).delete();
+                if(isDelete){
+                    new File(video.getSavePath()).delete();
+                }
                 size.addAndGet(video.getSize());
                 copyOnWriteArrayList.add(video.getSavePath());
             }
