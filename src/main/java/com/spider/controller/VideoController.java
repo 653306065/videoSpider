@@ -61,11 +61,11 @@ public class VideoController extends BaseController {
                 copyOnWriteArrayList.add(video.getSavePath());
             }
         });
-        Map<String, Object> map = new HashMap<>();
-        map.put("fileSize", size.get() / 1024.0 / 1024 / 1024);
-        map.put("list", copyOnWriteArrayList);
-        map.put("listSize", copyOnWriteArrayList.size());
-        return ResponseVo.succee(map);
+        return ResponseVo.succee(new HashMap<>() {{
+            put("fileSize", size.get() / 1024.0 / 1024 / 1024);
+            put("list", copyOnWriteArrayList);
+            put("listSize", copyOnWriteArrayList.size());
+        }});
     }
 
     @ApiOperation("清空低于指定分钟数的视频")
@@ -81,11 +81,11 @@ public class VideoController extends BaseController {
                 copyOnWriteArrayList.add(video.getSavePath());
             }
         });
-        Map<String, Object> map = new HashMap<>();
-        map.put("fileSize", size.get() / 1024.0 / 1024 / 1024);
-        map.put("list", copyOnWriteArrayList);
-        map.put("listSize", copyOnWriteArrayList.size());
-        return ResponseVo.succee(map);
+        return ResponseVo.succee(new HashMap<>() {{
+            put("fileSize", size.get() / 1024.0 / 1024 / 1024);
+            put("list", copyOnWriteArrayList);
+            put("listSize", copyOnWriteArrayList.size());
+        }});
     }
 
     @ApiOperation("同步视频code")
@@ -242,7 +242,7 @@ public class VideoController extends BaseController {
                 String translateName = BaiduTranslateUtil.translate(video.getName().replace("mp4", ""), "auto", "zh");
                 if (Objects.nonNull(translateName)) {
                     video.setTranslateName(translateName);
-                    logger.info("{}->{}",video.getName(),translateName);
+                    logger.info("{}->{}", video.getName(), translateName);
                     videoService.updateById(video);
                     try {
                         Thread.sleep(1000);
