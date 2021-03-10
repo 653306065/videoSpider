@@ -41,7 +41,6 @@ public class BeanConf {
 
     @Bean
     public ThreadPoolExecutor threadPoolExecutor() {
-        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(8 * 3, 8 * 3 * 10, 1, TimeUnit.MINUTES, new ArrayBlockingQueue<Runnable>(1000));
-        return threadPoolExecutor;
+        return new ThreadPoolExecutor(8 * 3, 8 * 3 * 10, 1, TimeUnit.MINUTES, new ArrayBlockingQueue<>(1000));
     }
 }

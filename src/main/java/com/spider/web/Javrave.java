@@ -39,7 +39,7 @@ public class Javrave extends BaseWeb {
             return list;
         }
         Elements elements = document.getElementsByTag("article");
-        elements.stream().forEach(element -> {
+        elements.forEach(element -> {
             Elements h3 = element.getElementsByTag("h3");
             if (h3.size() > 0) {
                 Elements as = h3.get(0).getElementsByTag("a");
@@ -98,7 +98,7 @@ public class Javrave extends BaseWeb {
                         video.setName(document.getElementsByClass("current").get(0).text());
                         Elements ps = postMetadata.getElementsByTag("p");
                         Map<String, String> map = new HashMap<>();
-                        ps.stream().forEach(p -> {
+                        ps.forEach(p -> {
                             String[] strArr = p.text().split(":");
                             if (strArr.length > 1) {
                                 map.put(strArr[0], strArr[1].trim());
@@ -117,7 +117,7 @@ public class Javrave extends BaseWeb {
                         if (tags.size() > 0) {
                             Elements as = tags.get(0).getElementsByTag("a");
                             List<String> tagList = new ArrayList<>();
-                            as.stream().forEach(tag -> {
+                            as.forEach(tag -> {
                                 tagList.add(tag.text());
                             });
                             video.setTags(tagList);

@@ -47,6 +47,9 @@ public class Pornhub extends BaseWeb {
 
     public Video getVideoByUrl(String url) {
         Document document = JsoupUtil.getDocument(url, enableProxy);
+        if(Objects.isNull(document)){
+            return null;
+        }
         Element element = document.getElementById("player");
         String videoId = element.attr("data-video-id");
         //分类
@@ -175,6 +178,9 @@ public class Pornhub extends BaseWeb {
             list.forEach(value -> {
                 try {
                     Video video = getVideoByUrl(value);
+                    if(Objects.isNull(video)){
+                        return;
+                    }
                     String date = simpleDateFormat.format(new Date());
                     String path = savePath + "channels" + fileSeparator + channels + fileSeparator + date + fileSeparator + video.getName();
                     video.setSavePath(path);
@@ -206,6 +212,9 @@ public class Pornhub extends BaseWeb {
                 for (String str : list) {
                     try {
                         Video video = getVideoByUrl(str);
+                        if(Objects.isNull(video)){
+                            return;
+                        }
                         String date = simpleDateFormat.format(new Date());
                         String path = savePath + key + File.separator + date + File.separator + video.getName();
                         video.setSavePath(path);
@@ -255,6 +264,9 @@ public class Pornhub extends BaseWeb {
                 List<String> list = getVideoList(url);
                 for (String str : list) {
                     Video video = getVideoByUrl(str);
+                    if(Objects.isNull(video)){
+                        return;
+                    }
                     String date = simpleDateFormat.format(new Date());
                     String path = savePath + categoriesName + fileSeparator + date + fileSeparator + video.getName();
                     video.setSavePath(path);
@@ -281,6 +293,9 @@ public class Pornhub extends BaseWeb {
                 List<String> list = getVideoList(url);
                 for (String str : list) {
                     Video video = getVideoByUrl(str);
+                    if(Objects.isNull(video)){
+                        return;
+                    }
                     String date = simpleDateFormat.format(new Date());
                     String path = savePath + categories + "+" + incategories + File.separator + date + File.separator + video.getName();
                     video.setSavePath(path);
