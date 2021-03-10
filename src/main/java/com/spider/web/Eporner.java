@@ -1,29 +1,24 @@
 package com.spider.web;
 
-import java.net.Proxy;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
+import com.oracle.truffle.object.PropertyMap;
 import com.spider.entity.Video;
 import com.spider.utils.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.spider.utils.OKHttpUtils;
-import com.spider.utils.download.MultithreadingDownload;
 
 @Service
 public class Eporner extends BaseWeb {
@@ -53,10 +48,11 @@ public class Eporner extends BaseWeb {
         String html = OKHttpUtils.get(url, enableProxy);
         Document document = Jsoup.parse(html);
         String name = document.getElementById("video-info").getElementsByTag("h1").get(0).text();
-        Element moviexxx = document.getElementById("moviexxx");
-        String js = moviexxx.getElementsByTag("script").get(2).toString();
-        String vid = js.split("vid:")[1].split("'")[1];
-        String hash = getHashCode(js.split("hash:")[1].split("'")[1]);
+        AtomicReference<String> js = new AtomicReference<>("");
+        document.getElementsByTag("script").stream().filter(script -> script.data().contains("EP.video.player.hash")).forEach(script -> js.set(script.data()));
+        Map<String, String> infoMap = getJsInfo("var EP={}; " + js.get());
+        String vid = infoMap.get("vid");
+        String hash = getHashCode(infoMap.get("hash"));
         logger.info("name:{},vid:{},hash:{}", name, vid, hash);
         String api = apiUrl.replace("${vid}", vid).replace("${hash}", hash) + System.currentTimeMillis();
         logger.info("APIUrl:{}", api);
@@ -163,6 +159,24 @@ public class Eporner extends BaseWeb {
                 e.printStackTrace();
             }
             page++;
+        }
+    }
+
+    public static Map<String, String> getJsInfo(String js) {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("graal.js");
+        try {
+            engine.eval(js);
+            AbstractMap abstractMap = (AbstractMap) engine.get("EP");
+            String vid = ((AbstractMap) ((AbstractMap) abstractMap.get("video")).get("player")).get("vid").toString();
+            String hash = ((AbstractMap) ((AbstractMap) abstractMap.get("video")).get("player")).get("hash").toString();
+            return new HashMap<>() {{
+                put("vid", vid);
+                put("hash", hash);
+            }};
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 

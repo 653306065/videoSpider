@@ -60,6 +60,24 @@ public class SpiderController extends BaseController {
     @Autowired
     private Netflav netflav;
 
+    @Autowired
+    private Eporner eporner;
+
+
+    @ApiOperation("开始eporner 4k下载")
+    @GetMapping("/start/eporner/4k")
+    public ResponseVo<Object> startEporner(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
+                                              @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
+                                              @RequestParam(name = "savePath",required = false) String savePath) {
+        eporner.setThread(thread);
+        eporner.setEnableProxy(enableProxy);
+        if(Objects.nonNull(savePath)){
+            eporner.setSavePath(savePath);
+        }
+        threadPoolExecutor.execute(() -> eporner.download4K());
+        return ResponseVo.succee();
+    }
+
     @ApiOperation("开始javbangers下载")
     @GetMapping("/start/javbangers")
     public ResponseVo<Object> startJavbangers(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
