@@ -63,7 +63,7 @@ public class VideoController extends BaseController {
                 copyOnWriteArrayList.add(video.getSavePath());
             }
         });
-        return ResponseVo.succee(new HashMap<>() {{
+        return ResponseVo.succee(new HashMap<String, Object>() {{
             put("fileSize", size.get() / 1024.0 / 1024 / 1024);
             put("list", copyOnWriteArrayList);
             put("listSize", copyOnWriteArrayList.size());
@@ -85,7 +85,7 @@ public class VideoController extends BaseController {
                 copyOnWriteArrayList.add(video.getSavePath());
             }
         });
-        return ResponseVo.succee(new HashMap<>() {{
+        return ResponseVo.succee(new HashMap<String, Object>() {{
             put("fileSize", size.get() / 1024.0 / 1024 / 1024);
             put("list", copyOnWriteArrayList);
             put("listSize", copyOnWriteArrayList.size());
