@@ -13,6 +13,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <graalvm.version>21.0.0.2</graalvm.version>
     </properties>
 
     <parent>
@@ -198,6 +199,25 @@
             <groupId>io.lindstrom</groupId>
             <artifactId>m3u8-parser</artifactId>
             <version>0.19</version>
+        </dependency>
+
+        <!--    js引擎    -->
+        <dependency>
+            <groupId>org.graalvm.js</groupId>
+            <artifactId>js-scriptengine</artifactId>
+            <version>${graalvm.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.graalvm.js</groupId>
+            <artifactId>js</artifactId>
+            <version>${graalvm.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.graalvm.sdk</groupId>
+            <artifactId>graal-sdk</artifactId>
+            <version>${graalvm.version}</version>
         </dependency>
     </dependencies>
 

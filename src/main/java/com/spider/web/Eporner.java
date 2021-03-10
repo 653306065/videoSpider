@@ -168,7 +168,7 @@ public class Eporner extends BaseWeb {
 
     public static String getHashCode(String code) {
         ScriptEngineManager manager = new ScriptEngineManager();
-        ScriptEngine engine = manager.getEngineByName("javascript");
+        ScriptEngine engine = manager.getEngineByName("graal.js");
         try {
             engine.eval(
                     "function a(a){ return parseInt(a.substring(0, 8), 16).toString(36) + parseInt(a.substring(8, 16), 16).toString(36) + parseInt(a.substring(16, 24), 16).toString(36) + parseInt(a.substring(24, 32), 16).toString(36)}");

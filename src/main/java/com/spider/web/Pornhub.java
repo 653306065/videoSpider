@@ -327,7 +327,7 @@ public class Pornhub extends BaseWeb {
     public String getScriptJsonString(String js) {
         js = js.split("playerObjList")[0];
         ScriptEngineManager manager = new ScriptEngineManager();
-        ScriptEngine engine = manager.getEngineByName("javascript");
+        ScriptEngine engine = manager.getEngineByName("graal.js");
         try {
             Object value = engine.eval(js);
             return String.valueOf(value);
