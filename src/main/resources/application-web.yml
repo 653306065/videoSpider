@@ -64,15 +64,6 @@ javhihi:
   thread: 20
   enableProxy: true
 
-avMovie:
-  home: http://av.movie/
-  savePath: D:\avMovie\
-  uncensored: http://av.movie/c/uncensored/@{page}
-  videoUrl: http://av.movie/v/@{code}
-  videoListUrl: http://av.movie/c/@{type}/@{page}
-  playApi: http://api.av.movie/video/players
-
-
 pornhub:
   home: https://www.pornhub.com
   savePath: C:\pornhub\
