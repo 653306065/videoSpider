@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class CallableDownloadThread implements Callable<Boolean> {
 
-    private Logger logger = LoggerFactory.getLogger(DownloadThread.class);
+    private Logger logger = LoggerFactory.getLogger(CallableDownloadThread.class);
 
     private String httpUrl;
 
