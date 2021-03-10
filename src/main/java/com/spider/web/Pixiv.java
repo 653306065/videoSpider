@@ -89,14 +89,11 @@ public class Pixiv extends BaseWeb {
                 String dateStr = simpleDateFormat.format(date);
                 List<String> urls = getHistoryRankListUrl(date);
                 for (String url : urls) {
-                    executorService.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            Map<String, String> header = new HashMap<>();
-                            header.put("Referer", "https://www.pixiv.net/ranking.php?mode=daily&content=illust");
-                            String fileName = url.split("/")[url.split("/").length - 1];
-                            imageDownload.downloadFile(url, header, savePath + "\\" + dateStr + "\\" + fileName, enableProxy);
-                        }
+                    executorService.execute(() -> {
+                        Map<String, String> header = new HashMap<>();
+                        header.put("Referer", "https://www.pixiv.net/ranking.php?mode=daily&content=illust");
+                        String fileName = url.split("/")[url.split("/").length - 1];
+                        imageDownload.downloadFile(url, header, savePath + "\\" + dateStr + "\\" + fileName, enableProxy);
                     });
                 }
                 executorService.shutdown();

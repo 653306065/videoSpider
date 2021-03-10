@@ -174,8 +174,7 @@ public class Eporner extends BaseWeb {
                     "function a(a){ return parseInt(a.substring(0, 8), 16).toString(36) + parseInt(a.substring(8, 16), 16).toString(36) + parseInt(a.substring(16, 24), 16).toString(36) + parseInt(a.substring(24, 32), 16).toString(36)}");
             if (engine instanceof Invocable) {
                 Invocable invoke = (Invocable) engine; // 调用merge方法，并传入两个参数
-                String c = (String) invoke.invokeFunction("a", code);
-                return c;
+                return (String) invoke.invokeFunction("a", code);
             }
             return "";
         } catch (Exception e) {

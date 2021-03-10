@@ -54,13 +54,10 @@ public class Wallhaven extends BaseWeb {
     public void downloadImageList(List<String> list, String path) {
         ExecutorService executorService = Executors.newFixedThreadPool(list.size() / 2);
         for (String imageUrl : list) {
-            executorService.execute(new Runnable() {
-                @Override
-                public void run() {
-                    String name = imageUrl.split("-")[1];
-                    String save = savePath + path + name;
-                    imageDownload.downloadFile(imageUrl, null, save, enableProxy);
-                }
+            executorService.execute(() -> {
+                String name = imageUrl.split("-")[1];
+                String save = savePath + path + name;
+                imageDownload.downloadFile(imageUrl, null, save, enableProxy);
             });
         }
         executorService.shutdown();

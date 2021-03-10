@@ -35,7 +35,7 @@ public class Kissjav extends BaseWeb {
             return list;
         }
         Elements elements = document.getElementsByClass("video");
-        elements.stream().forEach(element -> {
+        elements.forEach(element -> {
             Video video = new Video();
             if (element.getElementsByTag("a").size() != 0) {
                 Element a = element.getElementsByTag("a").get(0);
@@ -53,6 +53,9 @@ public class Kissjav extends BaseWeb {
         Video video = new Video();
         video.setSourceUrl(url);
         Document document = JsoupUtil.getDocument(url, enableProxy);
+        if(Objects.isNull(document)){
+            return null;
+        }
         Elements h1s = document.getElementsByTag("h1");
         if (Objects.nonNull(h1s) && h1s.size() != 0) {
             video.setName(h1s.get(0).text());
@@ -91,7 +94,7 @@ public class Kissjav extends BaseWeb {
                             }
                         }
                         Video getVideo = getVideoInfo(video.getSourceUrl());
-                        if (Objects.isNull(getVideo.getVideoUrl())) {
+                        if (Objects.isNull(getVideo)||Objects.isNull(getVideo.getVideoUrl())) {
                             logger.info("{},获取下载地址失败", video.getName());
                             continue;
                         }

@@ -1,5 +1,6 @@
 package com.spider.web;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.spider.entity.AvInfo;
 import com.spider.entity.Video;
 import com.spider.service.AvInfoService;
@@ -35,6 +36,9 @@ public class Javbangers extends BaseWeb {
         String listUrl = template.replace("@{categories}", categories).replace("@{page}", String.valueOf(page)).replace("@{time}", String.valueOf(System.currentTimeMillis()));
         logger.info(listUrl);
         Document document = JsoupUtil.getDocument(listUrl, enableProxy);
+        if (Objects.isNull(document)) {
+            return null;
+        }
         Elements elements = document.getElementsByClass("inf");
         return elements.stream().map(element -> {
             Video video = new Video();
@@ -54,6 +58,9 @@ public class Javbangers extends BaseWeb {
             Map<String, String> header = new HashMap<String, String>();
             header.put("cookie", cookie);
             Response response = OKHttpUtils.getResponse(video.getSourceUrl(), header, enableProxy);
+            if (Objects.isNull(response)) {
+                return null;
+            }
             String html = response.body().string();
             String setCookie = response.headers().get("set-cookie");
             setCookie(setCookie);
@@ -62,7 +69,7 @@ public class Javbangers extends BaseWeb {
             Element element = document.getElementById("tab_video_info");
             Element info = element.getElementsByClass("info").get(0);
             Elements videodescs = info.getElementsByClass("videodesc");
-            if (Objects.nonNull(video) && Objects.nonNull(videodescs.get(0))) {
+            if (Objects.nonNull(videodescs.get(0))) {
                 String videodescText = videodescs.get(0).text();
                 video.setIntroduction(videodescText);
             }
@@ -72,20 +79,20 @@ public class Javbangers extends BaseWeb {
             Elements videoFileElements = info.getElementsByClass("btn-success");
             String htmlStr = videoFileElements.toString();
             String maxFile = "1080p";
-            if (htmlStr.indexOf("1080p") != -1) {
+            if (htmlStr.contains("1080p")) {
                 maxFile = "1080p";
-            } else if (htmlStr.indexOf("720p") != -1) {
+            } else if (htmlStr.contains("720p")) {
                 maxFile = "720p";
-            } else if (htmlStr.indexOf("480p") != -1) {
+            } else if (htmlStr.contains("480p")) {
                 maxFile = "480p";
-            } else if (htmlStr.indexOf("360p") != -1) {
+            } else if (htmlStr.contains("360p")) {
                 maxFile = "360p";
             }
             String videoFileUrl = "";
-            if (Objects.nonNull(videoFileElements)) {
+            if (CollectionUtil.isNotEmpty(videoFileElements)) {
                 for (Element videoFile : videoFileElements) {
                     String text = videoFile.text();
-                    if (text.indexOf(maxFile) != -1) {
+                    if (text.contains(maxFile)) {
                         videoFileUrl = videoFile.attr("href");
                         break;
                     }
@@ -139,7 +146,6 @@ public class Javbangers extends BaseWeb {
             try {
                 List<Video> videoList = getVideoListByUrl(categories, page);
                 videoList = videoList.stream().filter(v -> Objects.nonNull(v.getSourceUrl())).collect(Collectors.toList());
-                A:
                 for (Video video : videoList) {
                     if (hasFilterKey(video.getName())) {
                         logger.info("{},含有过滤字段", video.getName());

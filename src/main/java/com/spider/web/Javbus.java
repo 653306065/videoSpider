@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -220,7 +221,7 @@ public class Javbus extends BaseWeb {
         }
         List<AvInfo.Magnet> magnetList = new CopyOnWriteArrayList<>();
         String gid = String.valueOf(getGid(scriptString));
-        if (!StringUtils.isEmpty(gid)) {
+        if (StringUtils.hasText(gid)) {
             String apiUrl = magnetApi.replace("@{gid}", gid);
             Map<String, String> header = new HashMap<>();
             header.put("referer", home);
@@ -240,9 +241,9 @@ public class Javbus extends BaseWeb {
                         magnetInfo.setSizeStr(sizeStr);
                         double size = 0;
                         if (sizeStr.endsWith("MB")) {
-                            size = Double.valueOf(sizeStr.replace("MB", "0"));
+                            size = Double.parseDouble(sizeStr.replace("MB", "0"));
                         } else if (sizeStr.endsWith("GB")) {
-                            size = Double.valueOf(sizeStr.replace("GB", "0")) * 1024;
+                            size = Double.parseDouble(sizeStr.replace("GB", "0")) * 1024;
                         }
                         magnetInfo.setSize(size);
                         String shareDate = dataList.get(2).text();
@@ -260,9 +261,9 @@ public class Javbus extends BaseWeb {
                         magnetInfo.setSizeStr(sizeStr);
                         double size = 0;
                         if (sizeStr.endsWith("MB")) {
-                            size = Double.valueOf(sizeStr.replace("MB", "0"));
+                            size = Double.parseDouble(sizeStr.replace("MB", "0"));
                         } else if (sizeStr.endsWith("GB")) {
-                            size = Double.valueOf(sizeStr.replace("GB", "0")) * 1024;
+                            size = Double.parseDouble(sizeStr.replace("GB", "0")) * 1024;
                         }
                         magnetInfo.setSize(size);
                         String shareDate = dataList.get(3).text();
@@ -276,7 +277,7 @@ public class Javbus extends BaseWeb {
                 });
             }
         }
-        return magnetList.stream().filter(magnet -> !StringUtils.isEmpty(magnet.getMagnet())).collect(Collectors.toList());
+        return magnetList.stream().filter(magnet -> StringUtils.hasText(magnet.getMagnet())).collect(Collectors.toList());
     }
 
     public void saveAvInfoByActresses(String actressesUrl) {
@@ -353,6 +354,9 @@ public class Javbus extends BaseWeb {
                 List<AvInfo> list = new CopyOnWriteArrayList<>();
                 String url = uncensoredPage.replace("@{page}", String.valueOf(page));
                 Document document = JsoupUtil.getDocument(url, enableProxy);
+                if (Objects.isNull(document)) {
+                    continue;
+                }
                 Elements elements = document.getElementsByClass("movie-box");
                 if (Objects.isNull(elements) || elements.size() == 0) {
                     break;
