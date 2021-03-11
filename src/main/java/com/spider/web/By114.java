@@ -8,8 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import cn.hutool.core.collection.CollectionUtil;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -34,7 +37,11 @@ public class By114 extends BaseWeb {
 
     public List<By114BT> getBTInfo(String type, String page) {
         String url = template.replace("@{type}", type).replace("@{page}", page);
-        Document document = JsoupUtil.getDocument(url);
+        logger.info(url);
+        Document document = JsoupUtil.getDocument(url,enableProxy);
+        if (Objects.isNull(document)) {
+            return null;
+        }
         Element element = document.getElementById("threadlisttableid");
         Elements tbodys = element.getElementsByTag("tbody");
         List<By114BT> list = new ArrayList<By114BT>();
@@ -76,7 +83,7 @@ public class By114 extends BaseWeb {
             logger.info(bt.getUrlName() + ",已存在");
             return;
         }
-        Document document = JsoupUtil.getDocument(bt.getUrl());
+        Document document = JsoupUtil.getDocument(bt.getUrl(),enableProxy);
         Element contentHtml = document.getElementsByClass("t_fsz").get(0);
         Element tf = contentHtml.getElementsByClass("t_f").get(0);
         String title = document.getElementById("thread_subject").text();
@@ -90,7 +97,7 @@ public class By114 extends BaseWeb {
             for (Element element : tf.getElementsByTag("font")) {
                 if (element.hasText()) {
                     String text = element.text();
-                    if (text.indexOf("：") != -1 && text.split("：").length == 2) {
+                    if (text.contains("：") && text.split("：").length == 2) {
                         String key = text.split("：")[0];
                         String value = text.split("：")[1];
                         contentMap.put(key, value);
@@ -122,20 +129,16 @@ public class By114 extends BaseWeb {
             }
         }
         // 图片下载
-        List<byte[]> imgList = new ArrayList<byte[]>();
+        List<byte[]> imgList = new ArrayList<>();
         Elements elements = tf.getElementsByTag("img");
         int index = 0;
         List<String> imgPath = new ArrayList<String>();
         List<String> imgurl = new ArrayList<String>();
         for (Element img : elements) {
             String url = img.attr("src");
-            byte[] bytes = OKHttpUtils.getBytes(url);
+            byte[] bytes = OKHttpUtils.getBytes(url,enableProxy);
             if (bytes != null) {
-                String path = savePath + "img" + File.separator + FileUtils.repairPath(title) + "_" + index + ".jpg";
-                if (bt.getMagnet() != null) {
-                    path = savePath + "img" + File.separator + FileUtils.repairPath(title) + "_" + bt.getMagnet() + "_"
-                            + index + ".jpg";
-                }
+                String path = savePath + "img" + fileSeparator + FileUtils.repairPath(title) + fileSeparator + index + ".jpg";
                 FileUtils.byteToFile(bytes, path);
                 imgList.add(bytes);
                 imgPath.add(path);
@@ -151,7 +154,7 @@ public class By114 extends BaseWeb {
             Element a = element.get(0).getElementsByTag("a").get(0);
             String url = home + a.attr("href");
             String name = a.text();
-            byte[] bytes = OKHttpUtils.getBytes(url);
+            byte[] bytes = OKHttpUtils.getBytes(url,enableProxy);
             if (bytes != null) {
                 String path = savePath + "torrent" + File.separator + FileUtils.repairPath(bt.getTitle()) + ".torrent";
                 FileUtils.byteToFile(bytes, path);
@@ -161,7 +164,7 @@ public class By114 extends BaseWeb {
                 bt.setTorrentUrl(url);
             }
         }
-        if (StringUtils.isEmpty(bt.getMagnet()) && Objects.isNull(bt.getTorrent())) {
+        if (!StringUtils.hasText(bt.getMagnet()) && Objects.isNull(bt.getTorrent())) {
             logger.info(bt.getTitle() + ",磁力和种子都为空");
             return;
         }
@@ -170,64 +173,21 @@ public class By114 extends BaseWeb {
         logger.info(bt.getTitle() + ",保存完成");
     }
 
-    public void clearFile() {
-        File file = new File("D:\\BT");
-        File[] list = file.listFiles();
-        for (File f : list) {
-            if (f.isDirectory()) {
-                File[] files = f.listFiles();
-                for (File btFile : files) {
-                    if (btFile.isDirectory()) {
-                        File[] fileArr = btFile.listFiles();
-                        List<File> fileList = new ArrayList<File>();
-                        for (File d : fileArr) {
-                            if (!d.isDirectory()) {
-                                fileList.add(d);
-                            } else {
-                                FileUtils.deleteDir(d.getAbsolutePath());
-                            }
-                        }
-                        fileList.sort(new Comparator<File>() {
-                            @Override
-                            public int compare(File o1, File o2) {
-                                return (int) (o2.length() - o1.length());
-                            }
-                        });
-                        for (int i = 1; i < fileList.size(); i++) {
-                            fileList.get(i).delete();
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    public void deleteFile() {
-
-    }
-
     public void downloadBt() {
         int i = 1;
         while (true) {
             try {
                 List<By114BT> list = getBTInfo("52", String.valueOf(i));
-                ExecutorService executorService = Executors.newFixedThreadPool(8);
-                // logger.info("list:{}",JSON.toJSONString(list));
-                for (By114BT bt : list) {
-                    executorService.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            saveBTInfo(bt);
-                        }
-                    });
+                if (CollectionUtil.isEmpty(list)) {
+                    continue;
                 }
-                if (list.size() == 0) {
-                    break;
+                ExecutorService executorService = Executors.newFixedThreadPool(20);
+                for (By114BT bt : list) {
+                    executorService.execute(() -> saveBTInfo(bt));
                 }
                 executorService.shutdown();
                 while (true) {
-                    if (executorService.isShutdown()) {
-                        // executorService.awaitTermination(10,TimeUnit.SECONDS);
+                    if (executorService.isTerminated()) {
                         break;
                     }
                 }

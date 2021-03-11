@@ -63,6 +63,17 @@ public class SpiderController extends BaseController {
     @Autowired
     private Eporner eporner;
 
+    @Autowired
+    private By114 by114;
+
+    @ApiOperation("开始by114 bt下载")
+    @GetMapping("/start/by114")
+    public ResponseVo<Object> startBy114(@RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy) {
+        by114.setEnableProxy(enableProxy);
+        threadPoolExecutor.execute(() -> by114.downloadBt());
+        return ResponseVo.succee();
+    }
+
 
     @ApiOperation("开始eporner 4k下载")
     @GetMapping("/start/eporner/4k")
