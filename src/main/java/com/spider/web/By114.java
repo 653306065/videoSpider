@@ -90,6 +90,9 @@ public class By114 extends BaseWeb {
             return;
         }
         Document document = JsoupUtil.getDocument(bt.getUrl(), enableProxy);
+        if(Objects.isNull(document)){
+            return;
+        }
         Element contentHtml = document.getElementsByClass("t_fsz").get(0);
         Element tf = contentHtml.getElementsByClass("t_f").get(0);
         String title = document.getElementById("thread_subject").text();
@@ -137,7 +140,6 @@ public class By114 extends BaseWeb {
         // 图片下载
         List<byte[]> imgList = new ArrayList<>();
         Elements elements = tf.getElementsByTag("img");
-        int index = 0;
         List<String> imgPath = new ArrayList<>();
         List<String> imgurl = new ArrayList<>();
         for (Element img : elements) {
@@ -149,7 +151,6 @@ public class By114 extends BaseWeb {
                 imgList.add(bytes);
                 imgPath.add(path);
                 imgurl.add(url);
-                index++;
             }
         }
         bt.setImages(imgList);
