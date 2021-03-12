@@ -11,13 +11,16 @@ import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.alibaba.fastjson.JSON;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import com.spider.entity.By114BT;
@@ -33,12 +36,15 @@ public class By114 extends BaseWeb {
     private String template;
 
     @Autowired
+    RedisTemplate<String, String> redisTemplate;
+
+    @Autowired
     private By114BTService by114BTService;
 
     public List<By114BT> getBTInfo(String type, String page) {
         String url = template.replace("@{type}", type).replace("@{page}", page);
         logger.info(url);
-        Document document = JsoupUtil.getDocument(url,enableProxy);
+        Document document = JsoupUtil.getDocument(url, enableProxy);
         if (Objects.isNull(document)) {
             return null;
         }
@@ -83,7 +89,7 @@ public class By114 extends BaseWeb {
             logger.info(bt.getUrlName() + ",已存在");
             return;
         }
-        Document document = JsoupUtil.getDocument(bt.getUrl(),enableProxy);
+        Document document = JsoupUtil.getDocument(bt.getUrl(), enableProxy);
         Element contentHtml = document.getElementsByClass("t_fsz").get(0);
         Element tf = contentHtml.getElementsByClass("t_f").get(0);
         String title = document.getElementById("thread_subject").text();
@@ -132,13 +138,13 @@ public class By114 extends BaseWeb {
         List<byte[]> imgList = new ArrayList<>();
         Elements elements = tf.getElementsByTag("img");
         int index = 0;
-        List<String> imgPath = new ArrayList<String>();
-        List<String> imgurl = new ArrayList<String>();
+        List<String> imgPath = new ArrayList<>();
+        List<String> imgurl = new ArrayList<>();
         for (Element img : elements) {
             String url = img.attr("src");
-            byte[] bytes = OKHttpUtils.getBytes(url,enableProxy);
+            byte[] bytes = OKHttpUtils.getBytes(url, enableProxy);
             if (bytes != null) {
-                String path = savePath + "img" + fileSeparator + FileUtils.repairPath(title) + fileSeparator + index + ".jpg";
+                String path = savePath + "img" + fileSeparator + FileUtils.repairPath(title) + fileSeparator + md5.digestHex(bytes) + ".jpg";
                 FileUtils.byteToFile(bytes, path);
                 imgList.add(bytes);
                 imgPath.add(path);
@@ -154,7 +160,7 @@ public class By114 extends BaseWeb {
             Element a = element.get(0).getElementsByTag("a").get(0);
             String url = home + a.attr("href");
             String name = a.text();
-            byte[] bytes = OKHttpUtils.getBytes(url,enableProxy);
+            byte[] bytes = OKHttpUtils.getBytes(url, enableProxy);
             if (bytes != null) {
                 String path = savePath + "torrent" + File.separator + FileUtils.repairPath(bt.getTitle()) + ".torrent";
                 FileUtils.byteToFile(bytes, path);
@@ -174,27 +180,28 @@ public class By114 extends BaseWeb {
     }
 
     public void downloadBt() {
-        int i = 1;
-        while (true) {
-            try {
-                List<By114BT> list = getBTInfo("52", String.valueOf(i));
-                if (CollectionUtil.isEmpty(list)) {
-                    continue;
-                }
-                ExecutorService executorService = Executors.newFixedThreadPool(20);
-                for (By114BT bt : list) {
-                    executorService.execute(() -> saveBTInfo(bt));
-                }
-                executorService.shutdown();
+        redisTemplate.delete("by114BTTaskList");
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        for (int i = 1; i < 1800; i++) {
+            int finalI = i;
+            executorService.execute(() -> {
+                List<By114BT> list = getBTInfo("52", String.valueOf(finalI));
+                redisTemplate.opsForList().rightPushAll("by114BTTaskList", list.stream().map(JSON::toJSONString).collect(Collectors.toList()));
+            });
+        }
+
+        ExecutorService taskExecutorService = Executors.newFixedThreadPool(40);
+        for (int i = 0; i < 40; i++) {
+            taskExecutorService.execute(() -> {
                 while (true) {
-                    if (executorService.isTerminated()) {
-                        break;
+                    String json = redisTemplate.opsForList().leftPop("by114BTTaskList");
+                    if (Objects.nonNull(json)) {
+                        saveBTInfo(JSON.parseObject(json, By114BT.class));
                     }
                 }
-                i++;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            });
         }
+
+
     }
 }
