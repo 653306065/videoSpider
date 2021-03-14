@@ -63,4 +63,6 @@ public class By114BT {
     private Date createData;
 
     private String pageHtml;
+
+    private String avCode;
 }
