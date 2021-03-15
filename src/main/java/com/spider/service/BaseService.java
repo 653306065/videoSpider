@@ -5,6 +5,8 @@ import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.Objects;
 
+import com.mongodb.client.MongoCollection;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,5 +96,9 @@ public abstract class BaseService<T> {
     public void removeById(String id) {
         Query query = new Query(Criteria.where("id").is(id));
         mongoTemplate.remove(query, clazz);
+    }
+
+    public MongoCollection<Document> getMongoCollection(){
+        return mongoTemplate.getCollection(mongoTemplate.getCollectionName(clazz));
     }
 }

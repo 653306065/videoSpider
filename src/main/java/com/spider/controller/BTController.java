@@ -10,11 +10,13 @@ import com.spider.vo.ResponseVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +33,9 @@ public class BTController extends BaseController {
 
     @Autowired
     VideoService videoService;
+
+    @Value("${filterKey}")
+    private List<String> filterKeyList;
 
     @ApiOperation("根据关键字搜索")
     @GetMapping("/search/{keyword}")
@@ -62,16 +67,28 @@ public class BTController extends BaseController {
     @ApiOperation("清除BT")
     @GetMapping("/clean/bt")
     public ResponseVo<Object> cleanBt() {
-        List<By114BT> btList = by114BTService.findByexists("avCode", true);
+        List<By114BT> btList = by114BTService.findAll();
         btList.parallelStream().forEach(bt -> {
-            List<Video> videoList = videoService.findBykeyValue("avCode", bt.getAvCode());
-            if (CollectionUtil.isNotEmpty(videoList)) {
-                logger.info("{},{}", bt.getTorrentPath(),bt.getAvCode());
+            if (StringUtils.hasText(bt.getAvCode())) {
+                List<Video> videoList = videoService.findBykeyValue("avCode", bt.getAvCode());
+                if (CollectionUtil.isNotEmpty(videoList)) {
+                    logger.info("{},{}", bt.getTorrentPath(), bt.getAvCode());
+                    new File(bt.getTorrentPath()).delete();
+                    bt.getImagesPath().forEach(path -> new File(path).delete());
+                }
+            }
+            filterKeyList.stream().filter(key -> bt.getTitle().contains(key)).forEach(key -> {
+                logger.info("{},{}", bt.getTitle(), key);
                 new File(bt.getTorrentPath()).delete();
                 bt.getImagesPath().forEach(path -> new File(path).delete());
-            }
+            });
         });
         return ResponseVo.succee();
     }
 
+    @PostConstruct
+    public void initFilterKey() {
+        filterKeyList.addAll(filterKeyList.stream().map(String::toLowerCase).collect(Collectors.toList()));
+        filterKeyList.addAll(filterKeyList.stream().map(String::toUpperCase).collect(Collectors.toList()));
+    }
 }
