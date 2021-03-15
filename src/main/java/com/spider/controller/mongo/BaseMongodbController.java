@@ -9,6 +9,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
@@ -24,19 +25,33 @@ public abstract class BaseMongodbController<service extends BaseService<entity>,
     public void run(ApplicationArguments args) {
         clazz = (Class<entity>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
         serviceClass = (Class<service>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-        service= SpringContentUtil.getBean(serviceClass);
+        service = SpringContentUtil.getBean(serviceClass);
     }
 
 
     @ApiOperation("根据指定键和值查询数据")
     @GetMapping("/findByKeyValue")
-    public ResponseVo<List<entity>> findByKeyValue(@RequestParam String key,@RequestParam String value){
-        return ResponseVo.succee(service.findBykeyValue(key,value));
+    public ResponseVo<List<entity>> findByKeyValue(@RequestParam String key, @RequestParam String value) {
+        return ResponseVo.succee(service.findBykeyValue(key, value));
+    }
+
+    @ApiOperation("根据指定键和值查询一条数据")
+    @GetMapping("/findOneKeyValue")
+    public ResponseVo<List<entity>> findOneByKeyValue(@RequestParam String key, @RequestParam String value) {
+        return ResponseVo.succee(service.findOnekeyValue(key, value));
     }
 
     @ApiOperation("根据指定键和值查询数量")
-    @GetMapping("/count")
-    public ResponseVo<Long> count(@RequestParam String key,@RequestParam String value){
+    @GetMapping("/countByKeyValue")
+    public ResponseVo<Long> countByKeyValue(@RequestParam String key, @RequestParam String value) {
         return ResponseVo.succee(service.count(key, value));
     }
+
+    @ApiOperation("查询总数量")
+    @GetMapping("/count")
+    public ResponseVo<Long> count() {
+        return ResponseVo.succee(service.count());
+    }
+
+
 }

@@ -32,6 +32,10 @@ public abstract class BaseService<T> {
         return mongoTemplate.count(new Query(Criteria.where(key).is(value)), clazz);
     }
 
+    public long count() {
+        return mongoTemplate.count(new Query(), clazz);
+    }
+
     public List<T> findAll() {
         return mongoTemplate.findAll(clazz);
     }
@@ -98,7 +102,7 @@ public abstract class BaseService<T> {
         mongoTemplate.remove(query, clazz);
     }
 
-    public MongoCollection<Document> getMongoCollection(){
+    public MongoCollection<Document> getMongoCollection() {
         return mongoTemplate.getCollection(mongoTemplate.getCollectionName(clazz));
     }
 }
