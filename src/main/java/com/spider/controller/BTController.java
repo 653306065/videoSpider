@@ -40,10 +40,7 @@ public class BTController extends BaseController {
     @ApiOperation("根据关键字搜索")
     @GetMapping("/search/{keyword}")
     public ResponseVo<Object> search(@PathVariable String keyword) {
-        List<By114BT> list = new ArrayList<>();
-        list.addAll(by114BTService.findByRegex("content", keyword));
-        list.addAll(by114BTService.findByRegex("title", keyword));
-        return ResponseVo.succee(list.stream().map(bt -> new HashMap<String, Object>() {{
+        return ResponseVo.succee(by114BTService.findByRegex("title", keyword).stream().map(bt -> new HashMap<String, Object>() {{
             put("content", bt.getContent());
             put("title", bt.getTitle());
             put("id", bt.getId());
