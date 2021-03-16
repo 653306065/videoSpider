@@ -53,5 +53,16 @@ public abstract class BaseMongodbController<service extends BaseService<entity>,
         return ResponseVo.succee(service.count());
     }
 
+    @ApiOperation("模糊查询")
+    @GetMapping("/findByRegex")
+    public ResponseVo<Long> count(@RequestParam String key, @RequestParam String value) {
+        return ResponseVo.succee(service.findByRegex(key,value));
+    }
 
+
+    @ApiOperation("查询所有")
+    @GetMapping("/findAll")
+    public ResponseVo<Long> findAll() {
+        return ResponseVo.succee(service.findAll());
+    }
 }
