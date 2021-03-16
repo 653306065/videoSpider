@@ -183,9 +183,14 @@ public class Eporner extends BaseWeb {
     public static String getHashCode(String code) {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName("graal.js");
+        String js = """
+                function a(a) {
+                    return parseInt(a.substring(0, 8), 16).toString(36) + parseInt(a.substring(8, 16), 16).toString(36) + parseInt(a.substring(
+                        16, 24), 16).toString(36) + parseInt(a.substring(24, 32), 16).toString(36)
+                }
+                """;
         try {
-            engine.eval(
-                    "function a(a){ return parseInt(a.substring(0, 8), 16).toString(36) + parseInt(a.substring(8, 16), 16).toString(36) + parseInt(a.substring(16, 24), 16).toString(36) + parseInt(a.substring(24, 32), 16).toString(36)}");
+            engine.eval(js);
             if (engine instanceof Invocable) {
                 Invocable invoke = (Invocable) engine; // 调用merge方法，并传入两个参数
                 return (String) invoke.invokeFunction("a", code);
