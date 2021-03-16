@@ -117,12 +117,4 @@ public class Kissjav extends BaseWeb {
     public void downloadJavUncensored() {
         downloadVideo("jav-uncensored");
     }
-
-    public Integer getThread() {
-        return thread;
-    }
-
-    public void setThread(Integer thread) {
-        this.thread = thread;
-    }
 }

@@ -93,12 +93,4 @@ public class Hqporner extends BaseWeb {
             page++;
         }
     }
-
-    public Integer getThread() {
-        return thread;
-    }
-
-    public void setThread(Integer thread) {
-        this.thread = thread;
-    }
 }

@@ -125,12 +125,4 @@ public class Netflav extends BaseWeb {
     public void downloadUncensoredVideo() {
         downloadVideo("uncensored");
     }
-
-    public Integer getThread() {
-        return thread;
-    }
-
-    public void setThread(Integer thread) {
-        this.thread = thread;
-    }
 }

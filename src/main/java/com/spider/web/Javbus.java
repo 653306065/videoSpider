@@ -418,12 +418,4 @@ public class Javbus extends BaseWeb {
     public String getGid(String js) {
         return js.split("gid")[1].replace("=", "").split(";")[0].trim();
     }
-
-    public Integer getThread() {
-        return thread;
-    }
-
-    public void setThread(Integer thread) {
-        this.thread = thread;
-    }
 }
