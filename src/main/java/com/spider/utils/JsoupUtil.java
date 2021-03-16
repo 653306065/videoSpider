@@ -14,8 +14,7 @@ public class JsoupUtil {
         if (StringUtils.isBlank(html)) {
             return null;
         }
-        Document document = Jsoup.parse(html);
-        return document;
+        return Jsoup.parse(html);
     }
 
     public static Document getDocument(String url, Boolean isProxy) {
@@ -23,8 +22,7 @@ public class JsoupUtil {
         if (Objects.isNull(html)) {
             return null;
         }
-        Document document = Jsoup.parse(html);
-        return document;
+        return Jsoup.parse(html);
     }
 
     public static Document getDocumentByProxy(String url) {
@@ -32,8 +30,7 @@ public class JsoupUtil {
         if (StringUtils.isBlank(html)) {
             return null;
         }
-        Document document = Jsoup.parse(html);
-        return document;
+        return Jsoup.parse(html);
     }
 
     public static Document getDocument(String url, Map<String, String> header, Boolean isProxy) {
@@ -41,7 +38,6 @@ public class JsoupUtil {
         if (StringUtils.isBlank(html)) {
             return null;
         }
-        Document document = Jsoup.parse(html);
-        return document;
+        return Jsoup.parse(html);
     }
 }

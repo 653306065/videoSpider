@@ -1,36 +1,30 @@
 package com.spider.utils;
 
 import okhttp3.*;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.Proxy;
 import java.net.URLEncoder;
-import java.util.Collection;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-public class OKHttpUtils {
+@Component
+public class OKHttpUtils implements ApplicationRunner {
 
     static OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(6, TimeUnit.SECONDS).readTimeout(6, TimeUnit.SECONDS).build();
 
     static OkHttpClient proxyHttpClient = null;
 
-    static {
-        try {
-            Proxy proxy = SpringContentUtil.getBean(Proxy.class);
-            proxyHttpClient = new OkHttpClient.Builder().connectTimeout(6, TimeUnit.SECONDS).readTimeout(6, TimeUnit.SECONDS).proxy(proxy).build();
-        } catch (Exception e) {
-            //e.printStackTrace();
-        }
-    }
-
     public static String get(String url, Boolean isProxy) {
         try {
             Request request = new Request.Builder().get().url(url).build();
-            Response response = null;
-            if (isProxy) {
+            Response response;
+            if (isProxy && Objects.nonNull(proxyHttpClient)) {
                 response = proxyHttpClient.newCall(request).execute();
             } else {
                 response = httpClient.newCall(request).execute();
@@ -58,8 +52,8 @@ public class OKHttpUtils {
                 }
             }
             Request request = builder.get().url(url).build();
-            Response response = null;
-            if (isProxy) {
+            Response response;
+            if (isProxy && Objects.nonNull(proxyHttpClient)) {
                 response = proxyHttpClient.newCall(request).execute();
             } else {
                 response = httpClient.newCall(request).execute();
@@ -81,8 +75,8 @@ public class OKHttpUtils {
     public static String getRedirectUrl(String url, Boolean isProxy) {
         try {
             Request request = new Request.Builder().get().url(url).build();
-            Response response = null;
-            if (isProxy) {
+            Response response;
+            if (isProxy && Objects.nonNull(proxyHttpClient)) {
                 response = proxyHttpClient.newCall(request).execute();
             } else {
                 response = httpClient.newCall(request).execute();
@@ -109,8 +103,8 @@ public class OKHttpUtils {
                 builder.addHeader(entry.getKey(), entry.getValue());
             }
             Request request = builder.get().url(url).build();
-            Response response = null;
-            if (isProxy) {
+            Response response;
+            if (isProxy && Objects.nonNull(proxyHttpClient)) {
                 response = proxyHttpClient.newCall(request).execute();
             } else {
                 response = httpClient.newCall(request).execute();
@@ -132,8 +126,8 @@ public class OKHttpUtils {
     public static InputStream getInputStream(String url, Boolean isProxy) {
         try {
             Request request = new Request.Builder().get().url(url).build();
-            Response response = null;
-            if (isProxy) {
+            Response response;
+            if (isProxy && Objects.nonNull(proxyHttpClient)) {
                 response = proxyHttpClient.newCall(request).execute();
             } else {
                 response = httpClient.newCall(request).execute();
@@ -158,8 +152,8 @@ public class OKHttpUtils {
                 }
             }
             Request request = builder.get().url(url).build();
-            Response response = null;
-            if (isProxy) {
+            Response response;
+            if (isProxy && Objects.nonNull(proxyHttpClient)) {
                 response = proxyHttpClient.newCall(request).execute();
             } else {
                 response = httpClient.newCall(request).execute();
@@ -180,8 +174,8 @@ public class OKHttpUtils {
                 }
             }
             Request request = builder.get().url(url).build();
-            Response response = null;
-            if (isProxy) {
+            Response response;
+            if (isProxy && Objects.nonNull(proxyHttpClient)) {
                 response = proxyHttpClient.newCall(request).execute();
             } else {
                 response = httpClient.newCall(request).execute();
@@ -200,8 +194,8 @@ public class OKHttpUtils {
     public static byte[] getBytes(String url, Boolean isProxy) {
         try {
             Request request = new Request.Builder().get().url(url).build();
-            Response response = null;
-            if (isProxy) {
+            Response response;
+            if (isProxy && Objects.nonNull(proxyHttpClient)) {
                 response = proxyHttpClient.newCall(request).execute();
             } else {
                 response = httpClient.newCall(request).execute();
@@ -247,8 +241,8 @@ public class OKHttpUtils {
                 }
             }
             Request request = builder.get().url(url).build();
-            Response response = null;
-            if (isProxy) {
+            Response response;
+            if (isProxy && Objects.nonNull(proxyHttpClient)) {
                 response = proxyHttpClient.newCall(request).execute();
             } else {
                 response = httpClient.newCall(request).execute();
@@ -271,8 +265,8 @@ public class OKHttpUtils {
         try {
             RequestBody requestBody = new FormBody.Builder().build();
             Request request = new Request.Builder().addHeader("Connection", "close").post(requestBody).url(url).build();
-            Response response = null;
-            if (isProxy) {
+            Response response;
+            if (isProxy && Objects.nonNull(proxyHttpClient)) {
                 response = proxyHttpClient.newCall(request).execute();
             } else {
                 response = httpClient.newCall(request).execute();
@@ -301,8 +295,8 @@ public class OKHttpUtils {
                 }
             }
             Request request = requestBuilder.post(body).url(url).build();
-            Response response = null;
-            if (isProxy) {
+            Response response;
+            if (isProxy && Objects.nonNull(proxyHttpClient)) {
                 response = proxyHttpClient.newCall(request).execute();
             } else {
                 response = httpClient.newCall(request).execute();
@@ -329,8 +323,8 @@ public class OKHttpUtils {
                 formBodyBuilder.add(entry.getKey(), entry.getValue());
             }
             Request request = requestBuilder.post(formBodyBuilder.build()).url(url).build();
-            Response response = null;
-            if (isProxy) {
+            Response response;
+            if (isProxy && Objects.nonNull(proxyHttpClient)) {
                 response = proxyHttpClient.newCall(request).execute();
             } else {
                 response = httpClient.newCall(request).execute();
@@ -356,15 +350,15 @@ public class OKHttpUtils {
             for (Map.Entry<String, Object> entry : params.entrySet()) {
                 if (entry.getValue() instanceof String) {
                     multipartBodyBuilder.addFormDataPart(entry.getKey(), (String) entry.getValue());
-                } else if (entry.getValue() instanceof byte[]) {
-                    multipartBodyBuilder.addFormDataPart(entry.getKey(), entry.getKey(), RequestBody.create((byte[]) entry.getValue()));
+                } else if (entry.getValue() instanceof byte[] data) {
+                    multipartBodyBuilder.addFormDataPart(entry.getKey(), entry.getKey(), RequestBody.create(data));
                 } else {
                     multipartBodyBuilder.addFormDataPart(entry.getKey(), String.valueOf(entry.getValue()));
                 }
             }
             Request request = requestBuilder.post(multipartBodyBuilder.build()).url(url).build();
-            Response response = null;
-            if (isProxy) {
+            Response response;
+            if (isProxy && Objects.nonNull(proxyHttpClient)) {
                 response = proxyHttpClient.newCall(request).execute();
             } else {
                 response = httpClient.newCall(request).execute();
@@ -421,11 +415,12 @@ public class OKHttpUtils {
         if (input == null) {
             return "";
         }
-        try {
-            return URLEncoder.encode(input, "utf-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return input;
+        return URLEncoder.encode(input, StandardCharsets.UTF_8);
+    }
+
+    @Override
+    public void run(ApplicationArguments args) {
+        Proxy proxy = SpringContentUtil.getBean(Proxy.class);
+        proxyHttpClient = new OkHttpClient.Builder().connectTimeout(6, TimeUnit.SECONDS).readTimeout(6, TimeUnit.SECONDS).proxy(proxy).build();
     }
 }
