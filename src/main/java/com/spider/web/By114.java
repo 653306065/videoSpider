@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.collection.CollectionUtil;
@@ -195,7 +196,7 @@ public class By114 extends BaseWeb {
         for (int i = 0; i < 40; i++) {
             taskExecutorService.execute(() -> {
                 while (true) {
-                    String json = redisTemplate.opsForList().leftPop("by114BTTaskList");
+                    String json = redisTemplate.opsForList().leftPop("by114BTTaskList",1, TimeUnit.SECONDS);
                     if (Objects.nonNull(json)) {
                         saveBTInfo(JSON.parseObject(json, By114BT.class));
                     }
