@@ -66,14 +66,14 @@ javhihi:
 
 pornhub:
   home: https://www.pornhub.com
-  savePath: C:\pornhub\
+  savePath: E:\pornhub\
   searchUrl: https://www.pornhub.com/video/search?search=@{key}&hd=1&page=@{page}&p=professional&min_duration=10
   channels: https://pornhub.com/channels/@{channelName}/videos?o=da&page=@{page}
   categories:
     - hentai
   categoriesUrl: https://www.pornhub.com/categories/@{categories}
   categoriesUrlByNum: https://pornhub.com/video?c=@{categories}&hd=1&page=@{page}&min_duration=10&p=professional
-  incategoriesUrl: https://pornhub.com/video/incategories/@{categories}/@{incategories}?p=professional&min_duration=10&hd=1&page=@{page}&o=mv&t=a
+  incategoriesUrl: https://pornhub.com/video/incategories/@{categories}/@{incategories}?p=professional&min_duration=10&hd=1&page=@{page}&t=a
   thread: 30
   enableProxy: true
 

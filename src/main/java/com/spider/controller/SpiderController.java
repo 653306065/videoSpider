@@ -226,6 +226,21 @@ public class SpiderController extends BaseController {
         return ResponseVo.succee();
     }
 
+
+    @ApiOperation("获取pornhub(compilation gangbang)的视频")
+    @GetMapping("/start/pornhub/creampi/gangbang")
+    public ResponseVo<Object> startPornhubCompilationGangbang(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
+                                                              @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
+                                                              @RequestParam(name = "savePath",required = false) String savePath) {
+        pornhub.setThread(thread);
+        pornhub.setEnableProxy(enableProxy);
+        if(Objects.nonNull(savePath)){
+            pornhub.setSavePath(savePath);
+        }
+        threadPoolExecutor.execute(() -> pornhub.downloadCreampie_gangbang());
+        return ResponseVo.succee();
+    }
+
     @ApiOperation("获取pornhub(doublePenetration)的视频")
     @GetMapping("/start/pornhub/doublePenetration")
     public ResponseVo<Object> startPornhubDoublePenetration(@RequestParam(name = "thread", defaultValue = "30") Integer thread,

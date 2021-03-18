@@ -253,6 +253,10 @@ public class Pornhub extends BaseWeb {
         }
     }
 
+    public void downloadCreampie_gangbang(){
+        downloadIncategories("creampie","gangbang");
+    }
+
     public void downloadIncategories(String categories, String incategories) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         int page = 1;
