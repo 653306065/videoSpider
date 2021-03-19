@@ -22,6 +22,7 @@ public abstract class BaseMongodbController<service extends BaseService<entity>,
 
     protected service service;
 
+    @Override
     public void run(ApplicationArguments args) {
         clazz = (Class<entity>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
         serviceClass = (Class<service>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
@@ -64,5 +65,25 @@ public abstract class BaseMongodbController<service extends BaseService<entity>,
     @GetMapping("/findAll")
     public ResponseVo<Long> findAll() {
         return ResponseVo.succee(service.findAll());
+    }
+
+    @ApiOperation("模糊查询数量")
+    @GetMapping("/findCountByRegex")
+    public ResponseVo<Long> findAll(@RequestParam String key, @RequestParam String value) {
+        return ResponseVo.succee(service.findCountByRegex(key, value));
+    }
+
+    @ApiOperation("模糊查询一条记录")
+    @GetMapping("/findOneByRegex")
+    public ResponseVo<Long> findOneByRegex(@RequestParam String key, @RequestParam String value) {
+        return ResponseVo.succee(service.findOneByRegex(key, value));
+    }
+
+
+    @ApiOperation("根据id删除")
+    @GetMapping("/removeById")
+    public ResponseVo<Object> removeById(@RequestParam String id) {
+        service.removeById(id);
+        return ResponseVo.succee();
     }
 }

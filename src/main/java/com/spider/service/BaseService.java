@@ -64,11 +64,6 @@ public abstract class BaseService<T> {
         return mongoTemplate.findOne(query, clazz);
     }
 
-    public List<T> findListByRegex(String key, String value) {
-        Query query = new Query(Criteria.where(key).regex(value));
-        return mongoTemplate.find(query, clazz);
-    }
-
     public void updateById(T t) {
         try {
             Field idField = clazz.getDeclaredField("id");
@@ -91,6 +86,11 @@ public abstract class BaseService<T> {
     public List<T> findByRegex(String key, String regex) {
         Query query = new Query(Criteria.where(key).regex(regex));
         return mongoTemplate.find(query, clazz);
+    }
+
+    public Long findCountByRegex(String key, String regex) {
+        Query query = new Query(Criteria.where(key).regex(regex));
+        return mongoTemplate.count(query, clazz);
     }
 
     public void insert(T t) {
