@@ -60,4 +60,6 @@ public class Video {
 
     private Boolean censored = false;
 
+    private List<FaceInfo> faceInfoList;
+
 }

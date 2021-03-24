@@ -64,7 +64,7 @@ public class FFmpegUtil {
     public static void videoSnapshot(String videoPath, String imagePath, String fileName, long time, int count) {
         try {
             String command = new File(FFmpegPath).getAbsolutePath() + "/ffmpeg -ss " + time + " -i  \"" + videoPath + "\"" +
-                    " -vframes " + count + " " + imagePath + "\\" + fileName + "_image-%d.jpg";
+                    " -vframes " + count + " \"" + imagePath + "\\" + fileName + "_image-%d.jpg\"";
             Process Process = Runtime.getRuntime().exec(command);
             try {
                 BufferedReader br = new BufferedReader(new InputStreamReader(Process.getErrorStream()));
@@ -120,11 +120,10 @@ public class FFmpegUtil {
     }
 
     public static void main(String[] args) {
-//        MultimediaInfo MultimediaInfo = getVideoInfo(new File("D:\\javfinder\\Uncensored2019-01-06\\1Pondo 020618_641 Matsuoka Shura Beautiful man beauty big screaming 3P Squirting.mp4"));
-//        for (int i = 0; i < 10; i++) {
-//            long index0 = (long) (MultimediaInfo.getDuration() / (10 - i)) / 1000;
-//            videoSnapshot("D:\\javfinder\\Uncensored2019-01-06\\1Pondo 020618_641 Matsuoka Shura Beautiful man beauty big screaming 3P Squirting.mp4", "G:\\test", String.valueOf(i), index0, 1);
-//        }
-        downloadM3U8("https://cdn-khzy-i-bofang.com/20201125/PzvFliqu/index.m3u8", "C:\\test\\test.mp4");
+        MultimediaInfo MultimediaInfo = getVideoInfo(new File("C:\\javbangers\\uncensored\\2021-03-24\\Sumire and Koharu.mp4"));
+        for (int i = 0; i < 100; i++) {
+            long index0 = (long) (MultimediaInfo.getDuration() / (100 - i)) / 1000;
+            videoSnapshot("C:\\javbangers\\uncensored\\2021-03-24\\Sumire and Koharu.mp4", "C:\\javbangers\\uncensored\\2021-03-24\\", String.valueOf(i), index0, 1);
+        }
     }
 }

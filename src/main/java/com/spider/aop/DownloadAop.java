@@ -2,10 +2,12 @@ package com.spider.aop;
 
 import com.alibaba.fastjson.JSON;
 import com.spider.entity.AvInfo;
+import com.spider.entity.FaceInfo;
 import com.spider.entity.Image;
 import com.spider.entity.Video;
 import com.spider.service.*;
 import com.spider.utils.FFmpegUtil;
+import com.spider.utils.FaceUtil;
 import com.spider.utils.FileUtils;
 import com.spider.utils.ImageUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -17,9 +19,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import ws.schild.jave.MultimediaInfo;
+
 import javax.annotation.PostConstruct;
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -185,6 +190,9 @@ public class DownloadAop {
             if (info.getVideo().getSize().getHeight() * info.getVideo().getSize().getWidth() < minWidth * minHeight) {
                 new File(video.getSavePath()).delete();
                 logger.info("{},视频尺寸小于{}*{},删除成功", video.getSavePath(), minHeight, minWidth);
+            } else {
+                //视频评分
+                videoService.videoScore(video.getId());
             }
             urlRecordService.insertList(Stream.of(video.getSourceUrl(), video.getVideoUrl()).filter(Objects::nonNull).collect(Collectors.toList()));
         } catch (Throwable e) {

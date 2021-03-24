@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.mongodb.client.MongoCollection;
+import com.spider.entity.Video;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,11 @@ public abstract class BaseService<T> {
     public List<T> findBykeyValue(String key, String value) {
         Query query = new Query(Criteria.where(key).is(value));
         return mongoTemplate.find(query, clazz);
+    }
+
+    public T findById(String id){
+        Query query = new Query(Criteria.where("_id").is(id));
+        return mongoTemplate.findOne(query,clazz);
     }
 
     public T findOnekeyValue(String key, String value) {

@@ -1,6 +1,9 @@
 package com.spider.controller;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.alibaba.fastjson.JSON;
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.MongoCursor;
 import com.spider.entity.By114BT;
 import com.spider.entity.Video;
 import com.spider.service.AvInfoService;
@@ -9,6 +12,7 @@ import com.spider.service.VideoService;
 import com.spider.vo.ResponseVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
@@ -63,8 +67,31 @@ public class BTController extends BaseController {
     @ApiOperation("清除BT")
     @GetMapping("/clean/bt")
     public ResponseVo<Object> cleanBt() {
-        List<By114BT> btList = by114BTService.findAll();
-        btList.parallelStream().forEach(bt -> {
+//        List<By114BT> btList = by114BTService.findAll();
+//        btList.parallelStream().forEach(bt -> {
+//            if (StringUtils.hasText(bt.getAvCode())) {
+//                List<Video> videoList = videoService.findBykeyValue("avCode", bt.getAvCode());
+//                if (CollectionUtil.isNotEmpty(videoList)) {
+//                    logger.info("{},{}", bt.getTorrentPath(), bt.getAvCode());
+//                    new File(bt.getTorrentPath()).delete();
+//                    bt.getImagesPath().forEach(path -> new File(path).delete());
+//                }
+//            }
+//            filterKeyList.stream().filter(key -> bt.getTitle().contains(key)).forEach(key -> {
+//                logger.info("{},{}", bt.getTitle(), key);
+//                new File(bt.getTorrentPath()).delete();
+//                bt.getImagesPath().forEach(path -> new File(path).delete());
+//            });
+//        });
+
+        MongoCursor<Document> mongoCursor= by114BTService.getMongoCollection().find(new BasicDBObject()).iterator();
+        while (mongoCursor.hasNext()){
+            Document document= mongoCursor.next();
+            By114BT bt= new By114BT();
+            bt.setAvCode(document.getString("avCode"));
+            bt.setTorrentPath(document.getString("torrentPath"));
+            bt.setImagesPath(document.getList("imagesPath",String.class));
+            bt.setTitle(document.getString("title"));
             if (StringUtils.hasText(bt.getAvCode())) {
                 List<Video> videoList = videoService.findBykeyValue("avCode", bt.getAvCode());
                 if (CollectionUtil.isNotEmpty(videoList)) {
@@ -74,11 +101,13 @@ public class BTController extends BaseController {
                 }
             }
             filterKeyList.stream().filter(key -> bt.getTitle().contains(key)).forEach(key -> {
-                logger.info("{},{}", bt.getTitle(), key);
-                new File(bt.getTorrentPath()).delete();
-                bt.getImagesPath().forEach(path -> new File(path).delete());
+                if(new File(bt.getTorrentPath()).exists()){
+                    new File(bt.getTorrentPath()).delete();
+                    logger.info("{},{}", bt.getTitle(), key);
+                    bt.getImagesPath().forEach(path -> new File(path).delete());
+                }
             });
-        });
+        }
         return ResponseVo.succee();
     }
 

@@ -80,7 +80,7 @@ public class Pornhub extends BaseWeb {
         video.setName(FileUtils.repairPath(document.getElementsByClass("inlineFree").get(0).text()));
         String js = element.getElementsByTag("script").get(0).html().split("loadScriptUniqueId")[0];
         String jsonUrl = getScriptJsonString(js);
-        String videoJson = OKHttpUtils.get(jsonUrl, new HashMap<String, String>() {{
+        String videoJson = OKHttpUtils.get(jsonUrl, new HashMap<>() {{
             put("cookie", cookie);
         }}, enableProxy);
         JSONArray jsonObject = JSON.parseArray(videoJson);
