@@ -58,7 +58,7 @@ public class VideoService extends BaseService<Video> {
             }
             List<File> fileList = new ArrayList<>();
             FileUtils.getPathFileList(path, fileList);
-            List<FaceInfo> faceInfos = fileList.stream().flatMap(image -> {
+            List<FaceInfo> faceInfos = fileList.stream().sequential().flatMap(image -> {
                 try {
                     List<FaceInfo> faceInfoList = FaceUtil.faceInfo(org.apache.commons.io.FileUtils.readFileToByteArray(image));
                     if (!CollectionUtils.isEmpty(faceInfoList)) {

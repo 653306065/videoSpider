@@ -260,4 +260,14 @@ public class VideoController extends BaseController {
         });
         return ResponseVo.succee();
     }
+
+
+    @ApiOperation("视频评分")
+    @GetMapping("/score")
+    public ResponseVo<Object> videoScore(@RequestParam(defaultValue = "65.0") double threshold,@RequestParam(defaultValue = "false") Boolean isDelete){
+        videoService.findByexists("avgFaceScore",false).stream().filter(video -> new File(video.getSavePath()).exists()).forEach(video -> {
+            videoService.videoScore(video.getId(),20,threshold,isDelete);
+        });
+        return ResponseVo.succee();
+    }
 }
