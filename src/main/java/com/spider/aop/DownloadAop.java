@@ -187,14 +187,14 @@ public class DownloadAop {
                 }
             }
             logger.info("{},文件信息保存完成", video.getName());
+            urlRecordService.insertList(Stream.of(video.getSourceUrl(), video.getVideoUrl()).filter(Objects::nonNull).collect(Collectors.toList()));
             if (info.getVideo().getSize().getHeight() * info.getVideo().getSize().getWidth() < minWidth * minHeight) {
                 new File(video.getSavePath()).delete();
                 logger.info("{},视频尺寸小于{}*{},删除成功", video.getSavePath(), minHeight, minWidth);
             } else {
                 //视频评分
-                videoService.videoScore(video.getId());
+                videoService.videoScore(video.getId(),20,65.0,true);
             }
-            urlRecordService.insertList(Stream.of(video.getSourceUrl(), video.getVideoUrl()).filter(Objects::nonNull).collect(Collectors.toList()));
         } catch (Throwable e) {
             e.printStackTrace();
         }

@@ -45,15 +45,15 @@ public class VideoService extends BaseService<Video> {
         return mongoTemplate.findOne(query, Video.class);
     }
 
-    public void videoScore(String videoId) {
+    public Double videoScore(String videoId, Integer imageCount, double threshold,boolean isDelete) {
         Video findVideo = this.findById(videoId);
         if (Objects.nonNull(findVideo)) {
             long duration = findVideo.getMultimediaInfo().getDuration();
-            long size = duration / 20;
+            long size = duration / imageCount;
             File file = new File(findVideo.getSavePath());
             String path = file.getParentFile().getAbsolutePath() + File.separator + "temp";
             new File(path).mkdirs();
-            for (int i = 0; i < 20; i++) {
+            for (int i = 0; i < imageCount; i++) {
                 FFmpegUtil.videoSnapshot(findVideo.getSavePath(), path, findVideo.getName() + "_" + i, (duration - (size * (i + 1))) / 1000, 1);
             }
             List<File> fileList = new ArrayList<>();
@@ -73,13 +73,26 @@ public class VideoService extends BaseService<Video> {
                 }
             }).filter(Objects::nonNull).collect(Collectors.toList());
             System.out.println(JSON.toJSONString(faceInfos));
+            if (faceInfos.stream().filter(faceInfo -> faceInfo.getGender().equals("Female")).count() == 0) {
+                logger.info("未匹配到面部，删除视频:{}", findVideo.getSavePath());
+                file.delete();
+                fileList.stream().forEach(image -> image.delete());
+                new File(path).delete();
+                return null;
+            }
             findVideo.setFaceInfoList(faceInfos.stream().filter(faceInfo -> faceInfo.getGender().equals("Female")).collect(Collectors.toList()));
+            double value = faceInfos.stream().filter(faceInfo -> faceInfo.getGender().equals("Female")).mapToDouble(faceInfo -> faceInfo.getFemaleScore() + faceInfo.getMaleScore()).average().getAsDouble() / 2;
+            logger.info("{},平均评分:{}", findVideo.getSavePath(), value);
+            findVideo.setAvgFaceScore(value);
             this.updateById(findVideo);
-            if (faceInfos.stream().filter(faceInfo -> faceInfo.getGender().equals("Female")).mapToDouble(faceInfo -> faceInfo.getFemaleScore() + faceInfo.getMaleScore()).average().getAsDouble() / 2 < 60.0) {
-                System.out.println("颜值过低，删除视频," + findVideo.getSavePath());
+            if (value < threshold && isDelete) {
+                logger.info("颜值过低，删除视频," + findVideo.getSavePath());
                 file.delete();
             }
             fileList.stream().forEach(image -> image.delete());
+            new File(path).delete();
+            return value;
         }
+        return null;
     }
 }
