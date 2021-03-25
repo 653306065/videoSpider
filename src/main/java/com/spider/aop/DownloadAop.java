@@ -193,7 +193,7 @@ public class DownloadAop {
                 logger.info("{},视频尺寸小于{}*{},删除成功", video.getSavePath(), minHeight, minWidth);
             } else {
                 //视频评分
-                videoService.videoScore(video.getId(),20,65.0,true);
+                videoService.videoScore(video.getId(),25,60.0,true);
             }
         } catch (Throwable e) {
             e.printStackTrace();

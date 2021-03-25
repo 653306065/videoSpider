@@ -94,7 +94,7 @@ public class VideoService extends BaseService<Video> {
             findVideo.setMinFaceScore(min);
             findVideo.setMedianFaceScore(median);
             this.updateById(findVideo);
-            if (max < threshold && isDelete) {
+            if (median < threshold && isDelete) {
                 logger.info("颜值过低，删除视频," + findVideo.getSavePath());
                 file.delete();
             }
