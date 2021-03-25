@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
+import java.util.stream.Stream;
 
 @Service
 public class VideoService extends BaseService<Video> {
@@ -45,7 +47,7 @@ public class VideoService extends BaseService<Video> {
         return mongoTemplate.findOne(query, Video.class);
     }
 
-    public Double videoScore(String videoId, Integer imageCount, double threshold,boolean isDelete) {
+    public Double videoScore(String videoId, Integer imageCount, double threshold, boolean isDelete) {
         Video findVideo = this.findById(videoId);
         if (Objects.nonNull(findVideo)) {
             long duration = findVideo.getMultimediaInfo().getDuration();
@@ -62,10 +64,10 @@ public class VideoService extends BaseService<Video> {
                 try {
                     List<FaceInfo> faceInfoList = FaceUtil.faceInfo(org.apache.commons.io.FileUtils.readFileToByteArray(image));
                     if (!CollectionUtils.isEmpty(faceInfoList)) {
-                        System.out.println(JSON.toJSONString(faceInfoList));
+                        System.out.println(JSON.toJSONString(faceInfoList.stream().filter(faceInfo -> faceInfo.getGender().equals("Female")).collect(Collectors.toList())));
                         return faceInfoList.stream();
                     }
-                    Thread.sleep(1300);
+                    Thread.sleep(1000);
                     return null;
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -81,17 +83,24 @@ public class VideoService extends BaseService<Video> {
                 return null;
             }
             findVideo.setFaceInfoList(faceInfos.stream().filter(faceInfo -> faceInfo.getGender().equals("Female")).collect(Collectors.toList()));
-            double value = faceInfos.stream().filter(faceInfo -> faceInfo.getGender().equals("Female")).mapToDouble(faceInfo -> faceInfo.getFemaleScore() + faceInfo.getMaleScore()).average().getAsDouble() / 2;
-            logger.info("{},平均评分:{}", findVideo.getSavePath(), value);
-            findVideo.setAvgFaceScore(value);
+            double avg = faceInfos.stream().filter(faceInfo -> faceInfo.getGender().equals("Female")).mapToDouble(faceInfo -> faceInfo.getFemaleScore() + faceInfo.getMaleScore()).average().getAsDouble() / 2;
+            double max = faceInfos.stream().filter(faceInfo -> faceInfo.getGender().equals("Female")).flatMapToDouble(faceInfo -> DoubleStream.of(faceInfo.getFemaleScore(), faceInfo.getMaleScore())).max().getAsDouble();
+            double min = faceInfos.stream().filter(faceInfo -> faceInfo.getGender().equals("Female")).flatMapToDouble(faceInfo -> DoubleStream.of(faceInfo.getFemaleScore(), faceInfo.getMaleScore())).min().getAsDouble();
+            long faceNum = faceInfos.stream().filter(faceInfo -> faceInfo.getGender().equals("Female")).flatMapToDouble(faceInfo -> DoubleStream.of(faceInfo.getFemaleScore(), faceInfo.getMaleScore())).count();
+            double median = faceInfos.stream().filter(faceInfo -> faceInfo.getGender().equals("Female")).flatMapToDouble(faceInfo -> DoubleStream.of(faceInfo.getFemaleScore(), faceInfo.getMaleScore())).sorted().skip(faceNum / 2).limit(1).max().getAsDouble();
+            logger.info("{},平均评分:{},最高评分:{},最低评分:{},中位数:{}", findVideo.getSavePath(), avg, max, min,median);
+            findVideo.setAvgFaceScore(avg);
+            findVideo.setMaxFaceScore(max);
+            findVideo.setMinFaceScore(min);
+            findVideo.setMedianFaceScore(median);
             this.updateById(findVideo);
-            if (value < threshold && isDelete) {
+            if (max < threshold && isDelete) {
                 logger.info("颜值过低，删除视频," + findVideo.getSavePath());
                 file.delete();
             }
             fileList.stream().forEach(image -> image.delete());
             new File(path).delete();
-            return value;
+            return avg;
         }
         return null;
     }

@@ -62,6 +62,12 @@ public class Video {
 
     private List<FaceInfo> faceInfoList;
 
-    private double avgFaceScore;
+    private Double avgFaceScore;
+
+    private Double maxFaceScore;
+
+    private Double minFaceScore;
+
+    private Double medianFaceScore;
 
 }
