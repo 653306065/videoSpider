@@ -29,7 +29,7 @@ pixiv:
 
 hanime:
   home: https://hanime.tv/
-  savePath: C:\hanime
+  savePath: D:\hanime
   imageApi: https://hr.hanime.tv/api/v8/community_uploads?channel_name__in[]=@{channel}&query_method=seek&before_id=@{beforeId}&loc=https://hanime.tv
   thread: 24
   videoListApi: https://search.hanime.tv

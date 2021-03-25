@@ -2,6 +2,7 @@ package com.spider.web;
 
 import java.net.Proxy;
 
+import com.spider.constant.Constant;
 import com.spider.entity.HanimeImage;
 
 import java.util.*;
@@ -54,12 +55,11 @@ public class Hanime extends BaseWeb {
     private HanimeImageService hanimeImageService;
 
     public void downloadImage(String channel) {
-        String maxApi = imageApi.replace("@{channel}", channel).replace("@{beforeId}", "99999999");
+        String maxApi = imageApi.replace("@{channel}", channel).replace("@{beforeId}", "1999999");
         String json = OKHttpUtils.get(maxApi, enableProxy);
         if (Objects.isNull(json)) {
             return;
         }
-
         String key = "hanimeImageTask";
         new Thread(() -> {
             List<HanimeImage> hanimeImageList = JSONObject.parseObject(json).getJSONArray("data").toJavaList(HanimeImage.class);
@@ -86,12 +86,12 @@ public class Hanime extends BaseWeb {
                 while (true) {
                     String jsonStr = redisTemplate.opsForList().leftPop(key, 1, TimeUnit.SECONDS);
                     HanimeImage hanimeImage = JSON.parseObject(jsonStr, HanimeImage.class);
-                    if (Objects.nonNull(hanimeImage) &&Objects.nonNull(hanimeImageService.findById(hanimeImage.getId()))) {
+                    if (Objects.nonNull(hanimeImage) && Objects.nonNull(hanimeImageService.findById(hanimeImage.getId()))) {
                         logger.info("id:{},url:{},已存在", hanimeImage.getId(), hanimeImage.getUrl());
                         continue;
                     }
                     if (Objects.nonNull(hanimeImage) && Objects.nonNull(hanimeImage.getUrl())) {
-                        byte[] bytes = OKHttpUtils.getBytes(hanimeImage.getUrl());
+                        byte[] bytes = OKHttpUtils.getBytes(hanimeImage.getUrl(),enableProxy);
                         if (Objects.isNull(bytes)) {
                             continue;
                         }
@@ -110,7 +110,7 @@ public class Hanime extends BaseWeb {
     }
 
     public void download_nsfw_general_Image() {
-        downloadImage("nsfw_general");
+        downloadImage("nsfw-general");
     }
 
     public void Download_yuri_Image() {
