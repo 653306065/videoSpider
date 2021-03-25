@@ -80,8 +80,8 @@ public class Hanime extends BaseWeb {
             }
         }).start();
 
-        ExecutorService executorService = Executors.newFixedThreadPool(20);
-        for (int i = 0; i < 20; i++) {
+        ExecutorService executorService = Executors.newFixedThreadPool(getThread());
+        for (int i = 0; i < getThread(); i++) {
             executorService.execute(() -> {
                 while (true) {
                     String jsonStr = redisTemplate.opsForList().leftPop(key, 1, TimeUnit.SECONDS);
@@ -109,7 +109,7 @@ public class Hanime extends BaseWeb {
 
     }
 
-    public void Download_nsfw_general_Image() {
+    public void download_nsfw_general_Image() {
         downloadImage("nsfw_general");
     }
 
