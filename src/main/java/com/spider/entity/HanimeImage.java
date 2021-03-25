@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
+
 @Getter
 @Setter
 @Document("hanimeImage")
@@ -24,4 +26,5 @@ public class HanimeImage {
     private String canonicalUrl;
     private byte[] image;
     private String savePath;
+    private String md5;
 }

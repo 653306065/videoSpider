@@ -95,8 +95,13 @@ public class Hanime extends BaseWeb {
                         if (Objects.isNull(bytes)) {
                             continue;
                         }
+                        hanimeImage.setMd5(md5.digestHex(bytes));
                         if (bytes.length < 16 * 1024 * 1024) {
                             hanimeImage.setImage(bytes);
+                        }
+                        if( Objects.nonNull(hanimeImageService.findOnekeyValue("md5",hanimeImage.getMd5()))){
+                            logger.info("id:{},url:{},md5重复", hanimeImage.getId(), hanimeImage.getUrl());
+                            continue;
                         }
                         String path = savePath + fileSeparator + hanimeImage.getChannelName() + fileSeparator + hanimeImage.getId() + "." + hanimeImage.getExtension();
                         FileUtils.byteToFile(bytes, path);
