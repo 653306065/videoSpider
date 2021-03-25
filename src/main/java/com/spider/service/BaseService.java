@@ -60,6 +60,11 @@ public abstract class BaseService<T> {
         return mongoTemplate.findOne(query,clazz);
     }
 
+    public T findById(Integer id){
+        Query query = new Query(Criteria.where("_id").is(id));
+        return mongoTemplate.findOne(query,clazz);
+    }
+
     public T findOnekeyValue(String key, String value) {
         Query query = new Query(Criteria.where(key).is(value));
         return mongoTemplate.findOne(query, clazz);

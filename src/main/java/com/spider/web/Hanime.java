@@ -2,32 +2,35 @@ package com.spider.web;
 
 import java.net.Proxy;
 
-import com.spider.utils.download.MultithreadingDownload;
+import com.spider.entity.HanimeImage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.spider.utils.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.spider.utils.OKHttpUtils;
 import com.spider.utils.download.ImageDownload;
+import org.springframework.util.CollectionUtils;
+import com.spider.service.HanimeImageService;
 
 @Service
 public class Hanime extends BaseWeb {
 
     @Value("${hanime.imageApi}")
     private String imageApi;
+
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
 
     @Autowired
     Proxy proxy;
@@ -47,54 +50,63 @@ public class Hanime extends BaseWeb {
     @Value("${hanime.auth_expires}")
     private String auth_expires;
 
-    public void downloadImage(String type) {
-        int offset = 0;
-        while (true) {
-            try {
-                String api = imageApi.replace("@{type}", type).replace("@{offset}", String.valueOf(offset * 24));
-                Map<String, String> header = new HashMap<String, String>();
-                header.put("x-directive", "api");
-                String json = OKHttpUtils.get(api, header, enableProxy);
+    @Autowired
+    private HanimeImageService hanimeImageService;
+
+    public void downloadImage(String channel) {
+        String maxApi = imageApi.replace("@{channel}", channel).replace("@{beforeId}", "99999999");
+        String json = OKHttpUtils.get(maxApi, enableProxy);
+        if (Objects.isNull(json)) {
+            return;
+        }
+
+        String key = "hanimeImageTask";
+        new Thread(() -> {
+            List<HanimeImage> hanimeImageList = JSONObject.parseObject(json).getJSONArray("data").toJavaList(HanimeImage.class);
+            Integer maxId = hanimeImageList.stream().mapToInt(HanimeImage::getId).max().getAsInt();
+            while (true) {
+                String api = imageApi.replace("@{channel}", channel).replace("@{beforeId}", String.valueOf(maxId));
                 logger.info(api);
-                JSONObject jsonObject = JSON.parseObject(json);
-                JSONArray array = jsonObject.getJSONArray("data");
-                if (array.size() == 0) {
+                String jsonStr = OKHttpUtils.get(api, enableProxy);
+                if (Objects.isNull(jsonStr)) {
+                    continue;
+                }
+                hanimeImageList = JSONObject.parseObject(jsonStr).getJSONArray("data").toJavaList(HanimeImage.class);
+                if (CollectionUtils.isEmpty(hanimeImageList)) {
                     break;
                 }
-                ExecutorService executorService = Executors.newFixedThreadPool(thread);
-                for (int i = 0; i < array.size(); i++) {
-                    JSONObject data = array.getJSONObject(i);
-                    String filename = data.getString("filename");
-                    String url = data.getString("canonical_url");
-                    Integer width = data.getInteger("width");
-                    Integer height = data.getInteger("height");
-                    String extension = data.getString("extension");
-                    // if (width * height >= 1920 * 1080) {
-                    executorService.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            String random = UUID.randomUUID().toString().replace("-", "").substring(0, 6);
-                            String name = filename.split("\\.")[0];
-                            String path = savePath + "\\" + type + "\\" + name + "_" + random + "." + extension;
-                            imageDownload.downloadFile(url, null, path, enableProxy);
-                            logger.info("{},{},下载完成", filename, url);
-                        }
-                    });
-                    // }
+                redisTemplate.opsForList().rightPushAll(key, hanimeImageList.stream().map(JSON::toJSONString).collect(Collectors.toList()));
+                maxId = hanimeImageList.stream().mapToInt(HanimeImage::getId).min().getAsInt();
+            }
+        }).start();
 
-                }
-                executorService.shutdown();
+        ExecutorService executorService = Executors.newFixedThreadPool(20);
+        for (int i = 0; i < 20; i++) {
+            executorService.execute(() -> {
                 while (true) {
-                    if (executorService.isTerminated()) {
-                        logger.info("offset:{},下载完成!!!", String.valueOf(offset * 24));
-                        break;
+                    String jsonStr = redisTemplate.opsForList().leftPop(key, 1, TimeUnit.SECONDS);
+                    HanimeImage hanimeImage = JSON.parseObject(jsonStr, HanimeImage.class);
+                    if (Objects.nonNull(hanimeImage) &&Objects.nonNull(hanimeImageService.findById(hanimeImage.getId()))) {
+                        logger.info("id:{},url:{},已存在", hanimeImage.getId(), hanimeImage.getUrl());
+                        continue;
+                    }
+                    if (Objects.nonNull(hanimeImage) && Objects.nonNull(hanimeImage.getUrl())) {
+                        byte[] bytes = OKHttpUtils.getBytes(hanimeImage.getUrl());
+                        if (Objects.isNull(bytes)) {
+                            continue;
+                        }
+                        if (bytes.length < 16 * 1024 * 1024) {
+                            hanimeImage.setImage(bytes);
+                        }
+                        String path = savePath + fileSeparator + hanimeImage.getChannelName() + fileSeparator + hanimeImage.getId() + "." + hanimeImage.getExtension();
+                        FileUtils.byteToFile(bytes, path);
+                        hanimeImageService.insert(hanimeImage);
+                        logger.info("id:{},url:{},下载完成", hanimeImage.getId(), hanimeImage.getUrl());
                     }
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            offset++;
+            });
         }
+
     }
 
     public void Download_nsfw_general_Image() {
