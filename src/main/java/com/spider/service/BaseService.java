@@ -55,14 +55,14 @@ public abstract class BaseService<T> {
         return mongoTemplate.find(query, clazz);
     }
 
-    public T findById(String id){
+    public T findById(String id) {
         Query query = new Query(Criteria.where("_id").is(id));
-        return mongoTemplate.findOne(query,clazz);
+        return mongoTemplate.findOne(query, clazz);
     }
 
-    public T findById(Integer id){
+    public T findById(Integer id) {
         Query query = new Query(Criteria.where("_id").is(id));
-        return mongoTemplate.findOne(query,clazz);
+        return mongoTemplate.findOne(query, clazz);
     }
 
     public T findOnekeyValue(String key, String value) {
@@ -92,6 +92,24 @@ public abstract class BaseService<T> {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void updateById(Object id, String key, Object value) {
+        try {
+            Query query = new Query(Criteria.where("_id").is(id));
+            Update update = new Update();
+            update.set(key, value);
+            mongoTemplate.updateFirst(query, update, clazz);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteKey(Object id,String key){
+        Query query = new Query(Criteria.where("_id").is(id));
+        Update update = new Update();
+        update.unset(key);
+        mongoTemplate.updateFirst(query, update, clazz);
     }
 
     public List<T> findByRegex(String key, String regex) {

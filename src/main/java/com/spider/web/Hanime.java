@@ -96,9 +96,6 @@ public class Hanime extends BaseWeb {
                             continue;
                         }
                         hanimeImage.setMd5(md5.digestHex(bytes));
-                        if (bytes.length < 16 * 1024 * 1024) {
-                            hanimeImage.setImage(bytes);
-                        }
                         if( Objects.nonNull(hanimeImageService.findOnekeyValue("md5",hanimeImage.getMd5()))){
                             logger.info("id:{},url:{},md5重复", hanimeImage.getId(), hanimeImage.getUrl());
                             continue;
