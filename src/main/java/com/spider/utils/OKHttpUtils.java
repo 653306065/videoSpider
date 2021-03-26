@@ -350,8 +350,8 @@ public class OKHttpUtils implements ApplicationRunner {
             for (Map.Entry<String, Object> entry : params.entrySet()) {
                 if (entry.getValue() instanceof String) {
                     multipartBodyBuilder.addFormDataPart(entry.getKey(), (String) entry.getValue());
-                } else if (entry.getValue() instanceof byte[] data) {
-                    multipartBodyBuilder.addFormDataPart(entry.getKey(), entry.getKey(), RequestBody.create(data));
+                } else if (entry.getValue() instanceof byte[]) {
+                    multipartBodyBuilder.addFormDataPart(entry.getKey(), entry.getKey(), RequestBody.create((byte[])(entry.getValue())));
                 } else {
                     multipartBodyBuilder.addFormDataPart(entry.getKey(), String.valueOf(entry.getValue()));
                 }
