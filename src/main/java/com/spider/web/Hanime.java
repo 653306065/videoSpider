@@ -93,7 +93,8 @@ public class Hanime extends BaseWeb {
                     if (Objects.nonNull(hanimeImage) && Objects.nonNull(hanimeImage.getUrl())) {
                         byte[] bytes = OKHttpUtils.getBytes(hanimeImage.getUrl(),enableProxy);
                         if (Objects.isNull(bytes)) {
-                            redisTemplate.opsForList().leftPush(key,jsonStr);
+                            logger.info("id:{},url:{},获取为空", hanimeImage.getId(), hanimeImage.getUrl());
+                            //redisTemplate.opsForList().leftPush(key,jsonStr);
                             continue;
                         }
                         hanimeImage.setMd5(md5.digestHex(bytes));
