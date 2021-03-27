@@ -49,8 +49,8 @@ public class VideoService extends BaseService<Video> {
 
     public Double videoScore(String videoId, Integer imageCount, double threshold, boolean isDelete) {
         Video findVideo = this.findById(videoId);
-        if (Objects.nonNull(findVideo)) {
-            long duration = findVideo.getMultimediaInfo().getDuration();
+        if (Objects.nonNull(findVideo)&&Objects.nonNull(findVideo.getMultimediaInfo())) {
+            Long duration = findVideo.getMultimediaInfo().getDuration();
             long size = duration / imageCount;
             File file = new File(findVideo.getSavePath());
             String path = file.getParentFile().getAbsolutePath() + File.separator + "temp";
