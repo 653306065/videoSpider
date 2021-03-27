@@ -104,9 +104,13 @@ public class Hanime extends BaseWeb {
                         }
                         String path = savePath + fileSeparator + hanimeImage.getChannelName() + fileSeparator + hanimeImage.getId() + "." + hanimeImage.getExtension();
                         hanimeImage.setSavePath(path);
-                        FileUtils.byteToFile(bytes, path);
-                        hanimeImageService.insert(hanimeImage);
-                        logger.info("id:{},url:{},下载完成", hanimeImage.getId(), hanimeImage.getUrl());
+                        if(FileUtils.byteToFile(bytes, path)){
+                            hanimeImageService.insert(hanimeImage);
+                            logger.info("id:{},url:{},下载完成", hanimeImage.getId(), hanimeImage.getUrl());
+                        }else{
+                            logger.info("id:{},url:{},保存失败", hanimeImage.getId(), hanimeImage.getUrl());
+
+                        }
                     }
                 }
             });

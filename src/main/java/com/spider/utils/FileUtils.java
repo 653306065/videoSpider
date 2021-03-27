@@ -293,7 +293,7 @@ public class FileUtils {
         }
     }
 
-    public static void byteToFile(byte[] bytes, String path) {
+    public static boolean byteToFile(byte[] bytes, String path) {
         File localFile = new File(path);
         try {
             // 根据绝对路径初始化文件
@@ -302,15 +302,17 @@ public class FileUtils {
                 localFile.createNewFile();
             } else {
                 System.out.println(path + ",已存在");
-                return;
+                return false;
             }
             // 输出流
             OutputStream os = new FileOutputStream(localFile);
             os.write(bytes);
             os.close();
+            return true;
         } catch (Exception e) {
             localFile.delete();
             e.printStackTrace();
+            return false;
         }
     }
 
