@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class OKHttpUtils implements ApplicationRunner {
 
-    static OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(6, TimeUnit.SECONDS).readTimeout(6, TimeUnit.SECONDS).build();
+    static OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
 
     static OkHttpClient proxyHttpClient = null;
 
@@ -421,6 +421,6 @@ public class OKHttpUtils implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
         Proxy proxy = SpringContentUtil.getBean(Proxy.class);
-        proxyHttpClient = new OkHttpClient.Builder().connectTimeout(6, TimeUnit.SECONDS).readTimeout(6, TimeUnit.SECONDS).proxy(proxy).build();
+        proxyHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).proxy(proxy).build();
     }
 }

@@ -6,6 +6,7 @@ import com.mongodb.client.MongoCursor;
 import com.spider.entity.HanimeImage;
 import com.spider.service.HanimeImageService;
 import com.spider.utils.FileUtils;
+import com.spider.utils.OKHttpUtils;
 import com.spider.vo.ResponseVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -20,6 +21,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 
 @Api(tags = "Hanime接口")
@@ -57,6 +59,30 @@ public class HanimeController extends BaseController {
                 hanimeImageService.updateById(hanimeImage);
                 logger.info("{},保存路径", hanimeImage.getId());
             }
+        });
+        return ResponseVo.succee();
+    }
+
+
+    @ApiOperation("下载数据库的的图片")
+    @GetMapping("/download/db/image")
+    public ResponseVo<Object> downloadDbImage(@RequestParam(defaultValue = "30") Integer thread,
+                                              @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
+                                              @RequestParam String savePath) {
+        List<HanimeImage> hanimeImageList = hanimeImageService.findAll();
+        ForkJoinPool forkJoinPool = new ForkJoinPool(thread);
+        forkJoinPool.execute(() -> {
+            hanimeImageList.stream().parallel().filter(hanimeImage -> !new File(hanimeImage.getSavePath()).exists()).forEach(hanimeImage -> {
+                byte[] bytes = OKHttpUtils.getBytes(hanimeImage.getUrl(), enableProxy);
+                if(Objects.nonNull(bytes)){
+                    String path=savePath+hanimeImage.getChannelName()+File.separator+hanimeImage.getId()+"."+hanimeImage.getExtension();
+                    if(FileUtils.byteToFile(bytes,path)){
+                        hanimeImage.setSavePath(path);
+                        hanimeImageService.updateById(hanimeImage);
+                        logger.info("id:{},url:{},下载完成",hanimeImage.getId(),hanimeImage.getUrl());
+                    }
+                }
+            });
         });
         return ResponseVo.succee();
     }

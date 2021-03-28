@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.spider.constant.Constant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,7 @@ public class Pixiv extends BaseWeb {
         String url = R18Url.replace("@{date}", dateStr).replace("@{page}", String.valueOf(1));
         Map<String, String> header = new HashMap<>();
         header.put("cookie", cookie);
+        header.put("user-agent", Constant.user_agent);
         String json = OKHttpUtils.get(url, header, enableProxy);
         JSONObject jsonObject = JSON.parseObject(json);
         JSONArray jsonArray = jsonObject.getJSONArray("contents");
@@ -54,11 +56,11 @@ public class Pixiv extends BaseWeb {
             for (int page = 0; page < illust_page_count; page++) {
                 String imageurl = jsonArray.getJSONObject(i).getString("url").replace("c/240x480/img-master", "img-original").replace("_master1200", "").replace("p0", "p" + page);
                 logger.info(jsonArray.getJSONObject(i).getString("url"));
-                String master1200 = jsonArray.getJSONObject(i).getString("url").replace("c/240x480/img-master", "img-master").replace("p0", "p" + page);
+                //String master1200 = jsonArray.getJSONObject(i).getString("url").replace("c/240x480/img-master", "img-master").replace("p0", "p" + page);
                 logger.info(imageurl);
-                logger.info(master1200);
+                //logger.info(master1200);
                 urlList.add(imageurl);
-                urlList.add(master1200);
+                //urlList.add(master1200);
             }
         }
 
@@ -70,11 +72,11 @@ public class Pixiv extends BaseWeb {
             for (int page = 0; i < page; page++) {
                 String imageurl = jsonArray2.getJSONObject(i).getString("url").replace("c/240x480/img-master", "img-original").replace("_master1200", "").replace("p0", "p" + page);
                 logger.info(jsonArray2.getJSONObject(i).getString("url"));
-                String master1200 = jsonArray2.getJSONObject(i).getString("url").replace("c/240x480/img-master", "img-master").replace("p0", "p" + page);
+               //String master1200 = jsonArray2.getJSONObject(i).getString("url").replace("c/240x480/img-master", "img-master").replace("p0", "p" + page);
                 logger.info(imageurl);
-                logger.info(master1200);
+                //logger.info(master1200);
                 urlList.add(imageurl);
-                urlList.add(master1200);
+                //urlList.add(master1200);
             }
         }
         return urlList;
@@ -85,7 +87,6 @@ public class Pixiv extends BaseWeb {
         while (true) {
             try {
                 ExecutorService executorService = Executors.newFixedThreadPool(thread);
-                ;
                 String dateStr = simpleDateFormat.format(date);
                 List<String> urls = getHistoryRankListUrl(date);
                 for (String url : urls) {
@@ -103,7 +104,6 @@ public class Pixiv extends BaseWeb {
                         break;
                     }
                 }
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
