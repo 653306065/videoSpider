@@ -19,7 +19,9 @@ javfinder:
 
 pixiv:
   home: https://www.pixiv.net
-  savePath: E:\pixiv
+  savePath: C:\pixiv
+  templatePage: https://www.pixiv.net/artworks/@{id}
+  newApi: https://www.pixiv.net/ajax/illust/new?limit=50&lastId=@{lastId}&type=@{type}&r18=true&lang=zh
   todayRank:
     normal:
     R-18: https://www.pixiv.net/ranking.php?mode=daily_r18&content=illust&p=@{page}&format=json&date=@{date}
