@@ -51,6 +51,7 @@ public class PixivImage {
     private boolean isUnlisted;
     private List<String> imageUrl;
     private List<String> imageSavePath;
+    private List<String> md5List;
 
     @Getter
     @Setter
