@@ -127,20 +127,23 @@ public class Pixiv extends BaseWeb {
         AtomicInteger i = new AtomicInteger();
         List<String> list = new ArrayList<>();
         image.setImageSavePath(image.getImageUrl().stream().sequential().map(url -> {
-            byte[] bytes = OKHttpUtils.getBytes(url, header, enableProxy);
-            if (Objects.nonNull(bytes)) {
-                String path = savePath + fileSeparator + image.getId() + "_" + i.get() + ".jpg";
-                String md5Str = md5.digestHex(bytes);
-                list.add(md5Str);
-                FileUtils.byteToFile(bytes, path);
-                logger.info("{},下载完成", path);
-                i.getAndIncrement();
-                HanimeImage hanimeImage= hanimeImageService.findOnekeyValue("md5",md5Str);
-                if(Objects.nonNull(hanimeImage)){
-                    new File(hanimeImage.getSavePath()).delete();
-                    logger.info("hanimeImage:{},{},md5一致,删除文件",hanimeImage.getId(),hanimeImage.getUrl());
+            //重试3次
+            for(int index=0;index<3;index++){
+                byte[] bytes = OKHttpUtils.getBytes(url, header, enableProxy);
+                if (Objects.nonNull(bytes)) {
+                    String path = savePath + fileSeparator + image.getId() + "_" + i.get() + ".jpg";
+                    String md5Str = md5.digestHex(bytes);
+                    list.add(md5Str);
+                    FileUtils.byteToFile(bytes, path);
+                    logger.info("{},下载完成", path);
+                    i.getAndIncrement();
+                    HanimeImage hanimeImage= hanimeImageService.findOnekeyValue("md5",md5Str);
+                    if(Objects.nonNull(hanimeImage)){
+                        new File(hanimeImage.getSavePath()).delete();
+                        logger.info("hanimeImage:{},{},md5一致,删除文件",hanimeImage.getId(),hanimeImage.getUrl());
+                    }
+                    return path;
                 }
-                return path;
             }
             return null;
         }).filter(Objects::nonNull).collect(Collectors.toList()));
