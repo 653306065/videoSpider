@@ -1,6 +1,8 @@
 package com.spider.utils;
 
 import okhttp3.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -15,6 +17,8 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 public class OKHttpUtils implements ApplicationRunner {
+
+    private static Logger logger=LoggerFactory.getLogger(OKHttpUtils.class);
 
     static OkHttpClient httpClient = new OkHttpClient.Builder().callTimeout(10,TimeUnit.SECONDS).connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
 
@@ -38,7 +42,7 @@ public class OKHttpUtils implements ApplicationRunner {
             response.close();
             return null;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.info("{},访问失败",url);
             return null;
         }
     }
@@ -67,7 +71,7 @@ public class OKHttpUtils implements ApplicationRunner {
             response.close();
             return null;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.info("{},访问失败",url);
             return null;
         }
     }
@@ -90,7 +94,7 @@ public class OKHttpUtils implements ApplicationRunner {
             response.close();
             return null;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.info("{},访问失败",url);
             return null;
         }
     }
@@ -118,7 +122,7 @@ public class OKHttpUtils implements ApplicationRunner {
             response.close();
             return null;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.info("{},访问失败",url);
             return null;
         }
     }
@@ -138,7 +142,7 @@ public class OKHttpUtils implements ApplicationRunner {
             response.close();
             return null;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.info("{},访问失败",url);
             return null;
         }
     }
@@ -160,7 +164,7 @@ public class OKHttpUtils implements ApplicationRunner {
             }
             return response;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.info("{},访问失败",url);
             return null;
         }
     }
@@ -186,7 +190,7 @@ public class OKHttpUtils implements ApplicationRunner {
             response.close();
             return null;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.info("{},访问失败",url);
             return null;
         }
     }
@@ -209,7 +213,7 @@ public class OKHttpUtils implements ApplicationRunner {
             response.close();
             return null;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.info("{},访问失败",url);
             return null;
         }
     }
@@ -227,7 +231,7 @@ public class OKHttpUtils implements ApplicationRunner {
             response.close();
             return null;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.info("{},访问失败",url);
             return null;
         }
     }
@@ -256,7 +260,7 @@ public class OKHttpUtils implements ApplicationRunner {
             response.close();
             return null;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.info("{},访问失败",url);
             return null;
         }
     }
@@ -280,7 +284,7 @@ public class OKHttpUtils implements ApplicationRunner {
             response.close();
             return null;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.info("{},访问失败",url);
             return null;
         }
     }
@@ -310,7 +314,7 @@ public class OKHttpUtils implements ApplicationRunner {
             response.close();
             return null;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.info("{},访问失败",url);
             return null;
         }
     }
@@ -338,7 +342,7 @@ public class OKHttpUtils implements ApplicationRunner {
             response.close();
             return null;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.info("{},访问失败",url);
             return null;
         }
     }
@@ -374,7 +378,7 @@ public class OKHttpUtils implements ApplicationRunner {
             response.close();
             return null;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.info("{},访问失败",url);
             return null;
         }
     }
