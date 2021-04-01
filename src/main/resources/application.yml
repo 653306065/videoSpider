@@ -35,7 +35,7 @@ proxy:
 FFmpegPath: C:\\ffmpeg\\bin\\
 
 server:
-  port: 8080
+  port: 80
 
   #logging:
   level:

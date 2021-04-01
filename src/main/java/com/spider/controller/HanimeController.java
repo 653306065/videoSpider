@@ -74,16 +74,38 @@ public class HanimeController extends BaseController {
         forkJoinPool.execute(() -> {
             hanimeImageList.stream().parallel().filter(hanimeImage -> !new File(hanimeImage.getSavePath()).exists()).forEach(hanimeImage -> {
                 byte[] bytes = OKHttpUtils.getBytes(hanimeImage.getUrl(), enableProxy);
-                if(Objects.nonNull(bytes)){
-                    String path=savePath+hanimeImage.getChannelName()+File.separator+hanimeImage.getId()+"."+hanimeImage.getExtension();
-                    if(FileUtils.byteToFile(bytes,path)){
+                if (Objects.nonNull(bytes)) {
+                    String path = savePath + hanimeImage.getChannelName() + File.separator + hanimeImage.getId() + "." + hanimeImage.getExtension();
+                    if (FileUtils.byteToFile(bytes, path)) {
                         hanimeImage.setSavePath(path);
                         hanimeImageService.updateById(hanimeImage);
-                        logger.info("id:{},url:{},下载完成",hanimeImage.getId(),hanimeImage.getUrl());
+                        logger.info("id:{},url:{},下载完成", hanimeImage.getId(), hanimeImage.getUrl());
                     }
                 }
             });
         });
+        return ResponseVo.succee();
+    }
+
+
+    @ApiOperation("拆分文件到文件夹")
+    @GetMapping("/splitFile")
+    public ResponseVo<Object> splitFile(@RequestParam String path, @RequestParam Integer size) {
+        List<HanimeImage> hanimeImageList = hanimeImageService.findAll();
+        hanimeImageList = hanimeImageList.stream().filter(hanimeImage -> new File(hanimeImage.getSavePath()).exists()).collect(Collectors.toList());
+        int pageCount = (int)Math.round(hanimeImageList.size()*1.0 / size);
+        for (int i = 0; i < pageCount; i++) {
+            File splitPath = new File(path + File.separator + i + File.separator);
+            splitPath.mkdirs();
+            List<HanimeImage> list = hanimeImageList.stream().skip((long) i * size).limit(size).collect(Collectors.toList());
+            list.forEach(hanimeImage -> {
+                File image = new File(hanimeImage.getSavePath());
+                File newFile=new File(splitPath.getAbsolutePath()+File.separator+image.getName());
+                image.renameTo(newFile);
+                hanimeImage.setSavePath(newFile.getAbsolutePath());
+                hanimeImageService.updateById(hanimeImage);
+            });
+        }
         return ResponseVo.succee();
     }
 }
