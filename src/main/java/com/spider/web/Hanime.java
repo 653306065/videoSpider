@@ -122,11 +122,11 @@ public class Hanime extends BaseWeb {
         downloadImage("nsfw-general");
     }
 
-    public void Download_yuri_Image() {
+    public void download_yuri_Image() {
         downloadImage("yuri");
     }
 
-    public void Download_irl_3d_Image() {
+    public void download_irl_3d_Image() {
         downloadImage("irl-3d");
     }
 

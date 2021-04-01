@@ -71,7 +71,7 @@ public class SpiderController extends BaseController {
 
     @ApiOperation("下载 hanime nsfw类型图片")
     @GetMapping("/hanime/image/nsfw")
-    public ResponseVo<Object> hanimeImage(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
+    public ResponseVo<Object> hanimeNsfwImage(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
                                           @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
                                           @RequestParam(name = "savePath",required = false) String savePath) {
         hanime.setThread(thread);
@@ -80,6 +80,20 @@ public class SpiderController extends BaseController {
         }
         hanime.setEnableProxy(enableProxy);
         threadPoolExecutor.execute(() -> hanime.download_nsfw_general_Image());
+        return ResponseVo.succee();
+    }
+
+    @ApiOperation("下载 hanime irl_3d类型图片")
+    @GetMapping("/hanime/image/irl_3d")
+    public ResponseVo<Object> hanimeirl_3dImage(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
+                                          @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
+                                          @RequestParam(name = "savePath",required = false) String savePath) {
+        hanime.setThread(thread);
+        if(Objects.nonNull(savePath)){
+            hanime.setSavePath(savePath);
+        }
+        hanime.setEnableProxy(enableProxy);
+        threadPoolExecutor.execute(() -> hanime.download_irl_3d_Image());
         return ResponseVo.succee();
     }
 

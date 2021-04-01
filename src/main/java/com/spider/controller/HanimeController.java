@@ -91,8 +91,8 @@ public class HanimeController extends BaseController {
 
     @ApiOperation("拆分文件到文件夹")
     @GetMapping("/splitFile")
-    public ResponseVo<Object> splitFile(@RequestParam String path, @RequestParam Integer size) {
-        List<HanimeImage> hanimeImageList = hanimeImageService.findAll();
+    public ResponseVo<Object> splitFile(@RequestParam String path, @RequestParam Integer size,@RequestParam String channelName) {
+        List<HanimeImage> hanimeImageList = hanimeImageService.findBykeyValue("channelName",channelName);
         hanimeImageList = hanimeImageList.stream().filter(hanimeImage -> new File(hanimeImage.getSavePath()).exists()).sorted(Comparator.comparing(HanimeImage::getId)).collect(Collectors.toList());
         int pageCount = (int)Math.round(hanimeImageList.size()*1.0 / size)+1;
         for (int i = 0; i < pageCount; i++) {
