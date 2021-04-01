@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ForkJoinPool;
@@ -92,8 +93,8 @@ public class HanimeController extends BaseController {
     @GetMapping("/splitFile")
     public ResponseVo<Object> splitFile(@RequestParam String path, @RequestParam Integer size) {
         List<HanimeImage> hanimeImageList = hanimeImageService.findAll();
-        hanimeImageList = hanimeImageList.stream().filter(hanimeImage -> new File(hanimeImage.getSavePath()).exists()).collect(Collectors.toList());
-        int pageCount = (int)Math.round(hanimeImageList.size()*1.0 / size);
+        hanimeImageList = hanimeImageList.stream().filter(hanimeImage -> new File(hanimeImage.getSavePath()).exists()).sorted(Comparator.comparing(HanimeImage::getId)).collect(Collectors.toList());
+        int pageCount = (int)Math.round(hanimeImageList.size()*1.0 / size)+1;
         for (int i = 0; i < pageCount; i++) {
             File splitPath = new File(path + File.separator + i + File.separator);
             splitPath.mkdirs();
@@ -104,6 +105,7 @@ public class HanimeController extends BaseController {
                 image.renameTo(newFile);
                 hanimeImage.setSavePath(newFile.getAbsolutePath());
                 hanimeImageService.updateById(hanimeImage);
+                logger.info("{}->{}",image.getAbsolutePath(),newFile.getAbsolutePath());
             });
         }
         return ResponseVo.succee();
