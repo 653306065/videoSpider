@@ -69,11 +69,29 @@ public class SpiderController extends BaseController {
     @Autowired
     private Hanime hanime;
 
+    @Autowired
+    private Pixiv pixiv;
+
+    @ApiOperation("下载 pixiv 排行图片")
+    @GetMapping("/pixiv/rank")
+    public ResponseVo<Object> pixivRank(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
+                                          @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
+                                          @RequestParam(name = "savePath",required = false) String savePath) {
+        pixiv.setThread(thread);
+        if(Objects.nonNull(savePath)){
+            pixiv.setSavePath(savePath);
+        }
+        pixiv.setEnableProxy(enableProxy);
+        threadPoolExecutor.execute(() -> pixiv.downloadRankImage());
+        return ResponseVo.succee();
+    }
+
+
     @ApiOperation("下载 hanime nsfw类型图片")
     @GetMapping("/hanime/image/nsfw")
     public ResponseVo<Object> hanimeNsfwImage(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
-                                          @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
-                                          @RequestParam(name = "savePath",required = false) String savePath) {
+                                              @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
+                                              @RequestParam(name = "savePath",required = false) String savePath) {
         hanime.setThread(thread);
         if(Objects.nonNull(savePath)){
             hanime.setSavePath(savePath);
