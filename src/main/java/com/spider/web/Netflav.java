@@ -8,6 +8,7 @@ import com.spider.entity.Video;
 import com.spider.utils.FileUtils;
 import com.spider.utils.JsoupUtil;
 import com.spider.utils.OKHttpUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.internal.StringUtil;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,8 +32,12 @@ public class Netflav extends BaseWeb {
     @Value("${netflav.fileApiTemplate}")
     private String fileApiTemplate;
 
-    public List<Video> getVideoList(String category, Integer page) {
+    public List<Video> getVideoList(String category,String genre, Integer page) {
         String listUrl = listTemplate.replace("@{category}", category).replace("@{page}", String.valueOf(page));
+        if(StringUtils.isNotBlank(listUrl)){
+            listUrl=listUrl+"&genre="+genre;
+        }
+        logger.info(listUrl);
         Document document = JsoupUtil.getDocument(listUrl, enableProxy);
         if (Objects.isNull(document)) {
             return null;
@@ -73,10 +78,10 @@ public class Netflav extends BaseWeb {
         return videoList;
     }
 
-    public void downloadVideo(String category) {
+    public void downloadVideo(String category, String genre) {
         int page = 1;//前面页数为其他格式
         while (true) {
-            List<Video> videoList = getVideoList(category, page);
+            List<Video> videoList = getVideoList(category,genre, page);
             if (CollectionUtil.isEmpty(videoList)) {
                 continue;
             }
@@ -86,6 +91,9 @@ public class Netflav extends BaseWeb {
             videoList.forEach(video -> {
                 video.setName(FileUtils.repairPath(video.getName()) + ".mp4");
                 String path = this.savePath + category + fileSeparator + simpleDateFormat.format(new Date()) + fileSeparator + video.getName();
+                if (StringUtils.isNotBlank(genre)) {
+                    path = this.savePath + category + fileSeparator + genre + fileSeparator + simpleDateFormat.format(new Date()) + fileSeparator + video.getName();
+                }
                 video.setSavePath(path);
                 if (hasFilterKey(video.getName())) {
                     logger.info("{},有过滤字段", video.getName());
@@ -122,7 +130,7 @@ public class Netflav extends BaseWeb {
         return null;
     }
 
-    public void downloadUncensoredVideo() {
-        downloadVideo("uncensored");
+    public void downloadUncensoredVideo(String genre) {
+        downloadVideo("uncensored",genre);
     }
 }

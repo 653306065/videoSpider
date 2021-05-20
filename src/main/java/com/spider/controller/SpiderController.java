@@ -419,13 +419,14 @@ public class SpiderController extends BaseController {
     @GetMapping(value = "/start/netflav/uncensored")
     public ResponseVo<Object> netflavUncensored(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
                                                 @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
-                                                @RequestParam(name = "savePath", required = false) String savePath) {
+                                                @RequestParam(name = "savePath", required = false) String savePath,
+                                                @RequestParam(name = "genre", required = false) String genre) {
         netflav.setThread(thread);
         netflav.setEnableProxy(enableProxy);
         if (Objects.nonNull(savePath)) {
             netflav.setSavePath(savePath);
         }
-        threadPoolExecutor.execute(() -> netflav.downloadUncensoredVideo());
+        threadPoolExecutor.execute(() -> netflav.downloadUncensoredVideo(genre));
         return ResponseVo.succee();
     }
 
