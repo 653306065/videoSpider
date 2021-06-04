@@ -34,12 +34,15 @@ public class Netflav extends BaseWeb {
 
     public List<Video> getVideoList(String category,String genre, Integer page) {
         String listUrl = listTemplate.replace("@{category}", category).replace("@{page}", String.valueOf(page));
-        if(StringUtils.isNotBlank(listUrl)){
+        if(StringUtils.isNotBlank(genre)){
             listUrl=listUrl+"&genre="+genre;
         }
         logger.info(listUrl);
         Document document = JsoupUtil.getDocument(listUrl, enableProxy);
         if (Objects.isNull(document)) {
+            return null;
+        }
+        if(Objects.isNull(document.getElementById("__NEXT_DATA__"))){
             return null;
         }
         JSONObject listJson = JSON.parseObject(document.getElementById("__NEXT_DATA__").data());
@@ -56,8 +59,14 @@ public class Netflav extends BaseWeb {
             if (Objects.isNull(videoDocument)) {
                 continue;
             }
+            if(Objects.isNull(videoDocument.getElementById("__NEXT_DATA__"))){
+                continue;
+            }
             JSONObject videoJson = JSON.parseObject(videoDocument.getElementById("__NEXT_DATA__").data());
             JSONObject videoInfo = videoJson.getJSONObject("props").getJSONObject("initialState").getJSONObject("video").getJSONObject("data");
+            if(Objects.isNull(videoInfo)){
+                continue;
+            }
             Video video = new Video();
             video.setName(videoInfo.getString("title"));
             try {
@@ -79,15 +88,13 @@ public class Netflav extends BaseWeb {
     }
 
     public void downloadVideo(String category, String genre) {
-        int page = 1;//前面页数为其他格式
+        int page = 1800;//前面页数为其他格式
         while (true) {
             List<Video> videoList = getVideoList(category,genre, page);
             if (CollectionUtil.isEmpty(videoList)) {
+                page++;
                 continue;
             }
-//            if(page>defaultEndPage){
-//               break;
-//            }
             videoList.forEach(video -> {
                 video.setName(FileUtils.repairPath(video.getName()) + ".mp4");
                 String path = this.savePath + category + fileSeparator + simpleDateFormat.format(new Date()) + fileSeparator + video.getName();
@@ -95,22 +102,21 @@ public class Netflav extends BaseWeb {
                     path = this.savePath + category + fileSeparator + genre + fileSeparator + simpleDateFormat.format(new Date()) + fileSeparator + video.getName();
                 }
                 video.setSavePath(path);
-                if (hasFilterKey(video.getName())) {
-                    logger.info("{},有过滤字段", video.getName());
-                    return;
+                if (videoExistVerify(video)) {
+                    video.setVideoUrl(getFileUrl(video.getVideoUrl()));
+                    if (Objects.nonNull(video.getVideoUrl())) {
+                        multithreadingDownload.videoDownload(video, null, enableProxy, thread, defaultSegmentSize);
+                    }
+                }else{
+                    logger.info("{},验证失败", video.getName());
                 }
-                video.setVideoUrl(getFileUrl(video.getVideoUrl()));
-                if (Objects.isNull(video.getVideoUrl())) {
-                    return;
-                }
-                multithreadingDownload.videoDownload(video, null, enableProxy, thread, defaultSegmentSize);
             });
-            page++;
+            page--;
         }
     }
 
     public String getFileUrl(String src) {
-        if (src.contains("www.avple.video")) {
+        if (src.contains("www.avple.video")||src.contains("mm9842.com")) {
             String key = src.replace(src.substring(0, src.lastIndexOf("/") + 1), "");
             String fileApiUrl = fileApiTemplate.replace("@{key}", key);
             String fileJsonStr = OKHttpUtils.post(fileApiUrl, enableProxy);

@@ -72,6 +72,7 @@ public abstract class BaseWeb implements ApplicationRunner {
     protected boolean hasFilterKey(String name) {
         for (String key : filterKey) {
             if (name.contains(key)) {
+                logger.info("{},包含过滤字段:{}",name,key);
                 return true;
             }
         }
@@ -79,30 +80,39 @@ public abstract class BaseWeb implements ApplicationRunner {
     }
 
     protected boolean videoExistVerify(Video video) {
+        if(Objects.nonNull(video.getName())&&hasFilterKey(video.getName())){
+            return false;
+        }
         if (Objects.nonNull(video.getName()) && Objects.nonNull(videoService.findOnekeyValue("name", video.getName()))) {
-            return true;
+            logger.info("{},视频名已存在",video.getName());
+            return false;
         }
         if (Objects.nonNull(video.getName()) && Objects.nonNull(videoService.findOnekeyValue("name", video.getName().toLowerCase()))) {
-            return true;
+            logger.info("{},视频名已存在",video.getName());
+            return false;
         }
         if (Objects.nonNull(video.getName()) && Objects.nonNull(videoService.findOnekeyValue("name", video.getName().toUpperCase()))) {
-            return true;
+            logger.info("{},视频名已存在",video.getName());
+            return false;
         }
         if (Objects.nonNull(video.getName())) {
             List<String> keyList = FileUtils.getSearchKeyList(video.getName());
             for (String key : keyList) {
                 if (Objects.nonNull(videoService.findOnekeyValue("avCode", key))) {
-                    return true;
+                    logger.info("{},{},avCode已存在",video.getName(),key);
+                    return false;
                 }
             }
         }
         if (Objects.nonNull(video.getSourceUrl()) && Objects.nonNull(videoService.findOnekeyValue("sourceUrl", video.getSourceUrl()))) {
-            return true;
+            logger.info("{},视频地址已存在",video.getName());
+            return false;
         }
         if (Objects.nonNull(video.getAvCode()) && Objects.nonNull(videoService.findOnekeyValue("avCode", video.getAvCode()))) {
-            return true;
+            logger.info("{},{},avCode已存在",video.getName(),video.getAvCode());
+            return false;
         }
-        return false;
+        return true;
     }
 
     @Override
