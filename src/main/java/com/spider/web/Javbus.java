@@ -100,7 +100,7 @@ public class Javbus extends BaseWeb {
                     Elements imgs = element.getElementsByTag("img");
                     if (Objects.nonNull(imgs) && imgs.size() != 0) {
                         Element img = imgs.get(0);
-                        String imgSrc = img.attr("src");
+                        String imgSrc = home+img.attr("src");
                         avInfo.setThumbUrl(imgSrc);
                         String title = img.attr("title");
                         avInfo.setName(title);
@@ -142,7 +142,7 @@ public class Javbus extends BaseWeb {
         }
         Elements elements = document.getElementsByClass("bigImage");
         if (elements.size() > 0) {
-            String imgUrl = elements.get(0).attr("href");
+            String imgUrl =home+elements.get(0).attr("href");
             avInfo.setCoverUrl(imgUrl);
             byte[] imgBytes = OKHttpUtils.getBytes(imgUrl, enableProxy);
             if (Objects.nonNull(imgBytes)) {
@@ -189,7 +189,7 @@ public class Javbus extends BaseWeb {
         }
         Element waterfall = document.getElementById("sample-waterfall");
         if (Objects.nonNull(waterfall)) {
-            List<String> waterfallList = waterfall.getElementsByClass("sample-box").stream().map(element -> element.attr("href")).filter(StringUtils::hasText).collect(Collectors.toList());
+            List<String> waterfallList = waterfall.getElementsByClass("sample-box").stream().map(element ->home+element.attr("href")).filter(StringUtils::hasText).collect(Collectors.toList());
             avInfo.setPreviewImageUrlList(waterfallList);
             List<byte[]> byteList = waterfallList.stream().parallel().map(url -> {
                 byte[] bytes = OKHttpUtils.getBytes(url, enableProxy);
