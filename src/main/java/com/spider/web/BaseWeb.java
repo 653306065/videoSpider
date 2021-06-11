@@ -3,6 +3,7 @@ package com.spider.web;
 import cn.hutool.crypto.digest.MD5;
 import com.spider.entity.Video;
 import com.spider.service.AvInfoService;
+import com.spider.service.UrlRecordService;
 import com.spider.service.VideoService;
 import com.spider.utils.FileUtils;
 import com.spider.utils.SpringContentUtil;
@@ -44,6 +45,9 @@ public abstract class BaseWeb implements ApplicationRunner {
 
     @Autowired
     protected HlsDownloader hlsDownloader;
+    
+    @Autowired
+    protected UrlRecordService urlRecordService;
 
     protected String fileSeparator = File.separator;
 
@@ -105,6 +109,10 @@ public abstract class BaseWeb implements ApplicationRunner {
             }
         }
         if (Objects.nonNull(video.getSourceUrl()) && Objects.nonNull(videoService.findOnekeyValue("sourceUrl", video.getSourceUrl()))) {
+            logger.info("{},视频地址已存在",video.getName());
+            return false;
+        }
+        if (Objects.nonNull(video.getVideoUrl()) && Objects.nonNull(videoService.findOnekeyValue("videoUrl", video.getVideoUrl()))) {
             logger.info("{},视频地址已存在",video.getName());
             return false;
         }
