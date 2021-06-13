@@ -32,7 +32,7 @@ public class AvInfoService extends BaseService<AvInfo> {
         for (Document document : mongoTemplate.getCollection(mongoTemplate.getCollectionName(clazz)).find().projection(new BasicDBObject("code", 1))) {
             codeList.add(document.getString("code"));
         }
-        codeList.forEach(code -> {
+        codeList.stream().filter(code->code.length()>3).forEach(code -> {
             List<String> list = new ArrayList<>();
             list.add(code);
             list.add(code.trim());

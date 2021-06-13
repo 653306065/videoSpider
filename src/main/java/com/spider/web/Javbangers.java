@@ -147,29 +147,19 @@ public class Javbangers extends BaseWeb {
                 List<Video> videoList = getVideoListByUrl(categories, page);
                 videoList = videoList.stream().filter(v -> Objects.nonNull(v.getSourceUrl())).collect(Collectors.toList());
                 for (Video video : videoList) {
-                    if (hasFilterKey(video.getName())) {
-                        logger.info("{},含有过滤字段", video.getName());
-                        continue;
+                    if (videoExistVerify(video)) {
+                        video = getVideoInfo(video);
+                        if (videoExistVerify(video)) {
+                            if (video.getCensored()) {
+                                logger.info("{},有码", video.getName());
+                                continue;
+                            }
+                            String date = simpleDateFormat.format(new Date());
+                            String videoSavePath = savePath + categories + fileSeparator + date + fileSeparator + video.getName();
+                            video.setSavePath(videoSavePath);
+                            multithreadingDownload.videoDownload(video, null, enableProxy, thread, defaultSegmentSize);
+                        }
                     }
-                    Video findVideo = videoService.findOnekeyValue("sourceUrl", video.getSourceUrl());
-                    if (Objects.nonNull(findVideo)) {
-                        logger.info("{},已存在", video.getSourceUrl());
-                        continue;
-                    }
-//                    if(!findAVCode(video.getName())){
-//                        logger.info("{},没有avCode",video.getName());
-//                        continue;
-//                    }
-                    video.getName();
-                    video = getVideoInfo(video);
-                    if (video.getCensored()) {
-                        logger.info("{},有码", video.getName());
-                        continue;
-                    }
-                    String date = simpleDateFormat.format(new Date());
-                    String videoSavePath = savePath + categories + fileSeparator + date + fileSeparator + video.getName();
-                    video.setSavePath(videoSavePath);
-                    multithreadingDownload.videoDownload(video, null, enableProxy, thread, defaultSegmentSize);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -220,6 +210,7 @@ public class Javbangers extends BaseWeb {
         return map;
     }
 
+    @Override
     public void setThread(Integer thread) {
         this.thread = thread;
     }

@@ -56,6 +56,11 @@ public class Netflav extends BaseWeb {
             String videoId = info.getString("videoId");
             String videoUrl = videoTemplate.replace("@{videoId}", videoId);
             Document videoDocument = JsoupUtil.getDocument(videoUrl, enableProxy);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             if (Objects.isNull(videoDocument)) {
                 continue;
             }
@@ -88,11 +93,10 @@ public class Netflav extends BaseWeb {
     }
 
     public void downloadVideo(String category, String genre) {
-        int page = 1800;//前面页数为其他格式
+        int page = 1718;//前面页数为其他格式
         while (true) {
             List<Video> videoList = getVideoList(category,genre, page);
             if (CollectionUtil.isEmpty(videoList)) {
-                page++;
                 continue;
             }
             videoList.forEach(video -> {
@@ -107,8 +111,6 @@ public class Netflav extends BaseWeb {
                     if (Objects.nonNull(video.getVideoUrl())) {
                         multithreadingDownload.videoDownload(video, null, enableProxy, thread, defaultSegmentSize);
                     }
-                }else{
-                    logger.info("{},验证失败", video.getName());
                 }
             });
             page--;

@@ -128,7 +128,7 @@ public class Pixiv extends BaseWeb {
         List<String> list = new ArrayList<>();
         image.setImageSavePath(image.getImageUrl().stream().sequential().map(url -> {
             //重试3次
-            for(int index=0;index<3;index++){
+            for (int index = 0; index < 3; index++) {
                 byte[] bytes = OKHttpUtils.getBytes(url, header, enableProxy);
                 if (Objects.nonNull(bytes)) {
                     String path = savePath + fileSeparator + image.getId() + "_" + i.get() + ".jpg";
@@ -137,10 +137,10 @@ public class Pixiv extends BaseWeb {
                     FileUtils.byteToFile(bytes, path);
                     logger.info("{},下载完成", path);
                     i.getAndIncrement();
-                    HanimeImage hanimeImage= hanimeImageService.findOnekeyValue("md5",md5Str);
-                    if(Objects.nonNull(hanimeImage)){
+                    HanimeImage hanimeImage = hanimeImageService.findOnekeyValue("md5", md5Str);
+                    if (Objects.nonNull(hanimeImage)) {
                         new File(hanimeImage.getSavePath()).delete();
-                        logger.info("hanimeImage:{},{},md5一致,删除文件",hanimeImage.getId(),hanimeImage.getUrl());
+                        logger.info("hanimeImage:{},{},md5一致,删除文件", hanimeImage.getId(), hanimeImage.getUrl());
                     }
                     return path;
                 }
@@ -222,9 +222,7 @@ public class Pixiv extends BaseWeb {
                 if (idList.size() == 0) {
                     break;
                 }
-                if (!CollectionUtils.isEmpty(filterKey)) {
-                    redisTemplate.opsForList().rightPushAll(key, idList);
-                }
+                redisTemplate.opsForList().rightPushAll(key, idList);
             }
         }).start();
 

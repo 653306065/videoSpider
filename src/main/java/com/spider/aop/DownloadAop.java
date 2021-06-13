@@ -1,13 +1,9 @@
 package com.spider.aop;
 
 import com.alibaba.fastjson.JSON;
-import com.spider.entity.AvInfo;
-import com.spider.entity.FaceInfo;
-import com.spider.entity.Image;
-import com.spider.entity.Video;
+import com.spider.entity.*;
 import com.spider.service.*;
 import com.spider.utils.FFmpegUtil;
-import com.spider.utils.FaceUtil;
 import com.spider.utils.FileUtils;
 import com.spider.utils.ImageUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -19,13 +15,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 import ws.schild.jave.MultimediaInfo;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -47,20 +41,11 @@ public class DownloadAop {
     @Autowired
     private AvInfoService avInfoService;
 
-    @Value("${filterKey}")
-    List<String> filterKeyList;
-
     @Value("${video.minWidth}")
     private Integer minWidth;
 
     @Value("${video.minHeight}")
     private Integer minHeight;
-
-    @PostConstruct
-    public void initFilterKey() {
-        filterKeyList.addAll(filterKeyList.stream().map(String::toLowerCase).collect(Collectors.toList()));
-        filterKeyList.addAll(filterKeyList.stream().map(String::toUpperCase).collect(Collectors.toList()));
-    }
 
     @Pointcut("execution(* com.spider.utils.download.MultithreadingDownload.videoDownload(..))")
     public void multithreadingDownload_videoDownload() {
@@ -76,11 +61,23 @@ public class DownloadAop {
             return;
         }
 
-        //过滤关键字
-        for (String key : filterKeyList) {
-            if (video.getName().contains(key)) {
-                logger.info("{},包含过滤字段:{}", video.getName(), key);
-                return;
+        /**
+         * 过滤规则验证
+         */
+        for (FilterRule key : FilterRuleServcie.filterRuleList) {
+            if (key.getEnable()) {
+                if (key.getType() == FilterRule.Rule.String) {
+                    if (video.getName().contains(key.getRule()) || video.getName().toLowerCase().contains(key.getRule().toLowerCase()) || video.getName().toUpperCase().contains(key.getRule().toUpperCase())) {
+                        logger.info("{},包含过滤规则:{}", video.getName(), key.getRule());
+                        return;
+                    }
+                } else if (key.getType() == FilterRule.Rule.RegExp) {
+                    Pattern pattern= Pattern.compile(key.getRule(),Pattern.CASE_INSENSITIVE);
+                    if (pattern.matcher(video.getName()).matches()) {
+                        logger.info("{},包含过滤规则:{}", video.getName(), key.getRule());
+                        return;
+                    }
+                }
             }
         }
 
@@ -103,7 +100,7 @@ public class DownloadAop {
         //确认视频是否为av
         for (Map.Entry<String, List<String>> entry : AvInfoService.codeTransformMap.entrySet()) {
             for (String code : entry.getValue()) {
-                if (name.contains(code)) {
+                if (name.contains(code)||name.toLowerCase().contains(code)||name.toUpperCase().contains(code)) {
                     video.setAvCode(entry.getKey());
                 }
             }
@@ -147,7 +144,7 @@ public class DownloadAop {
         }
 
         try {
-            logger.info("{},验证通过", video.getName());
+            logger.info("{},验证通过,code:{}", video.getName(),video.getAvCode());
             File videoFile = new File(video.getSavePath());
             Boolean result = (Boolean) joinPoint.proceed();
             if (!result) {

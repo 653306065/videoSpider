@@ -49,11 +49,11 @@ public class Kissjav extends BaseWeb {
         return list;
     }
 
-    public Video getVideoInfo(String url)  {
+    public Video getVideoInfo(String url) {
         Video video = new Video();
         video.setSourceUrl(url);
         Document document = JsoupUtil.getDocument(url, enableProxy);
-        if(Objects.isNull(document)){
+        if (Objects.isNull(document)) {
             return null;
         }
         Elements h1s = document.getElementsByTag("h1");
@@ -83,26 +83,19 @@ public class Kissjav extends BaseWeb {
         while (true) {
             try {
                 List<Video> videoList = getVideoList(category, page);
-                A:
                 for (Video video : videoList) {
                     try {
                         logger.info("{},开始下载", video.getName());
-                        for (String key : filterKey) {
-                            if (video.getName().contains(key)) {
-                                logger.info("{},有过滤字段", video.getName());
-                                continue A;
+                        if (videoExistVerify(video)) {
+                            Video getVideo = getVideoInfo(video.getSourceUrl());
+                            if (Objects.nonNull(getVideo) && Objects.nonNull(getVideo.getVideoUrl()) && videoExistVerify(getVideo)) {
+                                getVideo.setName(FileUtils.repairPath(getVideo.getName()) + ".mp4");
+                                String path = savePath + category + fileSeparator + simpleDateFormat.format(new Date()) + fileSeparator + getVideo.getName();
+                                getVideo.setSavePath(path);
+                                multithreadingDownload.videoDownload(getVideo, null, enableProxy, thread, defaultSegmentSize);
+                                logger.info("{},下载完成", video.getName());
                             }
                         }
-                        Video getVideo = getVideoInfo(video.getSourceUrl());
-                        if (Objects.isNull(getVideo)||Objects.isNull(getVideo.getVideoUrl())) {
-                            logger.info("{},获取下载地址失败", video.getName());
-                            continue;
-                        }
-                        getVideo.setName(FileUtils.repairPath(getVideo.getName()) + ".mp4");
-                        String path = savePath + category + fileSeparator + simpleDateFormat.format(new Date()) + fileSeparator + getVideo.getName();
-                        getVideo.setSavePath(path);
-                        multithreadingDownload.videoDownload(getVideo, null, enableProxy, thread, defaultSegmentSize);
-                        logger.info("{},下载完成", video.getName());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

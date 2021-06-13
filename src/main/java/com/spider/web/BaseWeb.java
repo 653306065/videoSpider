@@ -1,8 +1,10 @@
 package com.spider.web;
 
 import cn.hutool.crypto.digest.MD5;
+import com.spider.entity.FilterRule;
 import com.spider.entity.Video;
 import com.spider.service.AvInfoService;
+import com.spider.service.FilterRuleServcie;
 import com.spider.service.VideoService;
 import com.spider.utils.FileUtils;
 import com.spider.utils.SpringContentUtil;
@@ -11,16 +13,15 @@ import com.spider.utils.download.MultithreadingDownload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.env.Environment;
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Pattern;
 
 public abstract class BaseWeb implements ApplicationRunner {
 
@@ -29,9 +30,6 @@ public abstract class BaseWeb implements ApplicationRunner {
     protected final long defaultSegmentSize = 1024 * 1024 * 2;
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-    @Value("${filterKey}")
-    protected List<String> filterKey;
 
     @Autowired
     protected AvInfoService avInfoService;
@@ -63,53 +61,58 @@ public abstract class BaseWeb implements ApplicationRunner {
     //主页
     protected String home;
 
-    @PostConstruct
-    public void initFilterKey() {
-        filterKey.addAll(filterKey.stream().map(String::toLowerCase).collect(Collectors.toList()));
-        filterKey.addAll(filterKey.stream().map(String::toUpperCase).collect(Collectors.toList()));
-    }
-
     protected boolean hasFilterKey(String name) {
-        for (String key : filterKey) {
-            if (name.contains(key)) {
-                logger.info("{},包含过滤字段:{}",name,key);
-                return true;
+        AtomicBoolean value = new AtomicBoolean(false);
+        FilterRuleServcie.filterRuleList.forEach(key -> {
+            if (key.getEnable()) {
+                if (key.getType() == FilterRule.Rule.String) {
+                    if (name.contains(key.getRule()) || name.toLowerCase().contains(key.getRule().toLowerCase()) || name.toUpperCase().contains(key.getRule().toUpperCase())) {
+                        value.set(true);
+                        logger.info("{},包含过滤规则:{}",name,key.getRule());
+                    }
+                } else if (key.getType() == FilterRule.Rule.RegExp) {
+                    Pattern pattern= Pattern.compile(key.getRule(),Pattern.CASE_INSENSITIVE);
+                    if (pattern.matcher(name).matches()) {
+                        value.set(true);
+                        logger.info("{},包含过滤规则:{}",name,key.getRule());
+                    }
+                }
             }
-        }
-        return false;
+        });
+        return value.get();
     }
 
     protected boolean videoExistVerify(Video video) {
-        if(Objects.nonNull(video.getName())&&hasFilterKey(video.getName())){
+        if (Objects.nonNull(video.getName()) && hasFilterKey(video.getName())) {
             return false;
         }
         if (Objects.nonNull(video.getName()) && Objects.nonNull(videoService.findOnekeyValue("name", video.getName()))) {
-            logger.info("{},视频名已存在",video.getName());
+            logger.info("{},视频名已存在", video.getName());
             return false;
         }
         if (Objects.nonNull(video.getName()) && Objects.nonNull(videoService.findOnekeyValue("name", video.getName().toLowerCase()))) {
-            logger.info("{},视频名已存在",video.getName());
+            logger.info("{},视频名已存在", video.getName());
             return false;
         }
         if (Objects.nonNull(video.getName()) && Objects.nonNull(videoService.findOnekeyValue("name", video.getName().toUpperCase()))) {
-            logger.info("{},视频名已存在",video.getName());
+            logger.info("{},视频名已存在", video.getName());
             return false;
         }
         if (Objects.nonNull(video.getName())) {
             List<String> keyList = FileUtils.getSearchKeyList(video.getName());
             for (String key : keyList) {
                 if (Objects.nonNull(videoService.findOnekeyValue("avCode", key))) {
-                    logger.info("{},{},avCode已存在",video.getName(),key);
+                    logger.info("{},{},avCode已存在", video.getName(), key);
                     return false;
                 }
             }
         }
         if (Objects.nonNull(video.getSourceUrl()) && Objects.nonNull(videoService.findOnekeyValue("sourceUrl", video.getSourceUrl()))) {
-            logger.info("{},视频地址已存在",video.getName());
+            logger.info("{},视频地址已存在", video.getName());
             return false;
         }
         if (Objects.nonNull(video.getAvCode()) && Objects.nonNull(videoService.findOnekeyValue("avCode", video.getAvCode()))) {
-            logger.info("{},{},avCode已存在",video.getName(),video.getAvCode());
+            logger.info("{},{},avCode已存在", video.getName(), video.getAvCode());
             return false;
         }
         return true;

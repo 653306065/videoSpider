@@ -37,9 +37,6 @@ public class BTController extends BaseController {
     @Autowired
     VideoService videoService;
 
-    @Value("${filterKey}")
-    private List<String> filterKeyList;
-
     @ApiOperation("根据关键字搜索")
     @GetMapping("/search/{keyword}")
     public ResponseVo<Object> search(@PathVariable String keyword) {
@@ -84,36 +81,30 @@ public class BTController extends BaseController {
 //            });
 //        });
 
-        MongoCursor<Document> mongoCursor= by114BTService.getMongoCollection().find(new BasicDBObject()).iterator();
-        while (mongoCursor.hasNext()){
-            Document document= mongoCursor.next();
-            By114BT bt= new By114BT();
-            bt.setAvCode(document.getString("avCode"));
-            bt.setTorrentPath(document.getString("torrentPath"));
-            bt.setImagesPath(document.getList("imagesPath",String.class));
-            bt.setTitle(document.getString("title"));
-            if (StringUtils.hasText(bt.getAvCode())) {
-                List<Video> videoList = videoService.findBykeyValue("avCode", bt.getAvCode());
-                if (CollectionUtil.isNotEmpty(videoList)) {
-                    logger.info("{},{}", bt.getTorrentPath(), bt.getAvCode());
-                    new File(bt.getTorrentPath()).delete();
-                    bt.getImagesPath().forEach(path -> new File(path).delete());
-                }
-            }
-            filterKeyList.stream().filter(key -> bt.getTitle().contains(key)).forEach(key -> {
-                if(new File(bt.getTorrentPath()).exists()){
-                    new File(bt.getTorrentPath()).delete();
-                    logger.info("{},{}", bt.getTitle(), key);
-                    bt.getImagesPath().forEach(path -> new File(path).delete());
-                }
-            });
-        }
+//        MongoCursor<Document> mongoCursor= by114BTService.getMongoCollection().find(new BasicDBObject()).iterator();
+//        while (mongoCursor.hasNext()){
+//            Document document= mongoCursor.next();
+//            By114BT bt= new By114BT();
+//            bt.setAvCode(document.getString("avCode"));
+//            bt.setTorrentPath(document.getString("torrentPath"));
+//            bt.setImagesPath(document.getList("imagesPath",String.class));
+//            bt.setTitle(document.getString("title"));
+//            if (StringUtils.hasText(bt.getAvCode())) {
+//                List<Video> videoList = videoService.findBykeyValue("avCode", bt.getAvCode());
+//                if (CollectionUtil.isNotEmpty(videoList)) {
+//                    logger.info("{},{}", bt.getTorrentPath(), bt.getAvCode());
+//                    new File(bt.getTorrentPath()).delete();
+//                    bt.getImagesPath().forEach(path -> new File(path).delete());
+//                }
+//            }
+//            filterKeyList.stream().filter(key -> bt.getTitle().contains(key)).forEach(key -> {
+//                if(new File(bt.getTorrentPath()).exists()){
+//                    new File(bt.getTorrentPath()).delete();
+//                    logger.info("{},{}", bt.getTitle(), key);
+//                    bt.getImagesPath().forEach(path -> new File(path).delete());
+//                }
+//            });
+//        }
         return ResponseVo.succee();
-    }
-
-    @PostConstruct
-    public void initFilterKey() {
-        filterKeyList.addAll(filterKeyList.stream().map(String::toLowerCase).collect(Collectors.toList()));
-        filterKeyList.addAll(filterKeyList.stream().map(String::toUpperCase).collect(Collectors.toList()));
     }
 }
