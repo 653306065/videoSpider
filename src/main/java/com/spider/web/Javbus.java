@@ -59,7 +59,7 @@ public class Javbus extends BaseWeb {
             Elements imgs = element.getElementsByTag("img");
             if (imgs.size() != 0) {
                 Element img = imgs.get(0);
-                String imgUrl = img.attr("src");
+                String imgUrl = home+img.attr("src");
                 String name = img.attr("title");
                 if (!"https://images.javbus.com/actress/nowprinting.gif".equals(imgUrl)) {
                     byte[] imgBytes = OKHttpUtils.getBytes(imgUrl, enableProxy);
