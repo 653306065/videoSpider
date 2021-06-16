@@ -18,9 +18,9 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class OKHttpUtils implements ApplicationRunner {
 
-    private static Logger logger=LoggerFactory.getLogger(OKHttpUtils.class);
+    private static final Logger logger=LoggerFactory.getLogger(OKHttpUtils.class);
 
-    static OkHttpClient httpClient = new OkHttpClient.Builder().callTimeout(10,TimeUnit.SECONDS).connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
+    static OkHttpClient httpClient = new OkHttpClient.Builder().writeTimeout(10,TimeUnit.SECONDS).callTimeout(10,TimeUnit.SECONDS).connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
 
     static OkHttpClient proxyHttpClient = null;
 
@@ -42,7 +42,7 @@ public class OKHttpUtils implements ApplicationRunner {
             response.close();
             return null;
         } catch (Exception e) {
-            logger.error("{},访问失败",url);
+            logger.error("{},访问失败,e:{}",url,e.getMessage());
             return null;
         }
     }
@@ -71,7 +71,7 @@ public class OKHttpUtils implements ApplicationRunner {
             response.close();
             return null;
         } catch (Exception e) {
-            logger.error("{},访问失败",url);
+            logger.error("{},访问失败,e:{}",url,e.getMessage());
             return null;
         }
     }
@@ -94,7 +94,7 @@ public class OKHttpUtils implements ApplicationRunner {
             response.close();
             return null;
         } catch (Exception e) {
-            logger.error("{},访问失败",url);
+            logger.error("{},访问失败,e:{}",url,e.getMessage());
             return null;
         }
     }
@@ -122,7 +122,7 @@ public class OKHttpUtils implements ApplicationRunner {
             response.close();
             return null;
         } catch (Exception e) {
-            logger.error("{},访问失败",url);
+            logger.error("{},访问失败,e:{}",url,e.getMessage());
             return null;
         }
     }
@@ -142,7 +142,7 @@ public class OKHttpUtils implements ApplicationRunner {
             response.close();
             return null;
         } catch (Exception e) {
-            logger.error("{},访问失败",url);
+            logger.error("{},访问失败,e:{}",url,e.getMessage());
             return null;
         }
     }
@@ -164,7 +164,7 @@ public class OKHttpUtils implements ApplicationRunner {
             }
             return response;
         } catch (Exception e) {
-            logger.error("{},访问失败",url);
+            logger.error("{},访问失败,e:{}",url,e.getMessage());
             return null;
         }
     }
@@ -190,7 +190,7 @@ public class OKHttpUtils implements ApplicationRunner {
             response.close();
             return null;
         } catch (Exception e) {
-            logger.error("{},访问失败",url);
+            logger.error("{},访问失败,e:{}",url,e.getMessage());
             return null;
         }
     }
@@ -213,7 +213,7 @@ public class OKHttpUtils implements ApplicationRunner {
             response.close();
             return null;
         } catch (Exception e) {
-            logger.error("{},访问失败",url);
+            logger.error("{},访问失败,e:{}",url,e.getMessage());
             return null;
         }
     }
@@ -231,7 +231,7 @@ public class OKHttpUtils implements ApplicationRunner {
             response.close();
             return null;
         } catch (Exception e) {
-            logger.error("{},访问失败",url);
+            logger.error("{},访问失败,e:{}",url,e.getMessage());
             return null;
         }
     }
@@ -260,7 +260,7 @@ public class OKHttpUtils implements ApplicationRunner {
             response.close();
             return null;
         } catch (Exception e) {
-            logger.error("{},访问失败",url);
+            logger.error("{},访问失败,e:{}",url,e.getMessage());
             return null;
         }
     }
@@ -284,7 +284,7 @@ public class OKHttpUtils implements ApplicationRunner {
             response.close();
             return null;
         } catch (Exception e) {
-            logger.error("{},访问失败",url);
+            logger.error("{},访问失败,e:{}",url,e.getMessage());
             return null;
         }
     }
@@ -314,7 +314,7 @@ public class OKHttpUtils implements ApplicationRunner {
             response.close();
             return null;
         } catch (Exception e) {
-            logger.error("{},访问失败",url);
+            logger.error("{},访问失败,e:{}",url,e.getMessage());
             return null;
         }
     }
@@ -342,7 +342,7 @@ public class OKHttpUtils implements ApplicationRunner {
             response.close();
             return null;
         } catch (Exception e) {
-            logger.error("{},访问失败",url);
+            logger.error("{},访问失败,e:{}",url,e.getMessage());
             return null;
         }
     }
@@ -378,7 +378,7 @@ public class OKHttpUtils implements ApplicationRunner {
             response.close();
             return null;
         } catch (Exception e) {
-            logger.error("{},访问失败",url);
+            logger.error("{},访问失败,e:{}",url,e.getMessage());
             return null;
         }
     }
@@ -425,6 +425,6 @@ public class OKHttpUtils implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
         Proxy proxy = SpringContentUtil.getBean(Proxy.class);
-        proxyHttpClient = new OkHttpClient.Builder().proxy(proxy).callTimeout(10,TimeUnit.SECONDS).connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
+        proxyHttpClient = new OkHttpClient.Builder().proxy(proxy).writeTimeout(10,TimeUnit.SECONDS).callTimeout(10,TimeUnit.SECONDS).connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
     }
 }

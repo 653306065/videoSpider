@@ -75,7 +75,7 @@ public class SpiderController extends BaseController {
 
     @ApiOperation("下载 pixiv 排行图片")
     @GetMapping("/pixiv/rank")
-    public ResponseVo<Object> pixivRank(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
+    public ResponseVo<Object> pixivRank(@RequestParam(name = "thread", defaultValue = "5") Integer thread,
                                         @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
                                         @RequestParam(name = "savePath", required = false) String savePath) {
         pixiv.setThread(thread);
@@ -90,7 +90,7 @@ public class SpiderController extends BaseController {
 
     @ApiOperation("下载 hanime nsfw类型图片")
     @GetMapping("/hanime/image/nsfw")
-    public ResponseVo<Object> hanimeNsfwImage(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
+    public ResponseVo<Object> hanimeNsfwImage(@RequestParam(name = "thread", defaultValue = "5") Integer thread,
                                               @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
                                               @RequestParam(name = "savePath", required = false) String savePath) {
         hanime.setThread(thread);
@@ -104,7 +104,7 @@ public class SpiderController extends BaseController {
 
     @ApiOperation("下载 hanime irl_3d类型图片")
     @GetMapping("/hanime/image/irl_3d")
-    public ResponseVo<Object> hanimeirl_3dImage(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
+    public ResponseVo<Object> hanimeirl_3dImage(@RequestParam(name = "thread", defaultValue = "5") Integer thread,
                                                 @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
                                                 @RequestParam(name = "savePath", required = false) String savePath) {
         hanime.setThread(thread);
@@ -127,7 +127,7 @@ public class SpiderController extends BaseController {
 
     @ApiOperation("开始eporner 4k下载")
     @GetMapping("/start/eporner/4k")
-    public ResponseVo<Object> startEporner(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
+    public ResponseVo<Object> startEporner(@RequestParam(name = "thread", defaultValue = "5") Integer thread,
                                            @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
                                            @RequestParam(name = "savePath", required = false) String savePath) {
         eporner.setThread(thread);
@@ -141,7 +141,7 @@ public class SpiderController extends BaseController {
 
     @ApiOperation("开始javbangers下载")
     @GetMapping("/start/javbangers")
-    public ResponseVo<Object> startJavbangers(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
+    public ResponseVo<Object> startJavbangers(@RequestParam(name = "thread", defaultValue = "5") Integer thread,
                                               @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
                                               @RequestParam(name = "savePath", required = false) String savePath) {
         javbangers.setThread(thread);
@@ -155,7 +155,7 @@ public class SpiderController extends BaseController {
 
     @ApiOperation("开始保存javbus的avInfo")
     @GetMapping("/start/save/javbus/avInfo")
-    public ResponseVo<Object> saveJavBusAvInfo(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
+    public ResponseVo<Object> saveJavBusAvInfo(@RequestParam(name = "thread", defaultValue = "5") Integer thread,
                                                @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
                                                @RequestParam(name = "savePath", required = false) String savePath) {
         javbus.setThread(thread);
@@ -170,7 +170,7 @@ public class SpiderController extends BaseController {
 
     @ApiOperation("获取最新javbus的avInfo")
     @GetMapping("/start/save/javbus/new/avInfo")
-    public ResponseVo<Object> saveJavBusNewAvInfo(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
+    public ResponseVo<Object> saveJavBusNewAvInfo(@RequestParam(name = "thread", defaultValue = "5") Integer thread,
                                                   @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
                                                   @RequestParam(name = "savePath", required = false) String savePath) {
         javbus.setThread(thread);
@@ -184,7 +184,7 @@ public class SpiderController extends BaseController {
 
     @ApiOperation("更新javbus的磁力")
     @GetMapping("/start/update/javbus/magnet")
-    public ResponseVo<Object> updateJavBusMagnet(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
+    public ResponseVo<Object> updateJavBusMagnet(@RequestParam(name = "thread", defaultValue = "5") Integer thread,
                                                  @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
                                                  @RequestParam(name = "savePath", required = false) String savePath) {
         javbus.setThread(thread);
@@ -198,7 +198,7 @@ public class SpiderController extends BaseController {
 
     @ApiOperation("保存javbus的女优")
     @GetMapping("/start/save/javbus/actresses")
-    public ResponseVo<Object> saveJavBusActresses(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
+    public ResponseVo<Object> saveJavBusActresses(@RequestParam(name = "thread", defaultValue = "5") Integer thread,
                                                   @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
                                                   @RequestParam(name = "savePath", required = false) String savePath) {
         javbus.setThread(thread);
@@ -212,7 +212,7 @@ public class SpiderController extends BaseController {
 
     @ApiOperation("保存xslist的女优信息")
     @GetMapping("/start/save/xslist/actresses")
-    public ResponseVo<Object> saveXslist(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
+    public ResponseVo<Object> saveXslist(@RequestParam(name = "thread", defaultValue = "5") Integer thread,
                                          @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
                                          @RequestParam(name = "savePath", required = false) String savePath) {
         xslist.setEnableProxy(enableProxy);
@@ -250,7 +250,7 @@ public class SpiderController extends BaseController {
 
     @ApiOperation("获取javrave的视频")
     @GetMapping("/start/javrave")
-    public ResponseVo<Object> startJavrave(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
+    public ResponseVo<Object> startJavrave(@RequestParam(name = "thread", defaultValue = "5") Integer thread,
                                            @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
                                            @RequestParam(name = "savePath", required = false) String savePath) {
         javrave.setThread(thread);
@@ -264,7 +264,7 @@ public class SpiderController extends BaseController {
 
     @ApiOperation("获取pornhub(compilation creampie)的视频")
     @GetMapping("/start/pornhub/compilation/creampie")
-    public ResponseVo<Object> startPornhubCompilationCreampie(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
+    public ResponseVo<Object> startPornhubCompilationCreampie(@RequestParam(name = "thread", defaultValue = "5") Integer thread,
                                                               @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
                                                               @RequestParam(name = "savePath", required = false) String savePath) {
         pornhub.setThread(thread);
@@ -279,7 +279,7 @@ public class SpiderController extends BaseController {
 
     @ApiOperation("获取pornhub(compilation gangbang)的视频")
     @GetMapping("/start/pornhub/creampi/gangbang")
-    public ResponseVo<Object> startPornhubCompilationGangbang(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
+    public ResponseVo<Object> startPornhubCompilationGangbang(@RequestParam(name = "thread", defaultValue = "5") Integer thread,
                                                               @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
                                                               @RequestParam(name = "savePath", required = false) String savePath) {
         pornhub.setThread(thread);
@@ -293,7 +293,7 @@ public class SpiderController extends BaseController {
 
     @ApiOperation("获取pornhub(doublePenetration)的视频")
     @GetMapping("/start/pornhub/doublePenetration")
-    public ResponseVo<Object> startPornhubDoublePenetration(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
+    public ResponseVo<Object> startPornhubDoublePenetration(@RequestParam(name = "thread", defaultValue = "5") Integer thread,
                                                             @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
                                                             @RequestParam(name = "savePath", required = false) String savePath) {
         pornhub.setThread(thread);
@@ -308,7 +308,7 @@ public class SpiderController extends BaseController {
     @ApiOperation("获取pornhub 搜索的视频")
     @GetMapping("/start/pornhub/search/{keyword}")
     public ResponseVo<Object> startPornhubCompilationGangbang(@PathVariable String keyword,
-                                                              @RequestParam(name = "thread", defaultValue = "30") Integer thread,
+                                                              @RequestParam(name = "thread", defaultValue = "5") Integer thread,
                                                               @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
                                                               @RequestParam(name = "savePath", required = false) String savePath) {
         pornhub.setThread(thread);
@@ -333,7 +333,7 @@ public class SpiderController extends BaseController {
 
     @ApiOperation("hqporner 4k视频下载")
     @GetMapping(value = "/start/hqporner/4k")
-    public ResponseVo<List<FaceInfo>> hqporner4K(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
+    public ResponseVo<List<FaceInfo>> hqporner4K(@RequestParam(name = "thread", defaultValue = "5") Integer thread,
                                                  @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
                                                  @RequestParam(name = "savePath", required = false) String savePath) {
         hqporner.setThread(thread);
@@ -347,7 +347,7 @@ public class SpiderController extends BaseController {
 
     @ApiOperation("hqporner SexParties视频下载")
     @GetMapping(value = "/start/hqporner/SexParties")
-    public ResponseVo<List<FaceInfo>> hqpornerSexParties(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
+    public ResponseVo<List<FaceInfo>> hqpornerSexParties(@RequestParam(name = "thread", defaultValue = "5") Integer thread,
                                                          @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
                                                          @RequestParam(name = "savePath", required = false) String savePath) {
         hqporner.setThread(thread);
@@ -361,7 +361,7 @@ public class SpiderController extends BaseController {
 
     @ApiOperation("kissjav uncensored视频下载")
     @GetMapping(value = "/start/kissjav/uncensored")
-    public ResponseVo<Object> kissjavUncensored(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
+    public ResponseVo<Object> kissjavUncensored(@RequestParam(name = "thread", defaultValue = "5") Integer thread,
                                                 @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
                                                 @RequestParam(name = "savePath", required = false) String savePath) {
         kissjav.setThread(thread);
@@ -375,7 +375,7 @@ public class SpiderController extends BaseController {
 
     @ApiOperation("javhuge uncensored视频下载")
     @GetMapping(value = "/start/javhuge/uncensored")
-    public ResponseVo<Object> javhugeUncensored(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
+    public ResponseVo<Object> javhugeUncensored(@RequestParam(name = "thread", defaultValue = "5") Integer thread,
                                                 @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
                                                 @RequestParam(name = "savePath", required = false) String savePath) {
         javhuge.setThread(thread);
@@ -389,7 +389,7 @@ public class SpiderController extends BaseController {
 
     @ApiOperation("javhuge 破解无码视频下载")
     @GetMapping(value = "/start/javhuge/break/uncensored")
-    public ResponseVo<Object> javhugeBreakUncensored(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
+    public ResponseVo<Object> javhugeBreakUncensored(@RequestParam(name = "thread", defaultValue = "5") Integer thread,
                                                      @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
                                                      @RequestParam(name = "savePath", required = false) String savePath) {
         javhuge.setThread(thread);
@@ -403,7 +403,7 @@ public class SpiderController extends BaseController {
 
     @ApiOperation("javfull uncensored视频下载")
     @GetMapping(value = "/start/javfull/uncensored")
-    public ResponseVo<Object> javfullUncensored(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
+    public ResponseVo<Object> javfullUncensored(@RequestParam(name = "thread", defaultValue = "5") Integer thread,
                                                 @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
                                                 @RequestParam(name = "savePath", required = false) String savePath) {
         javfull.setThread(thread);
@@ -417,7 +417,7 @@ public class SpiderController extends BaseController {
 
     @ApiOperation("netflav 无码视频下载")
     @GetMapping(value = "/start/netflav/uncensored")
-    public ResponseVo<Object> netflavUncensored(@RequestParam(name = "thread", defaultValue = "30") Integer thread,
+    public ResponseVo<Object> netflavUncensored(@RequestParam(name = "thread", defaultValue = "5") Integer thread,
                                                 @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
                                                 @RequestParam(name = "savePath", required = false) String savePath,
                                                 @RequestParam(name = "genre", required = false) String genre) {
