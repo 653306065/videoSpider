@@ -18,7 +18,7 @@ public class Shubao extends BaseWeb {
     public static String downloadUrl = "http://www.shubao12.cc/modules/article/txtarticle.php?id=@{id}";
 
     public void getBookList() {
-        int page = 409;
+        int page = 417;
         while (true) {
             try {
                 String url = listUrl.replace("@{page}", String.valueOf(page));

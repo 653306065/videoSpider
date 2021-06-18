@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Api(tags = "文件接口")
@@ -49,12 +50,12 @@ public class FileController extends BaseController {
                 List<String> matchKey = new ArrayList<>();
                 List<String> matchLine = new ArrayList<>();
                 textList.stream().distinct().forEach(line -> {
-                    keyList.stream().distinct().filter(key -> !key.startsWith("#")).forEach(key -> {
-                        if (line.contains(key)) {
+                    keyList.stream().distinct().forEach(key -> {
+                        if (Pattern.matches(key,line)) {
                             keyCount.incrementAndGet();
                             matchKey.add(key);
                             matchLine.add(line);
-                            System.out.println(book.getName() + "," + key + "," + line);
+                            System.out.println(book.getName()+ "," + line);
                         }
                     });
                 });
