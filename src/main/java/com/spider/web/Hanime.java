@@ -115,7 +115,7 @@ public class Hanime extends BaseWeb {
                 }
             });
         }
-
+        executorService.shutdown();
     }
 
     public void download_nsfw_general_Image() {

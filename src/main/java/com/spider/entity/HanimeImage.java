@@ -24,7 +24,6 @@ public class HanimeImage {
     private String discordUserId;
     private String userAvatarUrl;
     private String canonicalUrl;
-    private byte[] image;
     private String savePath;
     private String md5;
 }
