@@ -41,82 +41,81 @@ public class MultithreadingDownload {
             if (Objects.isNull(info) || !String.valueOf(info.getResponseCode()).startsWith("20")) {
                 logger.info("----获取下载信息错误----");
                 return false;
-            } else {
-                downloadStatusMap.put(HttpUrl, true);
-                logger.info(path + ",开始下载,url:" + HttpUrl);
-                String fileSizeStr = getOmitValue(info.getContentLength() / 1024.0 / 1024.0, 6) + "m";
-                logger.info(JSON.toJSONString(info) + ",大小" + fileSizeStr);
-                RandomAccessFile raf = new RandomAccessFile(file, "rw");
-                raf.setLength(info.getContentLength());
-                ExecutorService executorService = Executors.newFixedThreadPool(threadNum);
-                int i = 0;
-                List<Future<Boolean>> downloadResult = new ArrayList<Future<Boolean>>();
-                while (true) {
-                    long startByte = i * segmentSize;
-                    long endByte = (i + 1) * segmentSize - 1;
-                    if (endByte >= info.getContentLength()) {
-                        CallableDownloadThread callableDownloadThread = new CallableDownloadThread(HttpUrl, header, isProxy, startByte, info.getContentLength(), file, downloadByte);
-                        Future<Boolean> future = executorService.submit(callableDownloadThread);
-                        downloadResult.add(future);
-                        break;
-                    }
-                    CallableDownloadThread callableDownloadThread = new CallableDownloadThread(HttpUrl, header, isProxy, startByte, endByte, file, downloadByte);
+            }
+            downloadStatusMap.put(HttpUrl, true);
+            logger.info(path + ",开始下载,url:" + HttpUrl);
+            String fileSizeStr = getOmitValue(info.getContentLength() / 1024.0 / 1024.0, 6) + "m";
+            logger.info(JSON.toJSONString(info) + ",大小" + fileSizeStr);
+            RandomAccessFile raf = new RandomAccessFile(file, "rw");
+            raf.setLength(info.getContentLength());
+            ExecutorService executorService = Executors.newFixedThreadPool(threadNum);
+            int i = 0;
+            List<Future<Boolean>> downloadResult = new ArrayList<Future<Boolean>>();
+            while (true) {
+                long startByte = i * segmentSize;
+                long endByte = (i + 1) * segmentSize - 1;
+                if (endByte >= info.getContentLength()) {
+                    CallableDownloadThread callableDownloadThread = new CallableDownloadThread(HttpUrl, header, isProxy, startByte, info.getContentLength(), file, downloadByte);
                     Future<Boolean> future = executorService.submit(callableDownloadThread);
                     downloadResult.add(future);
-                    i++;
+                    break;
                 }
-                executorService.shutdown();
-                ConsoleProgressBar cpb = new ConsoleProgressBar(100, '#');
-                long tmep = 0;
-                long sleepTime = 300;
-                boolean result = true;
-                while (true) {
-                    double percentage = (downloadByte.get() * 1.0) / (info.getContentLength() * 1.0) * 100.0;
-                    cpb.show((int) Math.floor(percentage));
-                    String speedStr = "0.0";
-                    if (tmep < downloadByte.get()) {
-                        double speed = ((downloadByte.get() - tmep) / 1024.0 / 1024) / (sleepTime / 1000.0);
-                        speedStr = getOmitValue(speed, 5);
-                    }
-                    System.out.print("(" + getOmitValue(percentage, 5) + "%)," + fileSizeStr + "," + speedStr + "m/s" + " | " + file.getName());
-                    tmep = downloadByte.get();
-                    Thread.sleep(sleepTime);
-                    if (executorService.isTerminated()) {
-                        break;
-                    }
-                    //分片下载失败，停止线程池
-                    if (!downloadStatusMap.get(HttpUrl)) {
-                        result = false;
-                        logger.info("分片下载失败,线程池停止下载");
-                        executorService.shutdownNow();
-                        break;
-                    }
-                }
-                //正常执行完成，获取分片结果
-                if (result) {
-                    for (Future<Boolean> future : downloadResult) {
-                        if (!future.get()) {
-                            result = false;
-                        }
-                    }
-                }
-                System.out.println("");
-                raf.close();
-                if (!result) {
-                    logger.info("{},下载失败", file.getName());
-                    while (!file.delete()) {
-                        logger.info("{},删除失败", file.getName());
-                    }
-                    logger.info("{},删除成功", file.getName());
-                } else {
-                    long endTime = System.currentTimeMillis();
-                    logger.info("----" + path + ",下载完成----");
-                    logger.info("耗时:" + (endTime - startTime) / 1000.0 / 60.0 + "分钟");
-                    double avg = (info.getContentLength() / 1024.0 / 1024.0) / ((endTime - startTime) / 1000.0);
-                    logger.info("平均速度:{}m/s", getOmitValue(avg, 5));
-                }
-                return result;
+                CallableDownloadThread callableDownloadThread = new CallableDownloadThread(HttpUrl, header, isProxy, startByte, endByte, file, downloadByte);
+                Future<Boolean> future = executorService.submit(callableDownloadThread);
+                downloadResult.add(future);
+                i++;
             }
+            executorService.shutdown();
+            ConsoleProgressBar cpb = new ConsoleProgressBar(100, '#');
+            long temp = 0;
+            long sleepTime = 300;
+            boolean result = true;
+            while (true) {
+                double percentage = (downloadByte.get() * 1.0) / (info.getContentLength() * 1.0) * 100.0;
+                cpb.show((int) Math.floor(percentage));
+                String speedStr = "0.0";
+                if (temp < downloadByte.get()) {
+                    double speed = ((downloadByte.get() - temp) / 1024.0 / 1024) / (sleepTime / 1000.0);
+                    speedStr = getOmitValue(speed, 5);
+                }
+                System.out.print("(" + getOmitValue(percentage, 5) + "%)," + fileSizeStr + "," + speedStr + "m/s" + " | " + file.getName());
+                temp = downloadByte.get();
+                Thread.sleep(sleepTime);
+                if (executorService.isTerminated()) {
+                    break;
+                }
+                //分片下载失败，停止线程池
+                if (!downloadStatusMap.get(HttpUrl)) {
+                    result = false;
+                    logger.info("分片下载失败,线程池停止下载");
+                    executorService.shutdownNow();
+                    break;
+                }
+            }
+            //正常执行完成，获取分片结果
+            if (result) {
+                for (Future<Boolean> future : downloadResult) {
+                    if (!future.get()) {
+                        result = false;
+                    }
+                }
+            }
+            System.out.println("");
+            raf.close();
+            if (!result) {
+                logger.info("{},下载失败", file.getName());
+                while (!file.delete()) {
+                    logger.info("{},删除失败", file.getName());
+                }
+                logger.info("{},删除成功", file.getName());
+            } else {
+                long endTime = System.currentTimeMillis();
+                logger.info("----" + path + ",下载完成----");
+                logger.info("耗时:" + (endTime - startTime) / 1000.0 / 60.0 + "分钟");
+                double avg = (info.getContentLength() / 1024.0 / 1024.0) / ((endTime - startTime) / 1000.0);
+                logger.info("平均速度:{}m/s", getOmitValue(avg, 5));
+            }
+            return result;
         } catch (Exception e) {
             logger.info("----下载异常----");
             new File(path).delete();
