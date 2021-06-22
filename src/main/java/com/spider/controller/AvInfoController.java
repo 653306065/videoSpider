@@ -2,6 +2,7 @@ package com.spider.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import com.mongodb.client.MongoCursor;
 import com.spider.entity.ActressesInfo;
 import com.spider.entity.AvInfo;
 import com.spider.entity.FaceInfo;
@@ -13,6 +14,8 @@ import com.spider.utils.FaceUtil;
 import com.spider.vo.ResponseVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,6 +39,24 @@ public class AvInfoController extends BaseController {
 
     @Autowired
     private AvInfoService avInfoService;
+
+
+    @ApiOperation("清空图片")
+    @GetMapping("/clean/image")
+    public ResponseVo<Object> cleanImage() {
+        MongoCursor<Document> mongoCursor = avInfoService.getMongoCollection().find().iterator();
+        while (mongoCursor.hasNext()) {
+            Document document = mongoCursor.next();
+            ObjectId objectId = document.getObjectId("_id");
+            AvInfo avInfo = avInfoService.findById(objectId.toString());
+            avInfo.setThumb(null);
+            avInfo.setCover(null);
+            avInfo.setPreviewImageList(null);
+            avInfoService.updateById(avInfo);
+            logger.info("{},清空图片完成",objectId.toString());
+        }
+        return ResponseVo.succee();
+    }
 
     @ApiOperation("根据关键字搜索")
     @GetMapping("/search/{value}")
