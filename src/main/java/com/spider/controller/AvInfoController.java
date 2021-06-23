@@ -48,11 +48,9 @@ public class AvInfoController extends BaseController {
         while (mongoCursor.hasNext()) {
             Document document = mongoCursor.next();
             ObjectId objectId = document.getObjectId("_id");
-            AvInfo avInfo = avInfoService.findById(objectId.toString());
-            avInfo.setThumb(null);
-            avInfo.setCover(null);
-            avInfo.setPreviewImageList(null);
-            avInfoService.updateById(avInfo);
+            avInfoService.deleteKey(objectId.toString(),"thumb");
+            avInfoService.deleteKey(objectId.toString(),"cover");
+            avInfoService.deleteKey(objectId.toString(),"previewImageList");
             logger.info("{},清空图片完成",objectId.toString());
         }
         return ResponseVo.succee();
