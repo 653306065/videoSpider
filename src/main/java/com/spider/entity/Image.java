@@ -15,7 +15,7 @@ public class Image {
 
     private String name;
 
-    private long size;
+    private Long size;
 
     private String sizeStr;
 

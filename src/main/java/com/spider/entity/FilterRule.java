@@ -24,7 +24,7 @@ public class FilterRule {
     private LocalDateTime createTime;
 
 
-    public static enum Rule{
+    public enum Rule{
         /**
          * 正则表达式
          */

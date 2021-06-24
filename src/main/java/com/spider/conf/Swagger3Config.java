@@ -27,7 +27,8 @@ public class Swagger3Config {
                 .build();
     }
 
-    private ApiInfo apiInfo() {
+    @Bean
+    public ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("videoSpider接口")
                 .description("videoSpider接口")
