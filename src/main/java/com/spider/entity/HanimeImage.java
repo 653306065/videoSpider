@@ -16,11 +16,11 @@ public class HanimeImage {
     private String url;
     private String proxyUrl;
     private String extension;
-    private int width;
-    private int height;
-    private int filesize;
-    private int createdAtUnix;
-    private int updatedAtUnix;
+    private Integer width;
+    private Integer height;
+    private Integer filesize;
+    private Integer createdAtUnix;
+    private Integer updatedAtUnix;
     private String discordUserId;
     private String userAvatarUrl;
     private String canonicalUrl;

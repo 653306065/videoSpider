@@ -23,6 +23,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Api(tags = "Hanime接口")
@@ -44,6 +45,23 @@ public class HanimeController extends BaseController {
             logger.info("{},清空图片", id);
         }
         return ResponseVo.succee();
+    }
+
+    @ApiOperation("清空指定低于分辨率图片")
+    @GetMapping("/clean/low/dpi/image/")
+    public ResponseVo<Integer> cleanImage(@RequestParam(value = "width", defaultValue = "250") Integer width, @RequestParam(value = "height", defaultValue = "250") Integer height) {
+        AtomicInteger atomicInteger = new AtomicInteger(0);
+        hanimeImageService.findAll().stream().parallel().filter(image ->
+                Objects.nonNull(image.getWidth()) && Objects.nonNull(image.getHeight())).filter(image ->
+                image.getWidth() * image.getHeight() < width * height).forEach(image -> {
+                    File file = new File(image.getSavePath());
+                    if (file.exists() && file.delete()) {
+                        atomicInteger.incrementAndGet();
+                        logger.info("{},清空图片,宽:{},高:{},{}", image.getId(), image.getWidth(), image.getHeight(), image.getSavePath());
+                    }
+                }
+        );
+        return ResponseVo.succee(atomicInteger.get());
     }
 
 
@@ -91,21 +109,21 @@ public class HanimeController extends BaseController {
 
     @ApiOperation("拆分文件到文件夹")
     @GetMapping("/splitFile")
-    public ResponseVo<Object> splitFile(@RequestParam String path, @RequestParam Integer size,@RequestParam String channelName) {
-        List<HanimeImage> hanimeImageList = hanimeImageService.findBykeyValue("channelName",channelName);
+    public ResponseVo<Object> splitFile(@RequestParam String path, @RequestParam Integer size, @RequestParam String channelName) {
+        List<HanimeImage> hanimeImageList = hanimeImageService.findBykeyValue("channelName", channelName);
         hanimeImageList = hanimeImageList.stream().filter(hanimeImage -> new File(hanimeImage.getSavePath()).exists()).sorted(Comparator.comparing(HanimeImage::getId)).collect(Collectors.toList());
-        int pageCount = (int)Math.round(hanimeImageList.size()*1.0 / size)+1;
+        int pageCount = (int) Math.round(hanimeImageList.size() * 1.0 / size) + 1;
         for (int i = 0; i < pageCount; i++) {
             File splitPath = new File(path + File.separator + i + File.separator);
             splitPath.mkdirs();
             List<HanimeImage> list = hanimeImageList.stream().skip((long) i * size).limit(size).collect(Collectors.toList());
             list.forEach(hanimeImage -> {
                 File image = new File(hanimeImage.getSavePath());
-                File newFile=new File(splitPath.getAbsolutePath()+File.separator+image.getName());
+                File newFile = new File(splitPath.getAbsolutePath() + File.separator + image.getName());
                 image.renameTo(newFile);
                 hanimeImage.setSavePath(newFile.getAbsolutePath());
                 hanimeImageService.updateById(hanimeImage);
-                logger.info("{}->{}",image.getAbsolutePath(),newFile.getAbsolutePath());
+                logger.info("{}->{}", image.getAbsolutePath(), newFile.getAbsolutePath());
             });
         }
         return ResponseVo.succee();

@@ -51,11 +51,15 @@ public class FileController extends BaseController {
                 List<String> matchLine = new ArrayList<>();
                 textList.stream().distinct().forEach(line -> {
                     keyList.stream().distinct().forEach(key -> {
-                        if (Pattern.matches(key,line)) {
+                        if (Pattern.matches(key, line)) {
                             keyCount.incrementAndGet();
                             matchKey.add(key);
                             matchLine.add(line);
-                            System.out.println(book.getName()+ "," + line);
+                            if (line.length() > 200) {
+                                System.out.println(book.getName() + "," + line.substring(0, 200));
+                            } else {
+                                System.out.println(book.getName() + "," + line);
+                            }
                         }
                     });
                 });

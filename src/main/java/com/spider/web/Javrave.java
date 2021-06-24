@@ -144,24 +144,17 @@ public class Javrave extends BaseWeb {
             try {
                 List<Video> list = getVideoList(category, page);
                 list.forEach(video -> {
-                    if (hasFilterKey(video.getName())) {
-                        logger.info("{},含有过滤字段", video.getName());
-                        return;
-                    }
                     if (videoExistVerify(video)) {
-                        logger.info("{},已存在", video.getName());
-                        return;
+                        Video getVideo = getVideoInfo(video.getSourceUrl());
+                        if (Objects.nonNull(getVideo)&&videoExistVerify(getVideo)) {
+                            String date = simpleDateFormat.format(new Date());
+                            getVideo.setName(FileUtils.repairPath(getVideo.getName()) + ".mp4");
+                            String videoSavePath = savePath + category + fileSeparator + date + fileSeparator + getVideo.getName();
+                            getVideo.setSavePath(videoSavePath);
+                            multithreadingDownload.videoDownload(getVideo, null, enableProxy, thread, defaultSegmentSize);
+                        }
                     }
 
-                    Video getVideo = getVideoInfo(video.getSourceUrl());
-                    if (Objects.isNull(getVideo)) {
-                        return;
-                    }
-                    String date = simpleDateFormat.format(new Date());
-                    getVideo.setName(FileUtils.repairPath(getVideo.getName()) + ".mp4");
-                    String videoSavePath = savePath + category + fileSeparator + date + fileSeparator + getVideo.getName();
-                    getVideo.setSavePath(videoSavePath);
-                    multithreadingDownload.videoDownload(getVideo, null, enableProxy, thread, defaultSegmentSize);
                 });
             } catch (Exception e) {
                 e.printStackTrace();

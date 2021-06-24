@@ -93,7 +93,7 @@ public class Netflav extends BaseWeb {
     }
 
     public void downloadVideo(String category, String genre) {
-        int page = 1718;//前面页数为其他格式
+        int page = 13;//前面页数为其他格式
         while (true) {
             List<Video> videoList = getVideoList(category,genre, page);
             if (CollectionUtil.isEmpty(videoList)) {
@@ -113,7 +113,7 @@ public class Netflav extends BaseWeb {
                     }
                 }
             });
-            page--;
+            page++;
         }
     }
 
