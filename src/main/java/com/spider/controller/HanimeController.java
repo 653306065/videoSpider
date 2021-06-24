@@ -11,6 +11,7 @@ import com.spider.vo.ResponseVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.bson.Document;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,12 +19,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 @Api(tags = "Hanime接口")
@@ -49,19 +48,24 @@ public class HanimeController extends BaseController {
 
     @ApiOperation("清空指定低于分辨率图片")
     @GetMapping("/clean/low/dpi/image/")
-    public ResponseVo<Integer> cleanImage(@RequestParam(value = "width", defaultValue = "250") Integer width, @RequestParam(value = "height", defaultValue = "250") Integer height) {
+    public ResponseVo<Map<String, Object>> cleanImage(@RequestParam(value = "width", defaultValue = "250") Integer width, @RequestParam(value = "height", defaultValue = "250") Integer height) {
         AtomicInteger atomicInteger = new AtomicInteger(0);
+        AtomicLong atomicLong = new AtomicLong(0);
         hanimeImageService.findAll().stream().parallel().filter(image ->
                 Objects.nonNull(image.getWidth()) && Objects.nonNull(image.getHeight())).filter(image ->
                 image.getWidth() * image.getHeight() < width * height).forEach(image -> {
                     File file = new File(image.getSavePath());
                     if (file.exists() && file.delete()) {
                         atomicInteger.incrementAndGet();
+                        atomicLong.addAndGet(file.length());
                         logger.info("{},清空图片,宽:{},高:{},{}", image.getId(), image.getWidth(), image.getHeight(), image.getSavePath());
                     }
                 }
         );
-        return ResponseVo.succee(atomicInteger.get());
+        return ResponseVo.succee(new HashMap<String, Object>() {{
+            put("number", atomicInteger.get());
+            put("size", atomicLong.get() / 1024.0 / 1024 / 1024);
+        }});
     }
 
 
