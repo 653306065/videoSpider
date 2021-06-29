@@ -3,18 +3,23 @@ package com.spider.utils.download;
 import com.spider.entity.Video;
 import com.spider.utils.FileUtils;
 import com.spider.utils.OKHttpUtils;
-import io.lindstrom.m3u8.model.MasterPlaylist;
-import io.lindstrom.m3u8.model.MediaPlaylist;
-import io.lindstrom.m3u8.model.MediaSegment;
+import io.lindstrom.m3u8.model.*;
 import io.lindstrom.m3u8.parser.MasterPlaylistParser;
 import io.lindstrom.m3u8.parser.MediaPlaylistParser;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.security.Security;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -26,11 +31,24 @@ public class HlsDownloader {
 
     private Logger logger = LoggerFactory.getLogger(HlsDownloader.class);
 
+    static {
+        Security.addProvider(new BouncyCastleProvider());
+    }
+
     //M3U8url
     public String m3u8Url;
 
     //TS 列表
     private MediaPlaylist mediaPlaylist;
+
+    //加密密钥
+    private byte[] key;
+
+    //加密vi
+    private byte[] vi = new byte[16];
+
+    //加密方式
+    private KeyMethod keyMethod;
 
     //线程数
     private int threadQuantity = 30;
@@ -136,6 +154,25 @@ public class HlsDownloader {
         }
         try {
             mediaPlaylist = mediaPlaylistParser.readPlaylist(content);
+            String keyUrl = null;
+            if (CollectionUtils.isNotEmpty(mediaPlaylist.mediaSegments())) {
+                MediaSegment mediaSegment = mediaPlaylist.mediaSegments().get(0);
+                if (mediaSegment.segmentKey().isPresent()) {
+                    SegmentKey segmentKey = mediaSegment.segmentKey().get();
+                    if (segmentKey.uri().isPresent()) {
+                        keyUrl = segmentKey.uri().get();
+                        if (!keyUrl.startsWith("http")) {
+                            keyUrl = rootUrl + keyUrl;
+                        }
+                        key = OKHttpUtils.getBytes(keyUrl, isProxy);
+                        keyMethod = segmentKey.method();
+                        if (segmentKey.iv().isPresent()) {
+                            vi = segmentKey.iv().get().getBytes(StandardCharsets.UTF_8);
+                        }
+                    }
+                }
+            }
+            System.out.println(new String(key) + "," + keyMethod.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -175,10 +212,21 @@ public class HlsDownloader {
         }
         File file = new File(savePath);
         String tempPath = file.getParentFile().getAbsolutePath() + File.separator + "temp" + File.separator + uuid + File.separator + index + ".ts";
-        //todo HLS解密
+        if (Objects.nonNull(key) && Objects.nonNull(keyMethod)) {
+            if (keyMethod == KeyMethod.AES_128 || keyMethod == KeyMethod.SAMPLE_AES) {
+                try {
+                    Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding");
+                    SecretKeySpec keySpec = new SecretKeySpec(key, "AES");
+                    cipher.init(Cipher.DECRYPT_MODE, keySpec, new IvParameterSpec(vi));
+                    bytes = cipher.doFinal(bytes);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
         FileUtils.byteToFile(bytes, tempPath);
         tempFileMap.put(mediaSegment.uri(), tempPath);
-        logger.info("{}/{},{}完成下载", tempFileMap.size(), mediaPlaylist.mediaSegments().size(), tempPath);
+        logger.info("{}/{},{},完成下载", tempFileMap.size(), mediaPlaylist.mediaSegments().size(), tempPath);
         return true;
     }
 
@@ -208,10 +256,5 @@ public class HlsDownloader {
 
     private void deleteTemp() {
         FileUtils.deleteDir(new File(new ArrayList<>(tempFileMap.values()).get(0)).getParentFile().getParentFile().getAbsolutePath());
-    }
-
-    public static void main(String[] args) {
-        String m3u8 = "https://dv-h.phncdn.com/hls/videos/202007/15/333255272/,1080P_4000K,720P_4000K,480P_2000K,240P_400K,_333255272.mp4.urlset/index-f3-v1-a1.m3u8?ttl=1610459084&l=0&hash=52c152513c8995afc4e7e14904e1bed5";
-        //HlsDownloader.builder().m3u8Url(m3u8).build().download();
     }
 }
