@@ -72,6 +72,23 @@ public class SpiderController extends BaseController {
 
     @Autowired
     private Pixiv pixiv;
+    
+    @Autowired
+    private Wandusp wandusp;
+
+    @ApiOperation("下载 Wandusp 无码视频")
+    @GetMapping("/wandusp/uncensored")
+    public ResponseVo<Object> wandusp(@RequestParam(name = "thread", defaultValue = "5") Integer thread,
+                                        @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
+                                        @RequestParam(name = "savePath", required = false) String savePath) {
+        wandusp.setThread(thread);
+        if (Objects.nonNull(savePath)) {
+            wandusp.setSavePath(savePath);
+        }
+        wandusp.setEnableProxy(enableProxy);
+        threadPoolExecutor.execute(() -> wandusp.downloadUncensored());
+        return ResponseVo.succee();
+    }
 
     @ApiOperation("下载 pixiv 排行图片")
     @GetMapping("/pixiv/rank")

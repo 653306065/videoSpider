@@ -164,6 +164,14 @@ netflav:
   enableProxy: true
   thread: 5
   savePath: E:\netflav\
+  
+wandusp:
+  home: https://wandusp.cc
+  listTemplate: https://wandusp.cc/index.php/vod/type/id/@{type}/page/@{page}.html
+  enableProxy: true
+  thread: 20
+  savePath: E:\wandusp\
+  playerApi: https://wandusp.cc/addons/dplayer/?url=@{url}&jump=&t=@{t}
 
 video:
   minWidth: 640
