@@ -11,8 +11,6 @@ import io.lindstrom.m3u8.model.MasterPlaylist;
 import org.htmlcleaner.TagNode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -86,6 +84,9 @@ public class Wandusp extends BaseWeb {
         int page = 1;
         while (true) {
             List<Video> videoList = getVideoList(type, page);
+            if(Objects.isNull(videoList)){
+                continue;
+            }
             if (Objects.nonNull(videoList) && videoList.size() == 0) {
                 break;
             }
