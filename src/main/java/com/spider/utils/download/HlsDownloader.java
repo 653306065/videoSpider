@@ -95,7 +95,7 @@ public class HlsDownloader {
         executorService.shutdown();
         while (!executorService.isTerminated()) {
             try {
-                Thread.sleep(500);
+                Thread.sleep(100);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -172,7 +172,7 @@ public class HlsDownloader {
                     }
                 }
             }
-            System.out.println(new String(key) + "," + keyMethod.toString());
+            logger.info("key:{},method:{}", new String(key), keyMethod.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -226,7 +226,7 @@ public class HlsDownloader {
         }
         FileUtils.byteToFile(bytes, tempPath);
         tempFileMap.put(mediaSegment.uri(), tempPath);
-        logger.info("{}/{},{},完成下载", tempFileMap.size(), mediaPlaylist.mediaSegments().size(), tempPath);
+        logger.info("{}/{},(),{},完成下载", tempFileMap.size(), mediaPlaylist.mediaSegments().size(), tempPath);
         return true;
     }
 
