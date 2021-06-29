@@ -28,7 +28,7 @@ public class Javhuge extends BaseWeb {
         if (Objects.isNull(document)) {
             return null;
         }
-        return document.getElementsByClass("entry-title").stream().map(element -> {
+        return document.getElementsByClass("myui-vodlist__box").stream().map(element -> {
             if (element.getElementsByTag("a").size() != 0) {
                 Map<String, String> map = new HashMap<>();
                 String videoUrl = home + element.getElementsByTag("a").get(0).attr("href");
@@ -55,7 +55,7 @@ public class Javhuge extends BaseWeb {
     }
 
     public void download(String category) {
-        int page = 251;
+        int page = 1;
         while (true) {
             try {
                 List<Map<String, String>> list = getVideoList(category, page);
@@ -97,7 +97,7 @@ public class Javhuge extends BaseWeb {
             if (page > defaultEndPage) {
                 break;
             }
-            page--;
+            page++;
         }
     }
 

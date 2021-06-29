@@ -379,8 +379,8 @@ public class FileUtils {
         if (name.contains(".")) {
             name = getFileNameWithoutSuffix(name);
         }
-        String[] splitKeys = {"_", ",", "-", " "};
-        String[] connectKeys = {"_", "-", " "};
+        String[] splitKeys = {",", " "};
+        String[] connectKeys = {" "};
         for (String splitKey : splitKeys) {
             String[] splitArr = name.split(splitKey);
             list.addAll(Arrays.asList(splitArr));

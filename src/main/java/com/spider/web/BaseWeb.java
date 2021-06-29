@@ -1,6 +1,7 @@
 package com.spider.web;
 
 import cn.hutool.crypto.digest.MD5;
+import com.spider.entity.AvInfo;
 import com.spider.entity.FilterRule;
 import com.spider.entity.Video;
 import com.spider.service.AvInfoService;
@@ -98,6 +99,21 @@ public abstract class BaseWeb implements ApplicationRunner {
             logger.info("{},视频名已存在", video.getName());
             return false;
         }
+
+        List<String> list = FileUtils.getSearchKeyList(video.getName());
+        for (String key : list) {
+            AvInfo avInfo = avInfoService.findOnekeyValue("code", key);
+            if(Objects.nonNull(avInfo)&&avInfo.isHasVideo()){
+                logger.info("视频已存在,{}", avInfo.getVideoSavePath());
+                return false;
+            }
+            Video findVideo= videoService.findOnekeyValue("avCode",key);
+            if(Objects.nonNull(findVideo)){
+                logger.info("视频已存在,{}", findVideo.getSavePath());
+                return false;
+            }
+        }
+
         if (Objects.nonNull(video.getName())) {
             List<String> keyList = FileUtils.getSearchKeyList(video.getName());
             for (String key : keyList) {

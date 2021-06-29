@@ -11,6 +11,7 @@ import io.lindstrom.m3u8.model.MasterPlaylist;
 import org.htmlcleaner.TagNode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -84,18 +85,20 @@ public class Wandusp extends BaseWeb {
         int page = 1;
         while (true) {
             List<Video> videoList = getVideoList(type, page);
-            if(Objects.isNull(videoList)){
+            if (Objects.isNull(videoList)) {
                 continue;
             }
             if (Objects.nonNull(videoList) && videoList.size() == 0) {
                 break;
             }
             videoList.stream().forEach(video -> {
-                Video getVideo = getVideoInfo(video);
-                if (Objects.nonNull(getVideo)&&videoExistVerify(video)) {
-                    getVideo.setName(FileUtils.repairPath(getVideo.getName()) + ".mp4");
-                    getVideo.setSavePath(savePath + path + fileSeparator + simpleDateFormat.format(new Date()) + fileSeparator + getVideo.getName());
-                    hlsDownloader.downloadByVideo(getVideo, thread, enableProxy);
+                if (videoExistVerify(video)) {
+                    Video getVideo = getVideoInfo(video);
+                    if (Objects.nonNull(getVideo) && videoExistVerify(video)) {
+                        getVideo.setName(FileUtils.repairPath(getVideo.getName()) + ".mp4");
+                        getVideo.setSavePath(savePath + path + fileSeparator + simpleDateFormat.format(new Date()) + fileSeparator + getVideo.getName());
+                        hlsDownloader.downloadByVideo(getVideo, thread, enableProxy);
+                    }
                 }
             });
             page++;
