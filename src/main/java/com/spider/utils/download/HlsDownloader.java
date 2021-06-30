@@ -170,8 +170,8 @@ public class HlsDownloader {
                             vi = segmentKey.iv().get().getBytes(StandardCharsets.UTF_8);
                         }
                     }
+                    logger.info("key:{},method:{}", new String(key), keyMethod.toString());
                 }
-                logger.info("key:{},method:{}", new String(key), keyMethod.toString());
             }
         } catch (Exception e) {
             e.printStackTrace();
