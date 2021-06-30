@@ -68,10 +68,15 @@ public class Wandusp extends BaseWeb {
             Object[] scripts = playTagNode.evaluateXPath("//script/text()");
             String js = Stream.of(scripts).filter(value -> String.valueOf(value).contains("var urls")).map(value -> String.valueOf(value)).findFirst().get();
             String m3u8Master = js.split("\"")[1];
-            MasterPlaylist masterPlaylist = hlsDownloader.getMasterPlaylist(m3u8Master, enableProxy);
-            video.setVideoUrl(masterPlaylist.variants().get(0).uri());
-            if (!masterPlaylist.variants().get(0).uri().startsWith("http")) {
-                video.setVideoUrl(m3u8Master.substring(0, m3u8Master.lastIndexOf("/") + 1) + masterPlaylist.variants().get(0).uri());
+            String m3u8Txt=OKHttpUtils.get(m3u8Master,enableProxy);
+            if(m3u8Txt.contains("EXTINF")){
+                video.setVideoUrl(m3u8Master);
+            }else{
+                MasterPlaylist masterPlaylist = hlsDownloader.getMasterPlaylist(m3u8Master, enableProxy);
+                video.setVideoUrl(masterPlaylist.variants().get(0).uri());
+                if (!masterPlaylist.variants().get(0).uri().startsWith("http")) {
+                    video.setVideoUrl(m3u8Master.substring(0, m3u8Master.lastIndexOf("/") + 1) + masterPlaylist.variants().get(0).uri());
+                }
             }
             logger.info(video.getVideoUrl());
             return video;
