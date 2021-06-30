@@ -18,6 +18,8 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.security.Security;
 import java.util.*;
@@ -188,7 +190,7 @@ public class HlsDownloader {
 
     private void buildTask() {
         executorService = Executors.newFixedThreadPool(this.threadQuantity);
-        String uuid = UUID.randomUUID().toString();
+        String uuid = UUID.randomUUID().toString().replace("-","");
         for (int i = 0; i < mediaPlaylist.mediaSegments().size(); i++) {
             final int index = i;
             executorService.execute(() -> {
@@ -219,7 +221,6 @@ public class HlsDownloader {
             return false;
         }
         File file = new File(savePath);
-        String tempPath = file.getParentFile().getAbsolutePath() + File.separator + "temp" + File.separator + uuid + File.separator + index + ".ts";
         if (Objects.nonNull(key) && Objects.nonNull(keyMethod)) {
             if (keyMethod == KeyMethod.AES_128 || keyMethod == KeyMethod.SAMPLE_AES) {
                 try {
@@ -232,9 +233,12 @@ public class HlsDownloader {
                 }
             }
         }
+        String tempPath = file.getParentFile().getAbsolutePath() + File.separator + "temp" + File.separator + uuid + File.separator + index + ".ts";
         FileUtils.byteToFile(bytes, tempPath);
         tempFileMap.put(mediaSegment.uri(), tempPath);
-        logger.info("{}/{},(),{},完成下载", tempFileMap.size(), mediaPlaylist.mediaSegments().size(), tempPath);
+        double progress = (tempFileMap.size()*1.0 / mediaPlaylist.mediaSegments().size())*100;
+        progress= BigDecimal.valueOf(progress).setScale(2, RoundingMode.HALF_UP).doubleValue();
+        logger.info("{}/{},({}%),{},完成下载", tempFileMap.size(), mediaPlaylist.mediaSegments().size(), progress, tempPath);
         return true;
     }
 
