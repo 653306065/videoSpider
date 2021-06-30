@@ -66,7 +66,8 @@ public class Wandusp extends BaseWeb {
             }}, enableProxy);
             TagNode playTagNode = HtmlCleanerUtil.getTagNode(playHtml);
             Object[] scripts = playTagNode.evaluateXPath("//script/text()");
-            String js = Stream.of(scripts).filter(value -> String.valueOf(value).contains("videos3.naibago.com")).map(value -> String.valueOf(value)).findFirst().get();
+            String js = Stream.of(scripts).filter(value -> String.valueOf(value).contains("var urls")).map(value -> String.valueOf(value)).findFirst().get();
+            System.out.println(js);
             String m3u8Master = js.split("\"")[1];
             MasterPlaylist masterPlaylist = hlsDownloader.getMasterPlaylist(m3u8Master, enableProxy);
             video.setVideoUrl(masterPlaylist.variants().get(0).uri());
