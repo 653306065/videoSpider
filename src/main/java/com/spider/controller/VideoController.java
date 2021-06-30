@@ -56,7 +56,7 @@ public class VideoController extends BaseController {
         videoService.findAll().stream().filter(video -> !video.getSavePath().contains("里番")).filter(video -> new File(video.getSavePath()).exists()).filter(video -> Objects.nonNull(video.getMultimediaInfo())).forEach(video -> {
             if (height * width > video.getMultimediaInfo().getVideo().getSize().getHeight() * video.getMultimediaInfo().getVideo().getSize().getWidth()) {
                 logger.info(video.getSavePath());
-                if(isDelete){
+                if (isDelete) {
                     new File(video.getSavePath()).delete();
                 }
                 size.addAndGet(video.getSize());
@@ -72,13 +72,13 @@ public class VideoController extends BaseController {
 
     @ApiOperation("清空低于指定分钟数的视频")
     @GetMapping("/clean/time/video")
-    public ResponseVo<Object> cleanTimeVideo(@RequestParam(required = false, defaultValue = "10") Integer minute,@RequestParam(defaultValue = "false") Boolean isDelete) {
+    public ResponseVo<Object> cleanTimeVideo(@RequestParam(required = false, defaultValue = "10") Integer minute, @RequestParam(defaultValue = "false") Boolean isDelete) {
         AtomicLong size = new AtomicLong(0);
         CopyOnWriteArrayList<String> copyOnWriteArrayList = new CopyOnWriteArrayList<>();
         videoService.findAll().stream().filter(video -> !video.getSavePath().contains("里番")).filter(video -> new File(video.getSavePath()).exists()).filter(video -> Objects.nonNull(video.getMultimediaInfo())).forEach(video -> {
             if (video.getMultimediaInfo().getDuration() < 1000L * 60 * minute) {
                 logger.info(video.getSavePath());
-                if(isDelete){
+                if (isDelete) {
                     new File(video.getSavePath()).delete();
                 }
                 size.addAndGet(video.getSize());
@@ -264,8 +264,16 @@ public class VideoController extends BaseController {
 
     @ApiOperation("视频评分")
     @GetMapping("/score")
-    public ResponseVo<Object> videoScore(@RequestParam(defaultValue = "65.0") double threshold,@RequestParam(defaultValue = "false") Boolean isDelete){
-        videoService.findByexists("avgFaceScore",false).stream().filter(video -> new File(video.getSavePath()).exists()).forEach(video -> videoService.videoScore(video.getId(),20,threshold,isDelete));
+    public ResponseVo<Object> videoScore(@RequestParam(defaultValue = "65.0") double threshold, @RequestParam(defaultValue = "false") Boolean isDelete) {
+        videoService.findByexists("avgFaceScore", false).stream().filter(video -> new File(video.getSavePath()).exists()).forEach(video -> videoService.videoScore(video.getId(), 20, threshold, isDelete));
         return ResponseVo.succee();
+    }
+
+    @ApiOperation("获取存在视频的大小")
+    @GetMapping("/exist/video/size")
+    public ResponseVo<Double> getExistVideoSize() {
+        List<Video> videoList = videoService.findAll();
+        long size = videoList.stream().filter(video -> new File(video.getSavePath()).exists()).mapToLong(Video::getSize).sum();
+        return ResponseVo.succee(size / 1024.0 / 1024 / 1024);
     }
 }
