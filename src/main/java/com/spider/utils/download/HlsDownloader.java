@@ -171,8 +171,8 @@ public class HlsDownloader {
                         }
                     }
                 }
+                logger.info("key:{},method:{}", new String(key), keyMethod.toString());
             }
-            logger.info("key:{},method:{}", new String(key), keyMethod.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
