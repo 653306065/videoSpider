@@ -154,6 +154,14 @@ public class HlsDownloader {
         }
         try {
             mediaPlaylist = mediaPlaylistParser.readPlaylist(content);
+            //绝对路径
+            if (CollectionUtils.isNotEmpty(mediaPlaylist.mediaSegments())) {
+                MediaSegment mediaSegment = mediaPlaylist.mediaSegments().get(0);
+                if (mediaSegment.uri().startsWith("/")) {
+                    String[] strs = rootUrl.split("/");
+                    rootUrl = strs[0] + "/" + strs[1] + "/" + strs[2];
+                }
+            }
             String keyUrl = null;
             if (CollectionUtils.isNotEmpty(mediaPlaylist.mediaSegments())) {
                 MediaSegment mediaSegment = mediaPlaylist.mediaSegments().get(0);

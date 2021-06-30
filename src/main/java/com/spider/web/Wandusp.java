@@ -60,22 +60,28 @@ public class Wandusp extends BaseWeb {
             JSONObject jsonObject = JSON.parseObject(json);
             String url = jsonObject.getString("url");
             String apiUrl = playerApi.replace("@{url}", url).replace("@{t}", String.valueOf(Math.random()));
-            String playHtml = OKHttpUtils.get(apiUrl, new HashMap<>() {{
+            Map<String, String> header = new HashMap<>() {{
                 put("referer", video.getSourceUrl());
                 put("user-agent", Constant.user_agent);
-            }}, enableProxy);
+            }};
+            String playHtml = OKHttpUtils.get(apiUrl, header, enableProxy);
             TagNode playTagNode = HtmlCleanerUtil.getTagNode(playHtml);
             Object[] scripts = playTagNode.evaluateXPath("//script/text()");
             String js = Stream.of(scripts).filter(value -> String.valueOf(value).contains("var urls")).map(value -> String.valueOf(value)).findFirst().get();
             String m3u8Master = js.split("\"")[1];
-            String m3u8Txt=OKHttpUtils.get(m3u8Master,enableProxy);
-            if(m3u8Txt.contains("EXTINF")){
+            String m3u8Txt = OKHttpUtils.get(m3u8Master, header, enableProxy);
+            if (m3u8Txt.contains("EXTINF")) {
                 video.setVideoUrl(m3u8Master);
-            }else{
+            } else {
                 MasterPlaylist masterPlaylist = hlsDownloader.getMasterPlaylist(m3u8Master, enableProxy);
                 video.setVideoUrl(masterPlaylist.variants().get(0).uri());
                 if (!masterPlaylist.variants().get(0).uri().startsWith("http")) {
-                    video.setVideoUrl(m3u8Master.substring(0, m3u8Master.lastIndexOf("/") + 1) + masterPlaylist.variants().get(0).uri());
+                    if (masterPlaylist.variants().get(0).uri().startsWith("/")) {
+                        String[] strs = m3u8Master.split("/");
+                        video.setVideoUrl(strs[0] + "/" + strs[1] + "/" + strs[2] + masterPlaylist.variants().get(0).uri());
+                    } else {
+                        video.setVideoUrl(m3u8Master.substring(0, m3u8Master.lastIndexOf("/") + 1) + masterPlaylist.variants().get(0).uri());
+                    }
                 }
             }
             logger.info(video.getVideoUrl());
