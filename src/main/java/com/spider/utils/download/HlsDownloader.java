@@ -6,6 +6,10 @@ import com.spider.utils.OKHttpUtils;
 import io.lindstrom.m3u8.model.*;
 import io.lindstrom.m3u8.parser.MasterPlaylistParser;
 import io.lindstrom.m3u8.parser.MediaPlaylistParser;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -37,44 +41,10 @@ public class HlsDownloader {
         Security.addProvider(new BouncyCastleProvider());
     }
 
-    //M3U8url
-    public String m3u8Url;
-
-    //TS 列表
-    private MediaPlaylist mediaPlaylist;
-
-    //加密密钥
-    private byte[] key;
-
-    //加密vi
-    private byte[] vi = new byte[16];
-
-    //加密方式
-    private KeyMethod keyMethod;
-
-    //线程数
-    private int threadQuantity = 30;
-
-    //保存地址
-    private String savePath;
-
-    //收费使用代理
-    private boolean isProxy = false;
-
-    //根路径
-    private String rootUrl;
+    private TaskInfo taskInfo;
 
     //线程池
     private ExecutorService executorService;
-
-    //TS列表的临时文件位置
-    private Map<String, String> tempFileMap = new ConcurrentHashMap<>();
-
-    //重试次数
-    private Integer time = 5;
-
-    //任务状态
-    private volatile boolean taskStatus;
 
     //播放列表转化器
     private MasterPlaylistParser masterPlaylistParser = new MasterPlaylistParser();
@@ -83,12 +53,11 @@ public class HlsDownloader {
     private MediaPlaylistParser mediaPlaylistParser = new MediaPlaylistParser();
 
     private boolean download() {
-        cleanData();
-        if (StringUtils.isNotBlank(m3u8Url)) {
-            rootUrl = m3u8Url.substring(0, m3u8Url.lastIndexOf("/") + 1);
+        if (StringUtils.isNotBlank(taskInfo.m3u8Url)) {
+            taskInfo.rootUrl = taskInfo.m3u8Url.substring(0, taskInfo.m3u8Url.lastIndexOf("/") + 1);
         }
         getTsList();
-        if (Objects.isNull(mediaPlaylist)) {
+        if (Objects.isNull(taskInfo.mediaPlaylist)) {
             logger.info("无法获取到TS列表");
             return false;
         }
@@ -101,11 +70,11 @@ public class HlsDownloader {
                 e.printStackTrace();
             }
         }
-        if (tempFileMap.size() == mediaPlaylist.mediaSegments().size()) {
+        if (taskInfo.tempFileMap.size() == taskInfo.mediaPlaylist.mediaSegments().size()) {
             mergeFile();
             logger.info("文件合并完成");
         } else {
-            logger.info("分块下载失败,{}/{}", tempFileMap.size(), mediaPlaylist.mediaSegments().size());
+            logger.info("分块下载失败,{}/{}", taskInfo.tempFileMap.size(), taskInfo.mediaPlaylist.mediaSegments().size());
             return false;
         }
         deleteTemp();
@@ -126,60 +95,64 @@ public class HlsDownloader {
         }
     }
 
-    public Boolean download(String m3u8Url, String savePath, Integer threadQuantity, Boolean isProxy) {
-        if (Objects.isNull(m3u8Url) || Objects.isNull(savePath) || Objects.isNull(threadQuantity) || Objects.isNull(isProxy)) {
+    public Boolean download(String m3u8Url, String savePath, Integer threadQuantity, Boolean enableProxy) {
+        if (Objects.isNull(m3u8Url) || Objects.isNull(savePath) || Objects.isNull(threadQuantity) || Objects.isNull(enableProxy)) {
             return false;
         }
-        this.m3u8Url = m3u8Url;
-        this.savePath = savePath;
-        this.threadQuantity = threadQuantity;
-        this.isProxy = isProxy;
+        TaskInfo taskInfo = new TaskInfo();
+        taskInfo.setM3u8Url(m3u8Url);
+        taskInfo.setSavePath(savePath);
+        taskInfo.setThreadQuantity(threadQuantity);
+        taskInfo.setEnableProxy(enableProxy);
+        this.taskInfo = taskInfo;
         return this.download();
     }
 
-    public Boolean downloadByVideo(Video video, Integer threadQuantity, Boolean isProxy) {
-        if (Objects.isNull(video) || StringUtils.isBlank(video.getVideoUrl()) || StringUtils.isBlank(video.getSavePath()) || Objects.isNull(threadQuantity) || Objects.isNull(isProxy)) {
+    public Boolean downloadByVideo(Video video, Integer threadQuantity, Boolean enableProxy) {
+        if (Objects.isNull(video) || StringUtils.isBlank(video.getVideoUrl()) || StringUtils.isBlank(video.getSavePath()) || Objects.isNull(threadQuantity) || Objects.isNull(enableProxy)) {
             return false;
         }
-        this.m3u8Url = video.getVideoUrl();
-        this.savePath = video.getSavePath();
-        this.threadQuantity = threadQuantity;
-        this.isProxy = isProxy;
+        TaskInfo taskInfo = new TaskInfo();
+        taskInfo.setM3u8Url(video.getVideoUrl());
+        taskInfo.setSavePath(video.getSavePath());
+        taskInfo.setThreadQuantity(threadQuantity);
+        taskInfo.setEnableProxy(enableProxy);
+        this.taskInfo = taskInfo;
         return this.download();
     }
 
     private void getTsList() {
-        String content = OKHttpUtils.get(m3u8Url, this.isProxy);
+        String content = OKHttpUtils.get(taskInfo.m3u8Url, taskInfo.enableProxy);
         if (StringUtils.isBlank(content)) {
             return;
         }
         try {
-            mediaPlaylist = mediaPlaylistParser.readPlaylist(content);
+            taskInfo.mediaPlaylist = mediaPlaylistParser.readPlaylist(content);
             //绝对路径
-            if (CollectionUtils.isNotEmpty(mediaPlaylist.mediaSegments())) {
-                MediaSegment mediaSegment = mediaPlaylist.mediaSegments().get(0);
+            if (CollectionUtils.isNotEmpty(taskInfo.mediaPlaylist.mediaSegments())) {
+                MediaSegment mediaSegment = taskInfo.mediaPlaylist.mediaSegments().get(0);
                 if (mediaSegment.uri().startsWith("/")) {
-                    String[] strs = rootUrl.split("/");
-                    rootUrl = strs[0] + "/" + strs[1] + "/" + strs[2];
+                    String[] strs = taskInfo.rootUrl.split("/");
+                    taskInfo.rootUrl = strs[0] + "/" + strs[1] + "/" + strs[2];
                 }
             }
             String keyUrl = null;
-            if (CollectionUtils.isNotEmpty(mediaPlaylist.mediaSegments())) {
-                MediaSegment mediaSegment = mediaPlaylist.mediaSegments().get(0);
+            if (CollectionUtils.isNotEmpty(taskInfo.mediaPlaylist.mediaSegments())) {
+                MediaSegment mediaSegment = taskInfo.mediaPlaylist.mediaSegments().get(0);
                 if (mediaSegment.segmentKey().isPresent()) {
                     SegmentKey segmentKey = mediaSegment.segmentKey().get();
                     if (segmentKey.uri().isPresent()) {
                         keyUrl = segmentKey.uri().get();
                         if (!keyUrl.startsWith("http")) {
-                            keyUrl = rootUrl + keyUrl;
+                            keyUrl = taskInfo.rootUrl + keyUrl;
                         }
-                        key = OKHttpUtils.getBytes(keyUrl, isProxy);
-                        keyMethod = segmentKey.method();
+                        taskInfo.key = OKHttpUtils.getBytes(keyUrl, taskInfo.enableProxy);
+                        taskInfo.keyMethod = segmentKey.method();
                         if (segmentKey.iv().isPresent()) {
-                            vi = segmentKey.iv().get().getBytes(StandardCharsets.UTF_8);
+                            taskInfo.vi = segmentKey.iv().get().getBytes(StandardCharsets.UTF_8);
                         }
                     }
-                    logger.info("key:{},method:{}", new String(key), keyMethod.toString());
+                    logger.info("key:{},method:{}", new String(taskInfo.key), taskInfo.keyMethod.toString());
                 }
             }
         } catch (Exception e) {
@@ -188,18 +161,18 @@ public class HlsDownloader {
     }
 
     private void buildTask() {
-        executorService = Executors.newFixedThreadPool(this.threadQuantity);
-        String uuid = UUID.randomUUID().toString().replace("-","");
-        for (int i = 0; i < mediaPlaylist.mediaSegments().size(); i++) {
+        executorService = Executors.newFixedThreadPool(this.taskInfo.threadQuantity);
+        String uuid = UUID.randomUUID().toString().replace("-", "");
+        for (int i = 0; i < taskInfo.mediaPlaylist.mediaSegments().size(); i++) {
             final int index = i;
             executorService.execute(() -> {
                 int taskTime = 0;
-                while (taskStatus) {
+                while (taskInfo.taskStatus) {
                     if (downloadTs(uuid, index)) {
                         break;
                     }
-                    if (taskTime > time) {
-                        taskStatus = false;
+                    if (taskTime > taskInfo.time) {
+                        taskInfo.taskStatus = false;
                         logger.info("index:{},下载失败", index);
                         break;
                     }
@@ -210,22 +183,22 @@ public class HlsDownloader {
     }
 
     private boolean downloadTs(String uuid, Integer index) {
-        MediaSegment mediaSegment = mediaPlaylist.mediaSegments().get(index);
+        MediaSegment mediaSegment = taskInfo.mediaPlaylist.mediaSegments().get(index);
         String url = mediaSegment.uri();
         if (!url.startsWith("http")) {
-            url = rootUrl + mediaSegment.uri();
+            url = taskInfo.rootUrl + mediaSegment.uri();
         }
-        byte[] bytes = OKHttpUtils.getBytes(url, isProxy);
+        byte[] bytes = OKHttpUtils.getBytes(url, taskInfo.enableProxy);
         if (Objects.isNull(bytes)) {
             return false;
         }
-        File file = new File(savePath);
-        if (Objects.nonNull(key) && Objects.nonNull(keyMethod)) {
-            if (keyMethod == KeyMethod.AES_128 || keyMethod == KeyMethod.SAMPLE_AES) {
+        File file = new File(taskInfo.savePath);
+        if (Objects.nonNull(taskInfo.key) && Objects.nonNull(taskInfo.keyMethod)) {
+            if (taskInfo.keyMethod == KeyMethod.AES_128 || taskInfo.keyMethod == KeyMethod.SAMPLE_AES) {
                 try {
                     Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding");
-                    SecretKeySpec keySpec = new SecretKeySpec(key, "AES");
-                    cipher.init(Cipher.DECRYPT_MODE, keySpec, new IvParameterSpec(vi));
+                    SecretKeySpec keySpec = new SecretKeySpec(taskInfo.key, "AES");
+                    cipher.init(Cipher.DECRYPT_MODE, keySpec, new IvParameterSpec(taskInfo.vi));
                     bytes = cipher.doFinal(bytes);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -234,20 +207,20 @@ public class HlsDownloader {
         }
         String tempPath = file.getParentFile().getAbsolutePath() + File.separator + "temp" + File.separator + uuid + File.separator + index + ".ts";
         FileUtils.byteToFile(bytes, tempPath);
-        tempFileMap.put(mediaSegment.uri(), tempPath);
-        double progress = (tempFileMap.size()*1.0 / mediaPlaylist.mediaSegments().size())*100;
-        progress= BigDecimal.valueOf(progress).setScale(2, RoundingMode.HALF_UP).doubleValue();
-        logger.info("{}/{},({}%),{},完成下载", tempFileMap.size(), mediaPlaylist.mediaSegments().size(), progress, tempPath);
+        taskInfo.tempFileMap.put(mediaSegment.uri(), tempPath);
+        double progress = (taskInfo.tempFileMap.size() * 1.0 / taskInfo.mediaPlaylist.mediaSegments().size()) * 100;
+        progress = BigDecimal.valueOf(progress).setScale(2, RoundingMode.HALF_UP).doubleValue();
+        logger.info("{}/{},({}%),{},完成下载", taskInfo.tempFileMap.size(), taskInfo.mediaPlaylist.mediaSegments().size(), progress, tempPath);
         return true;
     }
 
     private void mergeFile() {
         try {
-            File videoFile = new File(savePath);
+            File videoFile = new File(taskInfo.savePath);
             FileOutputStream fileOutputStream = new FileOutputStream(videoFile);
             byte[] bytes = new byte[1024 * 2];
-            for (MediaSegment mediaSegment : mediaPlaylist.mediaSegments()) {
-                File file = new File(tempFileMap.get(mediaSegment.uri()));
+            for (MediaSegment mediaSegment : taskInfo.mediaPlaylist.mediaSegments()) {
+                File file = new File(taskInfo.tempFileMap.get(mediaSegment.uri()));
                 FileInputStream fileInputStream = new FileInputStream(file);
                 while (true) {
                     int index = fileInputStream.read(bytes);
@@ -264,20 +237,47 @@ public class HlsDownloader {
             e.printStackTrace();
         }
     }
-    
-    private void cleanData(){
-        rootUrl=null;
-        taskStatus = true;
-        key=null;
-        keyMethod=null;
-        vi=null;
-        tempFileMap.clear();
-        mediaPlaylist=null;
-        savePath=null;
+
+    @Data
+    public static class TaskInfo {
+        //M3U8url
+        private String m3u8Url;
+
+        //TS 列表
+        private MediaPlaylist mediaPlaylist;
+
+        //加密密钥
+        private byte[] key;
+
+        //加密vi
+        private byte[] vi = new byte[16];
+
+        //加密方式
+        private KeyMethod keyMethod;
+
+        //线程数
+        private int threadQuantity = 30;
+
+        //保存地址
+        private String savePath;
+
+        //是否使用代理
+        private boolean enableProxy = false;
+
+        //根路径
+        private String rootUrl;
+
+        //TS列表的临时文件位置
+        private Map<String, String> tempFileMap = new ConcurrentHashMap<>();
+
+        //重试次数
+        private Integer time = 5;
+
+        //任务状态
+        private volatile boolean taskStatus = true;
     }
     
-
     private void deleteTemp() {
-        FileUtils.deleteDir(new File(new ArrayList<>(tempFileMap.values()).get(0)).getParentFile().getParentFile().getAbsolutePath());
+        FileUtils.deleteDir(new File(new ArrayList<>(taskInfo.tempFileMap.values()).get(0)).getParentFile().getParentFile().getAbsolutePath());
     }
 }
