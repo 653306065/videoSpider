@@ -83,8 +83,7 @@ public class HlsDownloader {
     private MediaPlaylistParser mediaPlaylistParser = new MediaPlaylistParser();
 
     private boolean download() {
-        taskStatus = true;
-        tempFileMap.clear();
+        cleanData();
         if (StringUtils.isNotBlank(m3u8Url)) {
             rootUrl = m3u8Url.substring(0, m3u8Url.lastIndexOf("/") + 1);
         }
@@ -265,6 +264,18 @@ public class HlsDownloader {
             e.printStackTrace();
         }
     }
+    
+    private void cleanData(){
+        rootUrl=null;
+        taskStatus = true;
+        key=null;
+        keyMethod=null;
+        vi=null;
+        tempFileMap.clear();
+        mediaPlaylist=null;
+        savePath=null;
+    }
+    
 
     private void deleteTemp() {
         FileUtils.deleteDir(new File(new ArrayList<>(tempFileMap.values()).get(0)).getParentFile().getParentFile().getAbsolutePath());
