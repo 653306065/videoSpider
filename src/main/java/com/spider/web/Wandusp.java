@@ -8,11 +8,14 @@ import com.spider.utils.FileUtils;
 import com.spider.utils.HtmlCleanerUtil;
 import com.spider.utils.OKHttpUtils;
 import io.lindstrom.m3u8.model.MasterPlaylist;
+import io.lindstrom.m3u8.model.Variant;
+import org.apache.commons.collections.CollectionUtils;
 import org.htmlcleaner.TagNode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
@@ -74,11 +77,18 @@ public class Wandusp extends BaseWeb {
                 video.setVideoUrl(m3u8Master);
             } else {
                 MasterPlaylist masterPlaylist = hlsDownloader.getMasterPlaylist(m3u8Master, enableProxy);
-                video.setVideoUrl(masterPlaylist.variants().get(0).uri());
-                if (!masterPlaylist.variants().get(0).uri().startsWith("http")) {
-                    if (masterPlaylist.variants().get(0).uri().startsWith("/")) {
+                //分辨率排序
+                List<Variant> list = masterPlaylist.variants().stream().filter(variant -> variant.resolution().isPresent()).
+                        sorted(Comparator.comparing(variant -> variant.resolution().get().height() * variant.resolution().get().width())).
+                        collect(Collectors.toList());
+                Collections.reverse(list);
+                if (CollectionUtils.isEmpty(list)) {
+                    list = masterPlaylist.variants();
+                }
+                if (!list.get(0).uri().startsWith("http")) {
+                    if (list.get(0).uri().startsWith("/")) {
                         String[] strs = m3u8Master.split("/");
-                        video.setVideoUrl(strs[0] + "/" + strs[1] + "/" + strs[2] + masterPlaylist.variants().get(0).uri());
+                        video.setVideoUrl(strs[0] + "/" + strs[1] + "/" + strs[2] + list.get(0).uri());
                     } else {
                         video.setVideoUrl(m3u8Master.substring(0, m3u8Master.lastIndexOf("/") + 1) + masterPlaylist.variants().get(0).uri());
                     }
