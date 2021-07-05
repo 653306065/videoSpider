@@ -13,6 +13,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.spider.entity.Video;
 import com.spider.utils.OKHttpUtils;
 import io.lindstrom.m3u8.model.MasterPlaylist;
+import io.lindstrom.m3u8.model.Variant;
 import okhttp3.Response;
 import org.apache.commons.collections.CollectionUtils;
 import org.jsoup.Jsoup;
@@ -332,10 +333,14 @@ public class Pornhub extends BaseWeb {
             if (video.getVideoUrl().contains("m3u8")) {
                 MasterPlaylist masterPlaylist = hlsDownloader.getMasterPlaylist(video.getVideoUrl(), enableProxy);
                 if (Objects.nonNull(masterPlaylist) && !CollectionUtils.isEmpty(masterPlaylist.variants())) {
-                    if (masterPlaylist.variants().get(0).uri().startsWith("http")) {
-                        video.setVideoUrl(masterPlaylist.variants().get(0).uri());
+                    List<Variant> list = masterPlaylist.variants().stream().filter(variant -> variant.resolution().isPresent()).
+                            sorted(Comparator.comparing(variant -> variant.resolution().get().height() * variant.resolution().get().width())).
+                            collect(Collectors.toList());
+                    Collections.reverse(list);
+                    if (list.get(0).uri().startsWith("http")) {
+                        video.setVideoUrl(list.get(0).uri());
                     } else {
-                        video.setVideoUrl(video.getVideoUrl().substring(0, video.getVideoUrl().lastIndexOf("/") + 1) + masterPlaylist.variants().get(0).uri());
+                        video.setVideoUrl(video.getVideoUrl().substring(0, video.getVideoUrl().lastIndexOf("/") + 1) + list.get(0).uri());
                     }
                     hlsDownloader.downloadByVideo(video, thread, enableProxy);
                 }
