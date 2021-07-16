@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Api(tags = "video mongodb接口")
 @RestController
-@RequestMapping("/mongodb/video")
+@RequestMapping("/api/mongodb/video")
 public class VideoMongodbController extends BaseMongodbController<VideoService, Video>{
 }

@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Api(tags = "avInfo mongodb接口")
 @RestController
-@RequestMapping("/mongodb/avInfo")
+@RequestMapping("/api/mongodb/avInfo")
 public class AvInfoMongodbController extends BaseMongodbController<AvInfoService, AvInfo> {
 }

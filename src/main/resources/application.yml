@@ -23,6 +23,11 @@ spring:
     active:
     include: web
 
+limit:
+  bucket: 100
+  rate: 10
+  time: 100
+
 proxy:
   enabled: false
   socks:
