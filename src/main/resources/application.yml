@@ -21,7 +21,7 @@ spring:
       maxRequestSize: 10GB
   profiles:
     active:
-    include: web
+    include: web  
 
 limit:
   bucket: 100
@@ -41,6 +41,14 @@ FFmpegPath: C:\\ffmpeg\\bin\\
 
 server:
   port: 80
+  undertow:
+    threads:
+      worker: 50
+      io: 6
+    url-charset: UTF-8
+    direct-buffers: true
+    accesslog:
+      enabled: true
 
   #logging:
   level:
