@@ -16,6 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Configuration
@@ -52,7 +53,11 @@ public class WebConfig implements WebMvcConfigurer, ApplicationContextAware, App
         new Thread(() -> {
             while (true) {
                 Map<String, String> urlMap = urlList.stream().collect(Collectors.toMap(url -> url, url -> {
-                    int size = Integer.valueOf(redisTemplate.opsForValue().get(url));
+                    int size = 0;
+                    String value = redisTemplate.opsForValue().get(url);
+                    if (Objects.nonNull(value)) {
+                        size = Integer.valueOf(value);
+                    }
                     int nextSize = Math.min(size + rate, bucket);
                     return nextSize + "";
                 }));

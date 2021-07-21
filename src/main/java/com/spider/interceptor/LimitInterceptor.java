@@ -2,11 +2,13 @@ package com.spider.interceptor;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
+import org.springframework.web.servlet.HandlerInterceptor;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Objects;
 
-public class LimitInterceptor implements AsyncHandlerInterceptor {
+public class LimitInterceptor implements HandlerInterceptor {
     
     private RedisTemplate<String, String> redisTemplate;
     
@@ -14,6 +16,7 @@ public class LimitInterceptor implements AsyncHandlerInterceptor {
         this.redisTemplate=redisTemplate;
     }
 
+    @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String url=request.getRequestURI();
         String size= redisTemplate.opsForValue().get(url);
