@@ -21,7 +21,7 @@ spring:
       maxRequestSize: 10GB
   profiles:
     active:
-    include: web  
+    include: web
 
 limit:
   bucket: 100
@@ -39,6 +39,7 @@ proxy:
 
 FFmpegPath: C:\\ffmpeg\\bin\\
 
+
 server:
   port: 80
   undertow:
@@ -50,9 +51,22 @@ server:
     accesslog:
       enabled: true
 
-  #logging:
-  level:
-    root: info
-    org.mybatis: debug
-    java.sql: debug
-    org.springframework.web: trace
+management:
+  auditevents:
+    enabled: false
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+#logging:
+#  level:
+#    root: info
+#    org.mybatis: debug
+#    java.sql: debug
+#    org.springframework.web: trace
+  
+

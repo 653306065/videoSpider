@@ -21,7 +21,7 @@ public class LimitInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String url=request.getRequestURI();
-        logger.info("{} url:{}",request.getMethod(),url);
+        logger.info("{} url:{}",request.getMethod(),request.getRequestURL());
         String size= redisTemplate.opsForValue().get(url);
         if(Objects.nonNull(size)&&Integer.parseInt(size)<0){
             throw new Exception("接口限流");
