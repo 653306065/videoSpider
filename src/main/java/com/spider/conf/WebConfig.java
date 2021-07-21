@@ -38,7 +38,7 @@ public class WebConfig implements WebMvcConfigurer, ApplicationContextAware, App
     ApplicationContext applicationContext;
 
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new LimitInterceptor(redisTemplate));
+        registry.addInterceptor(new LimitInterceptor(redisTemplate)).addPathPatterns("/api/**");
     }
 
     @Override
@@ -49,7 +49,7 @@ public class WebConfig implements WebMvcConfigurer, ApplicationContextAware, App
     @Override
     public void run(ApplicationArguments args) {
         RequestMappingHandlerMapping mapping = applicationContext.getBean(RequestMappingHandlerMapping.class);
-        List<String> urlList = mapping.getHandlerMethods().keySet().stream().flatMap(key -> key.getPatternsCondition().getPatterns().stream()).distinct().collect(Collectors.toList());
+        List<String> urlList = mapping.getHandlerMethods().keySet().stream().flatMap(key -> key.getPatternsCondition().getPatterns().stream()).distinct().filter(url->url.startsWith("/api/")).sorted().collect(Collectors.toList());
         new Thread(() -> {
             while (true) {
                 Map<String, String> urlMap = urlList.stream().collect(Collectors.toMap(url -> url, url -> {
