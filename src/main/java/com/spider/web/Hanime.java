@@ -84,33 +84,36 @@ public class Hanime extends BaseWeb {
         for (int i = 0; i < getThread(); i++) {
             executorService.execute(() -> {
                 while (true) {
-                    String jsonStr = redisTemplate.opsForList().leftPop(key, 1, TimeUnit.SECONDS);
-                    HanimeImage hanimeImage = JSON.parseObject(jsonStr, HanimeImage.class);
-                    if (Objects.nonNull(hanimeImage) && Objects.nonNull(hanimeImageService.findById(hanimeImage.getId()))) {
-                        logger.info("id:{},url:{},已存在", hanimeImage.getId(), hanimeImage.getUrl());
-                        continue;
-                    }
-                    if (Objects.nonNull(hanimeImage) && Objects.nonNull(hanimeImage.getUrl())) {
-                        byte[] bytes = OKHttpUtils.getBytes(hanimeImage.getUrl(),enableProxy);
-                        if (Objects.isNull(bytes)) {
-                            logger.info("id:{},url:{},获取为空", hanimeImage.getId(), hanimeImage.getUrl());
-                            //redisTemplate.opsForList().leftPush(key,jsonStr);
+                    try {
+                        String jsonStr = redisTemplate.opsForList().leftPop(key, 1, TimeUnit.SECONDS);
+                        HanimeImage hanimeImage = JSON.parseObject(jsonStr, HanimeImage.class);
+                        if (Objects.nonNull(hanimeImage) && Objects.nonNull(hanimeImageService.findById(hanimeImage.getId()))) {
+                            logger.info("id:{},url:{},已存在", hanimeImage.getId(), hanimeImage.getUrl());
                             continue;
                         }
-                        hanimeImage.setMd5(md5.digestHex(bytes));
-                        if( Objects.nonNull(hanimeImageService.findOnekeyValue("md5",hanimeImage.getMd5()))){
-                            logger.info("id:{},url:{},md5重复", hanimeImage.getId(), hanimeImage.getUrl());
-                            continue;
+                        if (Objects.nonNull(hanimeImage) && Objects.nonNull(hanimeImage.getUrl())) {
+                            byte[] bytes = OKHttpUtils.getBytes(hanimeImage.getUrl(), enableProxy);
+                            if (Objects.isNull(bytes)) {
+                                logger.info("id:{},url:{},获取为空", hanimeImage.getId(), hanimeImage.getUrl());
+                                //redisTemplate.opsForList().leftPush(key,jsonStr);
+                                continue;
+                            }
+                            hanimeImage.setMd5(md5.digestHex(bytes));
+                            if (Objects.nonNull(hanimeImageService.findOnekeyValue("md5", hanimeImage.getMd5()))) {
+                                logger.info("id:{},url:{},md5重复", hanimeImage.getId(), hanimeImage.getUrl());
+                                continue;
+                            }
+                            String path = savePath + fileSeparator + hanimeImage.getChannelName() + fileSeparator + hanimeImage.getId() + "." + hanimeImage.getExtension();
+                            hanimeImage.setSavePath(path);
+                            if (FileUtils.byteToFile(bytes, path)) {
+                                hanimeImageService.insert(hanimeImage);
+                                logger.info("id:{},url:{},下载完成", hanimeImage.getId(), hanimeImage.getUrl());
+                            } else {
+                                logger.info("id:{},url:{},保存失败", hanimeImage.getId(), hanimeImage.getUrl());
+                            }
                         }
-                        String path = savePath + fileSeparator + hanimeImage.getChannelName() + fileSeparator + hanimeImage.getId() + "." + hanimeImage.getExtension();
-                        hanimeImage.setSavePath(path);
-                        if(FileUtils.byteToFile(bytes, path)){
-                            hanimeImageService.insert(hanimeImage);
-                            logger.info("id:{},url:{},下载完成", hanimeImage.getId(), hanimeImage.getUrl());
-                        }else{
-                            logger.info("id:{},url:{},保存失败", hanimeImage.getId(), hanimeImage.getUrl());
-
-                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
             });

@@ -10,11 +10,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -49,19 +50,19 @@ public class WebConfig implements WebMvcConfigurer, ApplicationContextAware, App
     @Override
     public void run(ApplicationArguments args) {
         RequestMappingHandlerMapping mapping = applicationContext.getBean(RequestMappingHandlerMapping.class);
-        List<String> urlList = mapping.getHandlerMethods().keySet().stream().flatMap(key -> key.getPatternsCondition().getPatterns().stream()).distinct().filter(url->url.startsWith("/api/")).sorted().collect(Collectors.toList());
+        Collection<HandlerMethod> handlerMethodList = mapping.getHandlerMethods().values();
         new Thread(() -> {
             while (true) {
-                Map<String, String> urlMap = urlList.stream().collect(Collectors.toMap(url -> url, url -> {
+                Map<String, String> map = handlerMethodList.stream().collect(Collectors.toMap(url -> String.valueOf(url.getMethod().hashCode()), url -> {
                     int size = 0;
-                    String value = redisTemplate.opsForValue().get(url);
+                    String value = redisTemplate.opsForValue().get(String.valueOf(url.getMethod().hashCode()));
                     if (Objects.nonNull(value)) {
-                        size = Integer.valueOf(value);
+                        size = Integer.parseInt(value);
                     }
                     int nextSize = Math.min(size + rate, bucket);
                     return nextSize + "";
-                }));
-                redisTemplate.opsForValue().multiSet(urlMap);
+                }, (o, n) -> o));
+                redisTemplate.opsForValue().multiSet(map);
                 try {
                     Thread.sleep(time);
                 } catch (InterruptedException e) {
@@ -69,5 +70,7 @@ public class WebConfig implements WebMvcConfigurer, ApplicationContextAware, App
                 }
             }
         }).start();
+
+
     }
 }

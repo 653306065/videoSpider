@@ -15,14 +15,12 @@ import com.spider.vo.ResponseVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import ws.schild.jave.MultimediaInfo;
 
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -275,5 +273,11 @@ public class VideoController extends BaseController {
         List<Video> videoList = videoService.findAll();
         long size = videoList.stream().filter(video -> new File(video.getSavePath()).exists()).mapToLong(Video::getSize).sum();
         return ResponseVo.succee(size / 1024.0 / 1024 / 1024);
+    }
+
+    @ApiOperation("模糊搜索视频")
+    @GetMapping("/search/name/{name}")
+    public ResponseVo<List<Video>> searchByName(@PathVariable String name) {
+        return ResponseVo.succee(videoService.findByRegex("name",name));
     }
 }
