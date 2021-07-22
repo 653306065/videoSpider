@@ -23,15 +23,15 @@ public class LimitInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String url = request.getRequestURI();
         logger.info("{} url:{}", request.getMethod(), request.getRequestURL());
         HandlerMethod handlerMethod = (HandlerMethod) handler;
         Method method = handlerMethod.getMethod();
-        String size = redisTemplate.opsForValue().get(String.valueOf(method.hashCode()));
+        String key= method.getDeclaringClass()+"#"+method.getName();
+        String size = redisTemplate.opsForValue().get(key);
         if (Objects.nonNull(size) && Integer.parseInt(size) < 0) {
             throw new Exception("接口限流");
         }
-        redisTemplate.opsForValue().decrement(url);
+        redisTemplate.opsForValue().decrement(key);
         return true;
     }
 }

@@ -53,7 +53,7 @@ public class WebConfig implements WebMvcConfigurer, ApplicationContextAware, App
         Collection<HandlerMethod> handlerMethodList = mapping.getHandlerMethods().values();
         new Thread(() -> {
             while (true) {
-                Map<String, String> map = handlerMethodList.stream().collect(Collectors.toMap(url -> String.valueOf(url.getMethod().hashCode()), url -> {
+                Map<String, String> map = handlerMethodList.stream().collect(Collectors.toMap(url -> url.getMethod().getDeclaringClass()+"#"+url.getMethod().getName(), url -> {
                     int size = 0;
                     String value = redisTemplate.opsForValue().get(String.valueOf(url.getMethod().hashCode()));
                     if (Objects.nonNull(value)) {
