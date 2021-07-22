@@ -247,10 +247,16 @@
             <version>${graalvm.version}</version>
         </dependency>
 
+<!--        <dependency>-->
+<!--            <groupId>org.apache.jclouds.driver</groupId>-->
+<!--            <artifactId>jclouds-bouncycastle</artifactId>-->
+<!--            <version>2.3.0</version>-->
+<!--        </dependency>-->
+
         <dependency>
-            <groupId>org.apache.jclouds.driver</groupId>
-            <artifactId>jclouds-bouncycastle</artifactId>
-            <version>2.3.0</version>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk16</artifactId>
+            <version>1.46</version>
         </dependency>
     </dependencies>
 

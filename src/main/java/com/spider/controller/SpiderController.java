@@ -135,8 +135,12 @@ public class SpiderController extends BaseController {
 
     @ApiOperation("开始by114 bt下载")
     @GetMapping("/start/by114")
-    public ResponseVo<Object> startBy114(@RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy) {
+    public ResponseVo<Object> startBy114(@RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
+                                         @RequestParam(name = "thread", defaultValue = "5") Integer thread,
+                                         @RequestParam(name = "savePath", required = false) String savePath) {
         by114.setEnableProxy(enableProxy);
+        by114.setThread(thread);
+        by114.setSavePath(savePath);
         threadPoolExecutor.execute(() -> by114.downloadBt());
         return ResponseVo.succee();
     }

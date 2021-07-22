@@ -23,6 +23,7 @@ import com.spider.utils.OKHttpUtils;
 import com.spider.utils.download.ImageDownload;
 import org.springframework.util.CollectionUtils;
 import com.spider.service.HanimeImageService;
+import org.springframework.util.DigestUtils;
 
 @Service
 public class Hanime extends BaseWeb {
@@ -98,7 +99,7 @@ public class Hanime extends BaseWeb {
                                 //redisTemplate.opsForList().leftPush(key,jsonStr);
                                 continue;
                             }
-                            hanimeImage.setMd5(md5.digestHex(bytes));
+                            hanimeImage.setMd5(DigestUtils.md5DigestAsHex(bytes));
                             if (Objects.nonNull(hanimeImageService.findOnekeyValue("md5", hanimeImage.getMd5()))) {
                                 logger.info("id:{},url:{},md5重复", hanimeImage.getId(), hanimeImage.getUrl());
                                 continue;

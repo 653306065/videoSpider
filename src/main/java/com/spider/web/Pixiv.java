@@ -30,6 +30,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.spider.utils.OKHttpUtils;
 import com.spider.utils.download.ImageDownload;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 
 @Service
@@ -132,7 +133,7 @@ public class Pixiv extends BaseWeb {
                 byte[] bytes = OKHttpUtils.getBytes(url, header, enableProxy);
                 if (Objects.nonNull(bytes)) {
                     String path = savePath + fileSeparator + image.getId() + "_" + i.get() + ".jpg";
-                    String md5Str = md5.digestHex(bytes);
+                    String md5Str = DigestUtils.md5DigestAsHex(bytes);
                     list.add(md5Str);
                     FileUtils.byteToFile(bytes, path);
                     logger.info("{},下载完成", path);

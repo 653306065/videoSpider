@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
@@ -194,7 +195,7 @@ public class Javbus extends BaseWeb {
             List<byte[]> byteList = waterfallList.stream().parallel().map(url -> {
                 byte[] bytes = OKHttpUtils.getBytes(url, enableProxy);
                 if (Objects.nonNull(bytes)) {
-                    String path = savePath + "av" + File.separator + avInfo.getCode().trim() + File.separator + md5.digestHex(bytes) + ".jpg";
+                    String path = savePath + "av" + File.separator + avInfo.getCode().trim() + File.separator + DigestUtils.md5DigestAsHex(bytes) + ".jpg";
                     FileUtils.byteToFile(bytes, path);
                 }
                 return bytes;

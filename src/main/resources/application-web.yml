@@ -93,10 +93,11 @@ youtubeSpider:
     search: https://www.googleapis.com/youtube/v3/search?key=${youtube.googleApi.key}&part=snippet&channelId=@{channelId}&maxResults=50&type=video
 
 by114:
-  home: https://www.by114.pw/
-  template: https://www.by114.pw/forum-@{type}-@{page}.html
+  home: https://www.kan224.com/
+  template: https://www.kan224.com/forum-@{type}-@{page}.html
   savePath: C:\by114\
   enableProxy: true
+  thread: 10
 
 javbangers:
   home: https://www.javbangers.com/

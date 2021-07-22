@@ -48,7 +48,7 @@ public abstract class BaseWeb implements ApplicationRunner {
 
     protected Integer defaultEndPage = 500;
 
-    protected MD5 md5 = MD5.create();
+    //protected MD5 md5 = MD5.create();
 
     //配置线程数
     protected Integer thread;

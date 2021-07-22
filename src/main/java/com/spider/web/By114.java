@@ -2,19 +2,16 @@ package com.spider.web;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSON;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -23,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+import org.springframework.util.DigestUtils;
 import com.spider.entity.By114BT;
 import com.spider.utils.FileUtils;
 import com.spider.utils.JsoupUtil;
@@ -51,7 +48,7 @@ public class By114 extends BaseWeb {
         }
         Element element = document.getElementById("threadlisttableid");
         Elements tbodys = element.getElementsByTag("tbody");
-        List<By114BT> list = new ArrayList<By114BT>();
+        List<By114BT> list = new ArrayList<>();
         for (Element tb : tbodys) {
             String id = tb.attr("id");
             if (id.startsWith("normalthread")) {
@@ -91,7 +88,7 @@ public class By114 extends BaseWeb {
             return;
         }
         Document document = JsoupUtil.getDocument(bt.getUrl(), enableProxy);
-        if(Objects.isNull(document)){
+        if (Objects.isNull(document)) {
             return;
         }
         Element contentHtml = document.getElementsByClass("t_fsz").get(0);
@@ -147,14 +144,15 @@ public class By114 extends BaseWeb {
             String url = img.attr("src");
             byte[] bytes = OKHttpUtils.getBytes(url, enableProxy);
             if (bytes != null) {
-                String path = savePath + "img" + fileSeparator + FileUtils.repairPath(title) + fileSeparator + md5.digestHex(bytes) + ".jpg";
+
+                String path = savePath + fileSeparator + FileUtils.repairPath(title) + fileSeparator + DigestUtils.md5DigestAsHex(bytes) + ".jpg";
                 FileUtils.byteToFile(bytes, path);
                 imgList.add(bytes);
                 imgPath.add(path);
                 imgurl.add(url);
             }
         }
-        bt.setImages(imgList);
+        //bt.setImages(imgList);
         bt.setImagesPath(imgPath);
         bt.setImagesUrl(imgurl);
         Elements element = document.getElementsByClass("attnm");
@@ -164,18 +162,18 @@ public class By114 extends BaseWeb {
             String name = a.text();
             byte[] bytes = OKHttpUtils.getBytes(url, enableProxy);
             if (bytes != null) {
-                String path = savePath + "torrent" + File.separator + FileUtils.repairPath(bt.getTitle()) + ".torrent";
+                String path = savePath + File.separator + FileUtils.repairPath(title) + fileSeparator + FileUtils.repairPath(bt.getTitle()) + ".torrent";
                 FileUtils.byteToFile(bytes, path);
-                bt.setTorrent(bytes);
+                //bt.setTorrent(bytes);
                 bt.setTorrentName(name);
                 bt.setTorrentPath(path);
                 bt.setTorrentUrl(url);
             }
         }
-        if (!StringUtils.hasText(bt.getMagnet()) && Objects.isNull(bt.getTorrent())) {
-            logger.info(bt.getTitle() + ",磁力和种子都为空");
-            return;
-        }
+//        if (!StringUtils.hasText(bt.getMagnet()) && Objects.isNull(bt.getTorrent())) {
+//            logger.info(bt.getTitle() + ",磁力和种子都为空");
+//            return;
+//        }
         bt.setCreateData(new Date());
         by114BTService.save(bt);
         logger.info(bt.getTitle() + ",保存完成");
@@ -183,8 +181,8 @@ public class By114 extends BaseWeb {
 
     public void downloadBt() {
         redisTemplate.delete("by114BTTaskList");
-        ExecutorService executorService = Executors.newFixedThreadPool(10);
-        for (int i = 1; i < 1800; i++) {
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        for (int i = 1; i < 2011; i++) {
             int finalI = i;
             executorService.execute(() -> {
                 List<By114BT> list = getBTInfo("52", String.valueOf(finalI));
@@ -192,14 +190,19 @@ public class By114 extends BaseWeb {
             });
         }
 
-        ExecutorService taskExecutorService = Executors.newFixedThreadPool(40);
+        ExecutorService taskExecutorService = Executors.newFixedThreadPool(thread);
         for (int i = 0; i < 40; i++) {
             taskExecutorService.execute(() -> {
                 while (true) {
-                    String json = redisTemplate.opsForList().leftPop("by114BTTaskList",1, TimeUnit.SECONDS);
-                    if (Objects.nonNull(json)) {
-                        saveBTInfo(JSON.parseObject(json, By114BT.class));
+                    try {
+                        String json = redisTemplate.opsForList().leftPop("by114BTTaskList", 1, TimeUnit.SECONDS);
+                        if (Objects.nonNull(json)) {
+                            saveBTInfo(JSON.parseObject(json, By114BT.class));
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
+
                 }
             });
         }
