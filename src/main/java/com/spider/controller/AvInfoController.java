@@ -8,7 +8,7 @@ import com.spider.entity.AvInfo;
 import com.spider.entity.FaceInfo;
 import com.spider.service.ActressesInfoService;
 import com.spider.service.AvInfoService;
-import com.spider.service.es.EsAvInfoService;
+//import com.spider.service.es.EsAvInfoService;
 import com.spider.utils.BaiduTranslateUtil;
 import com.spider.utils.FaceUtil;
 import com.spider.vo.ResponseVo;
@@ -31,8 +31,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/avInfo")
 public class AvInfoController extends BaseController {
 
-    @Autowired
-    private EsAvInfoService esAvInfoService;
+//    @Autowired
+//    private EsAvInfoService esAvInfoService;
 
     @Autowired
     private ActressesInfoService actressesInfoService;
@@ -56,12 +56,12 @@ public class AvInfoController extends BaseController {
         return ResponseVo.succee();
     }
 
-    @ApiOperation("根据关键字搜索")
-    @GetMapping("/search/{value}")
-    public ResponseVo<List<AvInfo>> search(@PathVariable(value = "value") String value) {
-        List<AvInfo> list = esAvInfoService.searchByValue(value).stream().map(esAvInfoSearchHit -> BeanUtil.toBean(esAvInfoSearchHit.getContent(), AvInfo.class)).collect(Collectors.toList());
-        return ResponseVo.succee(list);
-    }
+//    @ApiOperation("根据关键字搜索")
+//    @GetMapping("/search/{value}")
+//    public ResponseVo<List<AvInfo>> search(@PathVariable(value = "value") String value) {
+//        List<AvInfo> list = esAvInfoService.searchByValue(value).stream().map(esAvInfoSearchHit -> BeanUtil.toBean(esAvInfoSearchHit.getContent(), AvInfo.class)).collect(Collectors.toList());
+//        return ResponseVo.succee(list);
+//    }
 
 
     @ApiOperation("获取av女优的脸部信息")

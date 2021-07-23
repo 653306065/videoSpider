@@ -1,15 +1,13 @@
 package com.spider.utils.download;
 
 import com.spider.entity.Video;
+import com.spider.utils.FFmpegUtil;
 import com.spider.utils.FileUtils;
 import com.spider.utils.OKHttpUtils;
 import io.lindstrom.m3u8.model.*;
 import io.lindstrom.m3u8.parser.MasterPlaylistParser;
 import io.lindstrom.m3u8.parser.MediaPlaylistParser;
-import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -215,27 +213,8 @@ public class HlsDownloader {
     }
 
     private void mergeFile() {
-        try {
-            File videoFile = new File(taskInfo.savePath);
-            FileOutputStream fileOutputStream = new FileOutputStream(videoFile);
-            byte[] bytes = new byte[1024 * 2];
-            for (MediaSegment mediaSegment : taskInfo.mediaPlaylist.mediaSegments()) {
-                File file = new File(taskInfo.tempFileMap.get(mediaSegment.uri()));
-                FileInputStream fileInputStream = new FileInputStream(file);
-                while (true) {
-                    int index = fileInputStream.read(bytes);
-                    if (index == -1) {
-                        break;
-                    }
-                    fileOutputStream.write(bytes, 0, index);
-                    fileOutputStream.flush();
-                }
-                fileInputStream.close();
-            }
-            fileOutputStream.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        String tsListPath = new File(taskInfo.tempFileMap.values().stream().findFirst().get()).getParentFile().getAbsolutePath();
+        FFmpegUtil.mergeTsFile(tsListPath, taskInfo.savePath);
     }
 
     @Data
@@ -276,7 +255,7 @@ public class HlsDownloader {
         //任务状态
         private volatile boolean taskStatus = true;
     }
-    
+
     private void deleteTemp() {
         FileUtils.deleteDir(new File(new ArrayList<>(taskInfo.tempFileMap.values()).get(0)).getParentFile().getParentFile().getAbsolutePath());
     }

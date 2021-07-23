@@ -4,9 +4,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.UUID;
-
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -119,11 +119,33 @@ public class FFmpegUtil {
         }
     }
 
-    public static void main(String[] args) {
-        MultimediaInfo MultimediaInfo = getVideoInfo(new File("C:\\javbangers\\uncensored\\2021-03-24\\Sumire and Koharu.mp4"));
-        for (int i = 0; i < 100; i++) {
-            long index0 = (long) (MultimediaInfo.getDuration() / (100 - i)) / 1000;
-            videoSnapshot("C:\\javbangers\\uncensored\\2021-03-24\\Sumire and Koharu.mp4", "C:\\javbangers\\uncensored\\2021-03-24\\", String.valueOf(i), index0, 1);
+    public static void mergeTsFile(String tsPath, String videoPath) {
+        try {
+            List<File> list = new ArrayList<>();
+            FileUtils.getPathFileList(tsPath, list);
+            List<String> textList = list.stream().sorted(Comparator.comparing(file -> Integer.valueOf(file.getName().split("\\.")[0]))).map(file -> "file '" + file.getAbsolutePath() + "'").collect(Collectors.toList());
+            File file = File.createTempFile(videoPath, ".txt");
+            FileUtils.saveTxt(file.getAbsolutePath(), textList);
+            String command = new File(FFmpegPath).getAbsolutePath() + "/ffmpeg -f concat -safe 0 -i \"" + file.getAbsolutePath() + "\" -c copy \"" + videoPath + "\"";
+            Process Process = Runtime.getRuntime().exec(command);
+            try {
+                BufferedReader br = new BufferedReader(new InputStreamReader(Process.getErrorStream()));
+                String line = "";
+                while ((line = br.readLine()) != null) {
+                    System.out.println(line);
+                }
+                br.close();
+                Process.destroy();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            file.delete();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
+
+    public static void main(String[] args) {
+        mergeTsFile("C:\\wandusp\\uncensored\\2021-07-23\\temp\\634c7250531c45cd80f5255fbb26300e", "C:\\wandusp\\uncensored\\2021-07-23\\一本道1pon-021821-001 グラマラス 森田みゆ.mp4");
     }
 }

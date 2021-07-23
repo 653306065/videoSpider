@@ -6,7 +6,7 @@ import com.spider.entity.AvInfo;
 import com.spider.entity.Video;
 import com.spider.service.AvInfoService;
 import com.spider.service.VideoService;
-import com.spider.service.es.EsVideoService;
+//import com.spider.service.es.EsVideoService;
 import com.spider.utils.BaiduTranslateUtil;
 import com.spider.utils.FFmpegUtil;
 import com.spider.utils.FileUtils;
@@ -30,8 +30,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/video")
 public class VideoController extends BaseController {
 
-    @Autowired
-    private EsVideoService esVideoService;
+//    @Autowired
+//    private EsVideoService esVideoService;
 
     @Autowired
     private VideoService videoService;
@@ -39,12 +39,12 @@ public class VideoController extends BaseController {
     @Autowired
     private AvInfoService avInfoService;
 
-    @ApiOperation("根据关键字搜索视频")
-    @GetMapping("/search/{value}")
-    public ResponseVo<List<Video>> search(@PathVariable(value = "value") String value) {
-        List<Video> list = esVideoService.searchByValue(value).stream().map(esAvInfoSearchHit -> BeanUtil.toBean(esAvInfoSearchHit.getContent(), Video.class)).collect(Collectors.toList());
-        return ResponseVo.succee(list);
-    }
+//    @ApiOperation("根据关键字搜索视频")
+//    @GetMapping("/search/{value}")
+//    public ResponseVo<List<Video>> search(@PathVariable(value = "value") String value) {
+//        List<Video> list = esVideoService.searchByValue(value).stream().map(esAvInfoSearchHit -> BeanUtil.toBean(esAvInfoSearchHit.getContent(), Video.class)).collect(Collectors.toList());
+//        return ResponseVo.succee(list);
+//    }
 
     @ApiOperation("清空低于指定分辨率的视频")
     @GetMapping("/clean/resolutionRatio/video")
