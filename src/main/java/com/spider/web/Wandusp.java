@@ -73,6 +73,9 @@ public class Wandusp extends BaseWeb {
             String js = Stream.of(scripts).filter(value -> String.valueOf(value).contains("var urls")).map(value -> String.valueOf(value)).findFirst().get();
             String m3u8Master = js.split("\"")[1];
             String m3u8Txt = OKHttpUtils.get(m3u8Master, header, enableProxy);
+            if(Objects.isNull(m3u8Txt)){
+                return null;
+            }
             if (m3u8Txt.contains("EXTINF")) {
                 video.setVideoUrl(m3u8Master);
             } else {
@@ -103,7 +106,7 @@ public class Wandusp extends BaseWeb {
     }
 
     public void downloadVideo(Integer type, String path) {
-        int page = 1;
+        int page = 944;
         while (true) {
             List<Video> videoList = getVideoList(type, page);
             if (Objects.isNull(videoList)) {
@@ -112,7 +115,7 @@ public class Wandusp extends BaseWeb {
             if (Objects.nonNull(videoList) && videoList.size() == 0) {
                 break;
             }
-            videoList.stream().forEach(video -> {
+            videoList.forEach(video -> {
                 if (videoExistVerify(video)) {
                     Video getVideo = getVideoInfo(video);
                     if (Objects.nonNull(getVideo) && videoExistVerify(video)) {
@@ -122,7 +125,7 @@ public class Wandusp extends BaseWeb {
                     }
                 }
             });
-            page++;
+            page--;
         }
 
     }

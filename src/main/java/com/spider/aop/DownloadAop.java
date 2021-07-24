@@ -100,7 +100,7 @@ public class DownloadAop {
         //确认视频是否为av
         for (Map.Entry<String, List<String>> entry : AvInfoService.codeTransformMap.entrySet()) {
             for (String code : entry.getValue()) {
-                if (name.contains(code)||name.toLowerCase().contains(code)||name.toUpperCase().contains(code)) {
+                if (name.contains(code)||name.toLowerCase().contains(code.toLowerCase())||name.toUpperCase().contains(code.toUpperCase())) {
                     video.setAvCode(entry.getKey());
                 }
             }
