@@ -368,7 +368,7 @@ public class FileUtils {
     public static String repairPath(String path) {
         return path.replaceAll("\\|", "").replaceAll("//", "").replaceAll("/", "").replaceAll(":", "")
                 .replaceAll("\\*", "").replaceAll("\\?", "").replaceAll("\"", "").replaceAll("<", "")
-                .replaceAll(">", "").replaceAll("|", "").trim();
+                .replaceAll(">", "").replaceAll("|", "").replaceAll("\\\\","").trim();
     }
 
 

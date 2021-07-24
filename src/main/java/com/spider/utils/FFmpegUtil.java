@@ -6,7 +6,10 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
+
+import com.spider.entity.Video;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -124,9 +127,11 @@ public class FFmpegUtil {
             List<File> list = new ArrayList<>();
             FileUtils.getPathFileList(tsPath, list);
             List<String> textList = list.stream().sorted(Comparator.comparing(file -> Integer.valueOf(file.getName().split("\\.")[0]))).map(file -> "file '" + file.getAbsolutePath() + "'").collect(Collectors.toList());
-            File file = File.createTempFile(videoPath, ".txt");
+            File file = File.createTempFile("tsLiST", ".txt");
             FileUtils.saveTxt(file.getAbsolutePath(), textList);
-            String command = new File(FFmpegPath).getAbsolutePath() + "/ffmpeg -f concat -safe 0 -i \"" + file.getAbsolutePath() + "\" -c copy \"" + videoPath + "\"";
+            File videoFile=new File(videoPath);
+            File tempFile=new File(videoFile.getParentFile().getAbsolutePath()+File.separator+ UUID.randomUUID() +".mp4");
+            String command = new File(FFmpegPath).getAbsolutePath() + "/ffmpeg -f concat -safe 0 -i \"" + file.getAbsolutePath() + "\" -c copy \"" + tempFile.getAbsolutePath() + "\"";
             Process Process = Runtime.getRuntime().exec(command);
             try {
                 BufferedReader br = new BufferedReader(new InputStreamReader(Process.getErrorStream()));
@@ -136,6 +141,7 @@ public class FFmpegUtil {
                 }
                 br.close();
                 Process.destroy();
+                tempFile.renameTo(videoFile);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -146,6 +152,6 @@ public class FFmpegUtil {
     }
 
     public static void main(String[] args) {
-        mergeTsFile("C:\\wandusp\\uncensored\\2021-07-23\\temp\\634c7250531c45cd80f5255fbb26300e", "C:\\wandusp\\uncensored\\2021-07-23\\一本道1pon-021821-001 グラマラス 森田みゆ.mp4");
+        mergeTsFile("C:\\wandusp\\uncensored\\2021-07-25\\temp\\1204b271c08a424ea091013203ab1a67", "C:\\test\\一本道1pon-021821-001 グラマラス                 森田みゆ.mp4");
     }
 }
