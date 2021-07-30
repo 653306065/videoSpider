@@ -209,6 +209,12 @@ public class OKHttpUtils implements ApplicationRunner {
                 response.body().close();
                 response.close();
                 return bytes;
+            }else{
+                String body = null;
+                if(Objects.nonNull(response.body())){
+                    body=response.body().string();
+                }
+                logger.info("code:{},url:{},body:{}",response.code(),url,body);
             }
             response.close();
             return null;

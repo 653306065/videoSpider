@@ -50,10 +50,11 @@ public class VideoService extends BaseService<Video> {
     public Double videoScore(String videoId, Integer imageCount, double threshold, boolean isDelete) {
         Video findVideo = this.findById(videoId);
         if (Objects.nonNull(findVideo)&&Objects.nonNull(findVideo.getMultimediaInfo())) {
-            Long duration = findVideo.getMultimediaInfo().getDuration();
+            long duration = findVideo.getMultimediaInfo().getDuration();
             long size = duration / imageCount;
             File file = new File(findVideo.getSavePath());
             String path = file.getParentFile().getAbsolutePath() + File.separator + "temp";
+            logger.info("{},截图路径:{}",findVideo.getSavePath(),path);
             new File(path).mkdirs();
             for (int i = 0; i < imageCount; i++) {
                 FFmpegUtil.videoSnapshot(findVideo.getSavePath(), path, findVideo.getName() + "_" + i, (duration - (size * (i + 1))) / 1000, 1);
@@ -67,7 +68,7 @@ public class VideoService extends BaseService<Video> {
                         System.out.println(JSON.toJSONString(faceInfoList.stream().filter(faceInfo -> faceInfo.getGender().equals("Female")).collect(Collectors.toList())));
                         return faceInfoList.stream();
                     }
-                    Thread.sleep(1000);
+                    Thread.sleep(1100);
                     return null;
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -98,8 +99,7 @@ public class VideoService extends BaseService<Video> {
                 logger.info("颜值过低，删除视频," + findVideo.getSavePath());
                 file.delete();
             }
-            fileList.stream().forEach(image -> image.delete());
-            new File(path).delete();
+            FileUtils.deleteDir(path);
             return avg;
         }
         return null;

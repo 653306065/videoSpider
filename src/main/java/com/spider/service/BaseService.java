@@ -50,7 +50,7 @@ public abstract class BaseService<T> {
         return mongoTemplate.find(query, clazz);
     }
 
-    public List<T> findBykeyValue(String key, String value) {
+    public List<T> findBykeyValue(String key, Object value) {
         Query query = new Query(Criteria.where(key).is(value));
         return mongoTemplate.find(query, clazz);
     }
@@ -65,7 +65,7 @@ public abstract class BaseService<T> {
         return mongoTemplate.findOne(query, clazz);
     }
 
-    public T findOnekeyValue(String key, String value) {
+    public T findOnekeyValue(String key, Object value) {
         Query query = new Query(Criteria.where(key).is(value));
         return mongoTemplate.findOne(query, clazz);
     }
