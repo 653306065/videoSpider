@@ -278,6 +278,24 @@ public class VideoController extends BaseController {
     @ApiOperation("模糊搜索视频")
     @GetMapping("/search/name/{name}")
     public ResponseVo<List<Video>> searchByName(@PathVariable String name) {
-        return ResponseVo.succee(videoService.findByRegex("name",name));
+        return ResponseVo.succee(videoService.findByRegex("name", name));
+    }
+
+
+    @ApiOperation("获取视频评分排序")
+    @GetMapping("/score/sort/list")
+    public ResponseVo<List<Map<String, Object>>> scoreSortList() {
+        List<Video> list = videoService.findByexists("avgFaceScore", true);
+        return ResponseVo.succee(list.stream().
+                filter(video -> Objects.nonNull(video.getAvgFaceScore())).
+                filter(video -> new File(video.getSavePath()).exists()).
+                sorted(Comparator.comparing(Video::getAvgFaceScore)).map(video -> new HashMap<String, Object>() {{
+            put("name", video.getName());
+            put("avgFaceScore", video.getAvgFaceScore());
+            put("maxFaceScore", video.getMaxFaceScore());
+            put("medianFaceScore", video.getMedianFaceScore());
+            put("minFaceScore", video.getMinFaceScore());
+            put("faceInfoList", video.getFaceInfoList());
+        }}).collect(Collectors.toList()));
     }
 }
