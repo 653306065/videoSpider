@@ -64,9 +64,7 @@ public class Pixiv extends BaseWeb {
 
     @Autowired
     private HanimeImageService hanimeImageService;
-
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
-
+    
     public List<String> getHistoryRankListUrl(Date date) {
         List<String> urlList = new ArrayList<>();
         String dateStr = simpleDateFormat.format(date);

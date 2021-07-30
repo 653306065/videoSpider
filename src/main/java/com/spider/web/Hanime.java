@@ -33,10 +33,7 @@ public class Hanime extends BaseWeb {
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
-
-    @Autowired
-    Proxy proxy;
-
+    
     @Autowired
     ImageDownload imageDownload;
 
