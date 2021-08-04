@@ -250,7 +250,7 @@ public class HlsDownloader {
         private Map<String, String> tempFileMap = new ConcurrentHashMap<>();
 
         //重试次数
-        private Integer time = 5;
+        private Integer time = 3;
 
         //任务状态
         private volatile boolean taskStatus = true;
