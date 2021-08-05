@@ -51,33 +51,35 @@ public class HlsDownloader {
     private MediaPlaylistParser mediaPlaylistParser = new MediaPlaylistParser();
 
     private boolean download() {
-        if (StringUtils.isNotBlank(taskInfo.m3u8Url)) {
-            taskInfo.rootUrl = taskInfo.m3u8Url.substring(0, taskInfo.m3u8Url.lastIndexOf("/") + 1);
-        }
-        getTsList();
-        if (Objects.isNull(taskInfo.mediaPlaylist)) {
-            logger.info("无法获取到TS列表");
-            return false;
-        }
-        buildTask();
-        executorService.shutdown();
-        while (!executorService.isTerminated()) {
-            try {
-                Thread.sleep(100);
-            } catch (Exception e) {
-                e.printStackTrace();
+        try {
+            if (StringUtils.isNotBlank(taskInfo.m3u8Url)) {
+                taskInfo.rootUrl = taskInfo.m3u8Url.substring(0, taskInfo.m3u8Url.lastIndexOf("/") + 1);
             }
-        }
-        if (taskInfo.tempFileMap.size() == taskInfo.mediaPlaylist.mediaSegments().size()) {
-            mergeFile();
-            logger.info("文件合并完成");
-        } else {
-            logger.info("分块下载失败,{}/{}", taskInfo.tempFileMap.size(), taskInfo.mediaPlaylist.mediaSegments().size());
+            getTsList();
+            if (Objects.isNull(taskInfo.mediaPlaylist)) {
+                logger.info("无法获取到TS列表");
+                return false;
+            }
+            buildTask();
+            executorService.shutdown();
+            while (!executorService.isTerminated()) {
+                Thread.sleep(100);
+            }
+            if (taskInfo.tempFileMap.size() == taskInfo.mediaPlaylist.mediaSegments().size()) {
+                mergeFile();
+                logger.info("文件合并完成");
+            } else {
+                logger.info("分块下载失败,{}/{}", taskInfo.tempFileMap.size(), taskInfo.mediaPlaylist.mediaSegments().size());
+                return false;
+            }
+            return true;
+        }catch (Exception e){
+            e.printStackTrace();
             return false;
+        }finally {
+            deleteTemp();
+            logger.info("删除临时文件");  
         }
-        deleteTemp();
-        logger.info("删除临时文件");
-        return true;
     }
 
     public MasterPlaylist getMasterPlaylist(String masterUrl, Boolean isProxy) {

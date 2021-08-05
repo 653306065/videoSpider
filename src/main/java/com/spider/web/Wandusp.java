@@ -95,6 +95,8 @@ public class Wandusp extends BaseWeb {
                     } else {
                         video.setVideoUrl(m3u8Master.substring(0, m3u8Master.lastIndexOf("/") + 1) + masterPlaylist.variants().get(0).uri());
                     }
+                }else{
+                    video.setVideoUrl(list.get(0).uri());
                 }
             }
             logger.info(video.getVideoUrl());
@@ -106,7 +108,7 @@ public class Wandusp extends BaseWeb {
     }
 
     public void downloadVideo(Integer type, String path) {
-        int page = 274;
+        int page = 1;
         while (true) {
             List<Video> videoList = getVideoList(type, page);
             if (Objects.isNull(videoList)) {
