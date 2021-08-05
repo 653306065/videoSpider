@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Objects;
+import javax.annotation.PostConstruct;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Component
@@ -29,20 +29,29 @@ public class CommonJob {
     @Value("${limit.rate}")
     private Integer rate;
 
+    private List<String> keyList = new ArrayList<>();
+
     @Async("scheduleThreadPool")
     @Scheduled(fixedDelayString = "${limit.time}")
     public void limitJob() {
-        Collection<HandlerMethod> handlerMethodList = mapping.getHandlerMethods().values();
-        Map<String, String> map = handlerMethodList.stream().collect(Collectors.toMap(url -> url.getMethod().getDeclaringClass() + "#" + url.getMethod().getName(), url -> {
+        List<String> valueList = redisTemplate.opsForValue().multiGet(keyList);
+        AtomicInteger index = new AtomicInteger(0);
+        Map<String, String> map = keyList.stream().collect(Collectors.toMap(key -> key, key -> {
             int size = 0;
-            String value = redisTemplate.opsForValue().get(String.valueOf(url.getMethod().hashCode()));
+            String value = valueList.get(index.get());
             if (Objects.nonNull(value)) {
                 size = Integer.parseInt(value);
             }
-            int nextSize = Math.min(size + rate, bucket);
-            return nextSize + "";
-        }, (o, n) -> o));
+            index.incrementAndGet();
+            return String.valueOf(Math.min(size + rate, bucket));
+        }));
         redisTemplate.opsForValue().multiSet(map);
+    }
+
+    @PostConstruct
+    public void initKeyList() {
+        Collection<HandlerMethod> handlerMethodList = mapping.getHandlerMethods().values();
+        keyList.addAll(handlerMethodList.stream().map(handler -> handler.getMethod().getDeclaringClass() + "#" + handler.getMethod().getName()).distinct().collect(Collectors.toList()));
     }
 
 }
