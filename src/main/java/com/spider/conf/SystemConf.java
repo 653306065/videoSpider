@@ -23,7 +23,7 @@ public class SystemConf {
         AtomicInteger i= new AtomicInteger();
         return new ThreadPoolExecutor(availableProcessors, availableProcessors * 10, 1, TimeUnit.MINUTES, new LinkedBlockingDeque<>(), r -> {
             Thread thread=new Thread(r);
-            thread.setName("scheduleThread-"+i);
+            thread.setName("scheduleThread-"+i.get());
             i.getAndIncrement();
             return thread;
         },new ThreadPoolExecutor.DiscardOldestPolicy());
