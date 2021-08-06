@@ -1,5 +1,8 @@
 package com.spider.utils.download;
 
+import com.comcast.viper.hlsparserj.IPlaylist;
+import com.comcast.viper.hlsparserj.PlaylistFactory;
+import com.comcast.viper.hlsparserj.PlaylistVersion;
 import com.spider.entity.Video;
 import com.spider.utils.FFmpegUtil;
 import com.spider.utils.FileUtils;
@@ -73,12 +76,12 @@ public class HlsDownloader {
                 return false;
             }
             return true;
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
-        }finally {
+        } finally {
             deleteTemp();
-            logger.info("删除临时文件");  
+            logger.info("删除临时文件");
         }
     }
 
@@ -93,6 +96,30 @@ public class HlsDownloader {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public MasterPlaylist getMasterPlaylist(String content) {
+        try {
+            return masterPlaylistParser.readPlaylist(content);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+    public Boolean isMasterPlaylist(String url, Boolean enableProxy) {
+        String m3u8Str = OKHttpUtils.get(url, enableProxy);
+        if (Objects.isNull(m3u8Str)) {
+            return null;
+        }
+        IPlaylist playlist = PlaylistFactory.parsePlaylist(PlaylistVersion.TWELVE, m3u8Str);
+        return playlist.isMasterPlaylist();
+    }
+
+    public Boolean isMasterPlaylist(String m3u8Str) {
+        IPlaylist playlist = PlaylistFactory.parsePlaylist(PlaylistVersion.TWELVE, m3u8Str);
+        return playlist.isMasterPlaylist();
     }
 
     public Boolean download(String m3u8Url, String savePath, Integer threadQuantity, Boolean enableProxy) {

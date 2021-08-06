@@ -20,7 +20,7 @@ public class OKHttpUtils implements ApplicationRunner {
 
     private static final Logger logger=LoggerFactory.getLogger(OKHttpUtils.class);
 
-    static OkHttpClient httpClient = new OkHttpClient.Builder().writeTimeout(10,TimeUnit.SECONDS).callTimeout(10,TimeUnit.SECONDS).connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
+    static OkHttpClient httpClient = new OkHttpClient.Builder().writeTimeout(3,TimeUnit.SECONDS).callTimeout(3,TimeUnit.SECONDS).connectTimeout(3, TimeUnit.SECONDS).readTimeout(3, TimeUnit.SECONDS).build();
 
     static OkHttpClient proxyHttpClient = null;
 
@@ -431,6 +431,6 @@ public class OKHttpUtils implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
         Proxy proxy = SpringContentUtil.getBean(Proxy.class);
-        proxyHttpClient = new OkHttpClient.Builder().proxy(proxy).writeTimeout(10,TimeUnit.SECONDS).callTimeout(10,TimeUnit.SECONDS).connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
+        proxyHttpClient = new OkHttpClient.Builder().proxy(proxy).writeTimeout(3,TimeUnit.SECONDS).callTimeout(3,TimeUnit.SECONDS).connectTimeout(3, TimeUnit.SECONDS).readTimeout(3, TimeUnit.SECONDS).build();
     }
 }

@@ -70,16 +70,16 @@ public class Wandusp extends BaseWeb {
             String playHtml = OKHttpUtils.get(apiUrl, header, enableProxy);
             TagNode playTagNode = HtmlCleanerUtil.getTagNode(playHtml);
             Object[] scripts = playTagNode.evaluateXPath("//script/text()");
-            String js = Stream.of(scripts).filter(value -> String.valueOf(value).contains("var urls")).map(value -> String.valueOf(value)).findFirst().get();
+            String js = Stream.of(scripts).filter(value -> String.valueOf(value).contains("var urls")).map(String::valueOf).findFirst().get();
             String m3u8Master = js.split("\"")[1];
             String m3u8Txt = OKHttpUtils.get(m3u8Master, header, enableProxy);
             if(Objects.isNull(m3u8Txt)){
                 return null;
             }
-            if (m3u8Txt.contains("EXTINF")) {
+            if (!hlsDownloader.isMasterPlaylist(m3u8Txt)) {
                 video.setVideoUrl(m3u8Master);
             } else {
-                MasterPlaylist masterPlaylist = hlsDownloader.getMasterPlaylist(m3u8Master, enableProxy);
+                MasterPlaylist masterPlaylist = hlsDownloader.getMasterPlaylist(m3u8Txt);
                 //分辨率排序
                 List<Variant> list = masterPlaylist.variants().stream().filter(variant -> variant.resolution().isPresent()).
                         sorted(Comparator.comparing(variant -> variant.resolution().get().height() * variant.resolution().get().width())).
@@ -108,7 +108,7 @@ public class Wandusp extends BaseWeb {
     }
 
     public void downloadVideo(Integer type, String path) {
-        int page = 1;
+        int page = 700;
         while (true) {
             List<Video> videoList = getVideoList(type, page);
             if (Objects.isNull(videoList)) {
