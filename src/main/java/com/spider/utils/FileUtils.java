@@ -36,7 +36,7 @@ public class FileUtils {
         while (true) {
             int i = in.read(bytes);
             if (i == -1) {
-                if (file.length() > 1024 * 1 * 1000) {
+                if (file.length() > 1024 * 1000) {
                     out.write(uid.getBytes());
                 }
                 in.close();
@@ -168,7 +168,7 @@ public class FileUtils {
         }
         File[] fileArr = files.listFiles();
         for (File file : fileArr) {
-            if (file.getName().indexOf(key) != -1) {
+            if (file.getName().contains(key)) {
                 deleteFile(file.getAbsolutePath());
             }
         }
@@ -185,7 +185,7 @@ public class FileUtils {
         file.delete();
     }
 
-    public static void FileCopy(String oldPath, String newPath) {
+    public static void fileCopy(String oldPath, String newPath) {
         try {
             if (!new File(newPath).exists()) {
                 new File(newPath).getParentFile().mkdirs();
@@ -207,33 +207,7 @@ public class FileUtils {
             exception.printStackTrace();
         }
     }
-
-    public static String codeString(String fileName) {
-        try {
-            BufferedInputStream bin = new BufferedInputStream(new FileInputStream(fileName));
-            int p = (bin.read() << 8) + bin.read();
-            String code = null;
-            switch (p) {
-                case 0xefbb:
-                    code = "UTF-8";
-                    break;
-                case 0xfffe:
-                    code = "Unicode";
-                    break;
-                case 0xfeff:
-                    code = "UTF-16BE";
-                    break;
-                default:
-                    code = "null";
-            }
-            bin.close();
-            return code;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "UTF-8";
-        }
-    }
-
+    
     public static String getFileNameWithoutSuffix(String fileName) {
         return fileName.substring(0, fileName.lastIndexOf("."));
     }
