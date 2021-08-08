@@ -90,6 +90,29 @@ public class VideoController extends BaseController {
         }});
     }
 
+
+    @ApiOperation("清空低于指定大小的视频")
+    @GetMapping("/clean/size/video")
+    public ResponseVo<Object> cleanSizeVideo(@RequestParam(required = false, defaultValue = "300") Integer size, @RequestParam(defaultValue = "false") Boolean isDelete) {
+        AtomicLong totalSize = new AtomicLong(0);
+        CopyOnWriteArrayList<String> copyOnWriteArrayList = new CopyOnWriteArrayList<>();
+        videoService.findAll().stream().filter(video -> !video.getSavePath().contains("里番")).filter(video -> new File(video.getSavePath()).exists()).filter(video -> Objects.nonNull(video.getSize())).forEach(video -> {
+            if (video.getSize() <= 1024L * 1024 * size) {
+                logger.info(video.getSavePath());
+                if (isDelete) {
+                    new File(video.getSavePath()).delete();
+                }
+                totalSize.addAndGet(video.getSize());
+                copyOnWriteArrayList.add(video.getSavePath());
+            }
+        });
+        return ResponseVo.succee(new HashMap<String, Object>() {{
+            put("fileSize", totalSize.get() / 1024.0 / 1024 / 1024);
+            put("list", copyOnWriteArrayList);
+            put("listSize", copyOnWriteArrayList.size());
+        }});
+    }
+
     @ApiOperation("同步视频code")
     @GetMapping("/sync/code")
     public ResponseVo<Object> syncCode() {
@@ -290,12 +313,12 @@ public class VideoController extends BaseController {
                 filter(video -> Objects.nonNull(video.getAvgFaceScore())).
                 filter(video -> new File(video.getSavePath()).exists()).
                 sorted(Comparator.comparing(Video::getAvgFaceScore)).map(video -> new HashMap<String, Object>() {{
-            put("name", video.getName());
-            put("avgFaceScore", video.getAvgFaceScore());
-            put("maxFaceScore", video.getMaxFaceScore());
-            put("medianFaceScore", video.getMedianFaceScore());
-            put("minFaceScore", video.getMinFaceScore());
-            put("faceInfoList", video.getFaceInfoList());
-        }}).collect(Collectors.toList()));
+                    put("name", video.getName());
+                    put("avgFaceScore", video.getAvgFaceScore());
+                    put("maxFaceScore", video.getMaxFaceScore());
+                    put("medianFaceScore", video.getMedianFaceScore());
+                    put("minFaceScore", video.getMinFaceScore());
+                    put("faceInfoList", video.getFaceInfoList());
+                }}).collect(Collectors.toList()));
     }
 }
