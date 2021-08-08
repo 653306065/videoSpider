@@ -62,6 +62,10 @@ management:
       exposure:
         include: '*'
 
+#zookeeper:
+#  host: 127.0.0.1
+#  port: 2181
+
 #logging:
 #  level:
 #    root: info
