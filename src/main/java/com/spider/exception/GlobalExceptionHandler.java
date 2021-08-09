@@ -15,6 +15,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = Exception.class)
     public ResponseVo<Object> exceptionHandler(Exception e) {
+        e.printStackTrace();
         logger.error(e.getMessage());
         return ResponseVo.failure(-1, e.getMessage());
     }

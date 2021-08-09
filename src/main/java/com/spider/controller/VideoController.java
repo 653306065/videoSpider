@@ -7,10 +7,7 @@ import com.spider.entity.Video;
 import com.spider.service.AvInfoService;
 import com.spider.service.VideoService;
 //import com.spider.service.es.EsVideoService;
-import com.spider.utils.BaiduTranslateUtil;
-import com.spider.utils.FFmpegUtil;
-import com.spider.utils.FileUtils;
-import com.spider.utils.MD5Util;
+import com.spider.utils.*;
 import com.spider.vo.ResponseVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -216,7 +213,19 @@ public class VideoController extends BaseController {
     @GetMapping("/clean/same/md5/video")
     public ResponseVo<Object> cleanSameMd5Video() {
         List<Video> videoList = videoService.findAll();
-        Map<String, List<Video>> videoMap = videoList.stream().filter(video -> Objects.nonNull(video.getMd5())).collect(Collectors.groupingBy(Video::getMd5));
+        Map<String, List<Video>> videoMap = videoList.stream().filter(video -> Objects.nonNull(video.getMd5())).filter(video -> new File(video.getSavePath()).exists()).collect(Collectors.groupingBy(Video::getMd5, Collectors.collectingAndThen(Collectors.toList(), list -> {
+            if (list.size() > 1) {
+                return list;
+            }
+            return null;
+        })));
+        while (videoMap.entrySet().iterator().hasNext()) {
+            Map.Entry<String, List<Video>> entry = videoMap.entrySet().iterator().next();
+            if (Objects.isNull(entry.getValue())) {
+                videoMap.remove(entry.getKey());
+            }
+        }
+        System.out.println(videoMap);
         for (Map.Entry<String, List<Video>> entry : videoMap.entrySet()) {
             if (entry.getValue().size() > 1) {
                 List<Video> sameList = entry.getValue().stream().skip(1).limit(entry.getValue().size() - 1).collect(Collectors.toList());
@@ -302,6 +311,35 @@ public class VideoController extends BaseController {
     @GetMapping("/search/name/{name}")
     public ResponseVo<List<Video>> searchByName(@PathVariable String name) {
         return ResponseVo.succee(videoService.findByRegex("name", name));
+    }
+
+
+    @ApiOperation("获取视频名称匹配度")
+    @GetMapping("/name/matching/list")
+    public ResponseVo<List<Map<String, Object>>> searchByName(@RequestParam(defaultValue = "0.8") Double percentage) {
+        List<Video> videoList = videoService.findAll();
+        videoList = videoList.stream().filter(video -> new File(video.getSavePath()).exists()).collect(Collectors.toList());
+        List<Video> finalVideoList = videoList;
+        List<Map<String, Object>> list = videoList.parallelStream().map(video -> {
+            List<Map<String, Object>> map = finalVideoList.stream().map(v -> {
+                if (!v.getSavePath().equals(video.getSavePath())) {
+                    double value = StringMatchingDegreeUtil.SimilarDegree(v.getName(), video.getName());
+                    if (value >= percentage) {
+                        return new HashMap<String, Object>() {{
+                            put(v.getName(), value);
+                        }};
+                    }
+                }
+                return null;
+            }).filter(Objects::nonNull).collect(Collectors.toList());
+            if(map.size()==0){
+                return null;
+            }
+            return new HashMap<String, Object>() {{
+                put(video.getName(), map);
+            }};
+        }).filter(Objects::nonNull).collect(Collectors.toList());
+        return ResponseVo.succee(list);
     }
 
 
