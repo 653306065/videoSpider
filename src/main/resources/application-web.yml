@@ -143,8 +143,8 @@ javfull:
   api: https://www.fembed.com/api/source/@{key}
 
 javhuge:
-  home: http://javhuge.com/
-  template: http://javhuge.com/vod/show/class/@{category}/id/22/page/@{page}
+  home: https://javhuge.com/
+  template: https://javhuge.com/vod/show/class/@{category}/id/22/page/@{page}
   savePath: E:\javhuge\
   thread: 5
   enableProxy: true
