@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.spider.entity.Video;
-import com.spider.service.VideoService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.jsoup.nodes.Document;
@@ -19,7 +17,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.spider.utils.FileUtils;
 import com.spider.utils.JsoupUtil;
 import com.spider.utils.OKHttpUtils;
-import com.spider.utils.download.MultithreadingDownload;
 
 @Component
 public class Javhihi extends BaseWeb {
@@ -27,6 +24,9 @@ public class Javhihi extends BaseWeb {
     @Value("${javhihi.movie}")
     private String movie;
 
+    @Value("${javhihi.videoApi}")
+    private String videoApi;        
+    
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     public void getMoive(int page) {
@@ -54,7 +54,7 @@ public class Javhihi extends BaseWeb {
                 String href = element.attr("href");
                 String[] strArr = href.split("/");
                 String key = strArr[strArr.length - 1];
-                String api = "https://anime789.com/api/source/" + key;
+                String api = videoApi + key;
                 String apiJson = OKHttpUtils.post(api, enableProxy);
                 JSONObject apiJsonObject = JSON.parseObject(apiJson);
                 if (apiJsonObject.getBoolean("success")) {

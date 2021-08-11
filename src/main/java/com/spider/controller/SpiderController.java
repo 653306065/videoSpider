@@ -72,15 +72,30 @@ public class SpiderController extends BaseController {
 
     @Autowired
     private Pixiv pixiv;
-    
+
     @Autowired
     private Wandusp wandusp;
+
+    @Autowired
+    private Javhihi javhihi;
+
+    @ApiOperation("下载 javhihi 无码视频")
+    @GetMapping("/javhihi/uncensored")
+    public ResponseVo<Object> javhihi(@RequestParam(name = "thread", defaultValue = "5") Integer thread,
+                                      @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
+                                      @RequestParam(name = "savePath", required = false) String savePath) {
+        javhihi.setEnableProxy(enableProxy);
+        javhihi.setThread(thread);
+        javhihi.setSavePath(savePath);
+        threadPoolExecutor.execute(() -> javhihi.downloadVideo());
+        return ResponseVo.succee();
+    }
 
     @ApiOperation("下载 Wandusp 无码视频")
     @GetMapping("/wandusp/uncensored")
     public ResponseVo<Object> wandusp(@RequestParam(name = "thread", defaultValue = "5") Integer thread,
-                                        @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
-                                        @RequestParam(name = "savePath", required = false) String savePath) {
+                                      @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
+                                      @RequestParam(name = "savePath", required = false) String savePath) {
         wandusp.setThread(thread);
         if (Objects.nonNull(savePath)) {
             wandusp.setSavePath(savePath);

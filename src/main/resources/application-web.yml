@@ -56,10 +56,11 @@ wallhaven:
   enableProxy: true
 
 javhihi:
-  home: https://www1.javhihi.com/
+  home: https://javkiki.com/
   #home: https://www1.javbuz.com/
   #home: https://xart.letfap.com/
   movie: ${javhihi.home}movie?sort=published&page=@{page}&ajax=1
+  videoApi: https://www.fembed.com/api/source/
   savePath: E:\javhihi\
   #savePath: D:\javbuz\
   #savePath: D:\xart.letfap\
