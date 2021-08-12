@@ -366,8 +366,8 @@ public class VideoController extends BaseController {
     @GetMapping("/regex/video/list")
     public ResponseVo<Map<String, List<String>>> regexVideoList(@RequestParam("regex") String regex) {
         List<Video> list = videoService.findAll();
-        Map<String, List<String>> videoMap = new HashMap<>();
         list = list.parallelStream().filter(video -> new File(video.getSavePath()).exists()).collect(Collectors.toList());
+        Map<String, List<String>> videoMap = new HashMap<>(list.size());
         list.stream().forEach(video -> {
             List<String> keys = ReUtil.findAll(regex, video.getName(), 0);
             if (CollectionUtils.isNotEmpty(keys)) {
