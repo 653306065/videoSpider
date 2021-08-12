@@ -1,27 +1,17 @@
 package com.spider.controller;
 
-import cn.hutool.core.collection.CollectionUtil;
-import com.alibaba.fastjson.JSON;
-import com.mongodb.BasicDBObject;
-import com.mongodb.client.MongoCursor;
 import com.spider.entity.By114BT;
-import com.spider.entity.Video;
 import com.spider.service.AvInfoService;
 import com.spider.service.By114BTService;
 import com.spider.service.VideoService;
 import com.spider.vo.ResponseVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import javax.annotation.PostConstruct;
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;

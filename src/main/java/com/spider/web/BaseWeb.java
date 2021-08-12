@@ -1,6 +1,5 @@
 package com.spider.web;
 
-import cn.hutool.crypto.digest.MD5;
 import com.spider.entity.AvInfo;
 import com.spider.entity.FilterRule;
 import com.spider.entity.Video;
@@ -20,10 +19,8 @@ import org.springframework.core.env.Environment;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
 public abstract class BaseWeb implements ApplicationRunner {

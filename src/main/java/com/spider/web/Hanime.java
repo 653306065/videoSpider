@@ -1,8 +1,5 @@
 package com.spider.web;
 
-import java.net.Proxy;
-
-import com.spider.constant.Constant;
 import com.spider.entity.HanimeImage;
 
 import java.util.*;

@@ -3,23 +3,17 @@ package com.spider.web;
 import cn.hutool.core.collection.CollectionUtil;
 import com.spider.entity.AvInfo;
 import com.spider.entity.Video;
-import com.spider.service.AvInfoService;
-import com.spider.service.VideoService;
 import com.spider.utils.FileUtils;
 import com.spider.utils.JsoupUtil;
 import com.spider.utils.OKHttpUtils;
-import com.spider.utils.download.MultithreadingDownload;
 import okhttp3.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 

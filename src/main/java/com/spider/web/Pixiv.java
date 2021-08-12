@@ -2,7 +2,6 @@ package com.spider.web;
 
 import java.io.File;
 import java.net.Proxy;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

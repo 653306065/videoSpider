@@ -1,9 +1,6 @@
 package com.spider.utils.download;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.net.Proxy;
 import java.util.Map;
 
 import com.spider.utils.FileUtils;

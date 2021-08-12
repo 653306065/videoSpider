@@ -7,7 +7,6 @@ import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
-import com.oracle.truffle.object.PropertyMap;
 import com.spider.entity.Video;
 import com.spider.utils.FileUtils;
 import org.jsoup.Jsoup;

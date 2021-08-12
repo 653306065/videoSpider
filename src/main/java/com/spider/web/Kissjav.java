@@ -5,16 +5,13 @@ import com.spider.entity.Video;
 import com.spider.utils.FileUtils;
 import com.spider.utils.JsoupUtil;
 import com.spider.utils.OKHttpUtils;
-import com.spider.utils.download.MultithreadingDownload;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Component

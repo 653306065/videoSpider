@@ -1,6 +1,5 @@
 package com.spider.controller;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ReUtil;
 import com.spider.constant.Constant;
 import com.spider.entity.AvInfo;
