@@ -13,6 +13,7 @@ import com.spider.vo.ResponseVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ws.schild.jave.MultimediaInfo;
@@ -22,6 +23,7 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Api(tags = "视频接口")
@@ -364,14 +366,16 @@ public class VideoController extends BaseController {
 
     @ApiOperation("获取正则表达式匹配到同样字符的视频列表")
     @GetMapping("/regex/video/list")
-    public ResponseVo<Map<String, List<String>>> regexVideoList(@RequestParam("regex") String regex) {
+    public ResponseVo<Map<String, List<String>>> regexVideoList(@RequestParam("regex") String regex, @RequestParam(name = "nextRegex", required = false) String nextRegex) {
         List<Video> list = videoService.findAll();
         list = list.parallelStream().filter(video -> new File(video.getSavePath()).exists()).collect(Collectors.toList());
         Map<String, List<String>> videoMap = new HashMap<>(list.size());
         list.stream().forEach(video -> {
-            List<String> keys = ReUtil.findAll(regex, video.getName(), 0);
+            List<String> keys = ReUtil.findAll(Pattern.compile(regex, Pattern.CASE_INSENSITIVE), video.getName(), 0);
             if (CollectionUtils.isNotEmpty(keys)) {
                 keys.stream().forEach(key -> {
+                    key = key.toLowerCase();
+                    logger.info("{},{}", key, video.getName());
                     if (videoMap.containsKey(key) && !videoMap.get(key).contains(video.getName())) {
                         videoMap.get(key).add(video.getName());
                     } else {
@@ -382,11 +386,27 @@ public class VideoController extends BaseController {
                 });
             }
         });
-        while (videoMap.entrySet().iterator().hasNext()) {
-            Map.Entry<String, List<String>> entry = videoMap.entrySet().iterator().next();
-            if (entry.getValue().size() == 1) {
-                videoMap.remove(entry.getKey());
-            }
+        Map<String, List<String>> regexMap = videoMap.entrySet().stream().filter(stringListEntry -> stringListEntry.getValue().size() > 1).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        if (StringUtils.isNotBlank(nextRegex)) {
+            List<String> nameList = regexMap.values().stream().flatMap(Collection::stream).collect(Collectors.toList());
+            Map<String, List<String>> nextMap = new HashMap<>(nameList.size());
+            nameList.stream().forEach(videoName -> {
+                List<String> keys = ReUtil.findAll(Pattern.compile(nextRegex, Pattern.CASE_INSENSITIVE), videoName, 0);
+                if (CollectionUtils.isNotEmpty(keys)) {
+                    keys.stream().forEach(key -> {
+                        key = key.toLowerCase();
+                        logger.info("{},{}", key, videoName);
+                        if (nextMap.containsKey(key) && !nextMap.get(key).contains(videoName)) {
+                            nextMap.get(key).add(videoName);
+                        } else {
+                            nextMap.put(key, new ArrayList<>() {{
+                                add(videoName);
+                            }});
+                        }
+                    });
+                }
+            });
+            return ResponseVo.succee(nextMap);
         }
         return ResponseVo.succee(videoMap);
     }
