@@ -1,6 +1,7 @@
 package com.spider.controller;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ReUtil;
 import com.spider.constant.Constant;
 import com.spider.entity.AvInfo;
 import com.spider.entity.Video;
@@ -11,6 +12,7 @@ import com.spider.utils.*;
 import com.spider.vo.ResponseVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ws.schild.jave.MultimediaInfo;
@@ -332,7 +334,7 @@ public class VideoController extends BaseController {
                 }
                 return null;
             }).filter(Objects::nonNull).collect(Collectors.toList());
-            if(map.size()==0){
+            if (map.size() == 0) {
                 return null;
             }
             return new HashMap<String, Object>() {{
@@ -358,5 +360,34 @@ public class VideoController extends BaseController {
                     put("minFaceScore", video.getMinFaceScore());
                     put("faceInfoList", video.getFaceInfoList());
                 }}).collect(Collectors.toList()));
+    }
+
+    @ApiOperation("获取正则表达式匹配到同样字符的视频列表")
+    @GetMapping("/regex/video/list")
+    public ResponseVo<Map<String, List<String>>> regexVideoList(@RequestParam("regex") String regex) {
+        List<Video> list = videoService.findAll();
+        Map<String, List<String>> videoMap = new HashMap<>();
+        list = list.parallelStream().filter(video -> new File(video.getSavePath()).exists()).collect(Collectors.toList());
+        list.stream().forEach(video -> {
+            List<String> keys = ReUtil.findAll(regex, video.getName(), 0);
+            if (CollectionUtils.isNotEmpty(keys)) {
+                keys.stream().forEach(key -> {
+                    if (videoMap.containsKey(key) && !videoMap.get(key).contains(video.getName())) {
+                        videoMap.get(key).add(video.getName());
+                    } else {
+                        videoMap.put(key, new ArrayList<>() {{
+                            add(video.getName());
+                        }});
+                    }
+                });
+            }
+        });
+        while (videoMap.entrySet().iterator().hasNext()) {
+            Map.Entry<String, List<String>> entry = videoMap.entrySet().iterator().next();
+            if (entry.getValue().size() == 1) {
+                videoMap.remove(entry.getKey());
+            }
+        }
+        return ResponseVo.succee(videoMap);
     }
 }
