@@ -266,7 +266,10 @@ public class VideoController extends BaseController {
     public ResponseVo<Object> getVideoTotalSize() {
         List<Video> videoList = videoService.findAll();
         long totalSize = videoList.stream().filter(video -> Objects.nonNull(video.getSize())).mapToLong(Video::getSize).sum();
-        return ResponseVo.succee(totalSize / 1024.0 / 1024 / 1024);
+        return ResponseVo.succee(new HashMap<String, Object>() {{
+            put("count", videoList.size());
+            put("size", totalSize / 1024.0 / 1024 / 1024);
+        }});
     }
 
     @ApiOperation("翻译名称")
@@ -304,10 +307,14 @@ public class VideoController extends BaseController {
 
     @ApiOperation("获取存在视频的大小")
     @GetMapping("/exist/video/size")
-    public ResponseVo<Double> getExistVideoSize() {
+    public ResponseVo<Object> getExistVideoSize() {
         List<Video> videoList = videoService.findAll();
+        long count = videoList.stream().filter(video -> new File(video.getSavePath()).exists()).count();
         long size = videoList.stream().filter(video -> new File(video.getSavePath()).exists()).mapToLong(Video::getSize).sum();
-        return ResponseVo.succee(size / 1024.0 / 1024 / 1024);
+        return ResponseVo.succee(new HashMap<String, Object>() {{
+            put("count", count);
+            put("size", size / 1024.0 / 1024 / 1024);
+        }});
     }
 
     @ApiOperation("模糊搜索视频")
