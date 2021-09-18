@@ -2,14 +2,11 @@ package com.spider.conf;
 
 import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpHost;
-import org.apache.zookeeper.ZooKeeper;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
@@ -45,15 +42,6 @@ public class BeanConf {
         return new ThreadPoolExecutor(8 * 3, 8 * 3 * 10, 1, TimeUnit.MINUTES, new ArrayBlockingQueue<>(1000));
     }
 
-    @Bean
-    @ConditionalOnProperty(prefix = "zookeeper",name = {"host","port"})
-    public ZooKeeper zooKeeper(@Value("${zookeeper.host}")String host,@Value("${zookeeper.port}") Integer port) throws IOException, InterruptedException {
-        CountDownLatch countDownLatch =new CountDownLatch(1);
-        ZooKeeper zooKeeper=new ZooKeeper(host, port, (watchedEvent) -> {
-            countDownLatch.countDown();
-        });
-        countDownLatch.await();
-        return zooKeeper;
-    }
+
 
 }
