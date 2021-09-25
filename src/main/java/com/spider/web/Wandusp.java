@@ -36,8 +36,8 @@ public class Wandusp extends BaseWeb {
         }
         List<Video> list = new ArrayList<>();
         try {
-            Object[] titles = tagNode.evaluateXPath("//ul[@class='lul']/li/a/@title");
-            Object[] hrefs = tagNode.evaluateXPath("//ul[@class='lul']/li/a/@href");
+            Object[] titles = tagNode.evaluateXPath("//div[@class='post-content']/a/@title");
+            Object[] hrefs = tagNode.evaluateXPath("//div[@class='post-content']/a/@href");
             for (int i = 0; i < titles.length; i++) {
                 Video video = new Video();
                 video.setName(String.valueOf(titles[i]));
@@ -108,7 +108,7 @@ public class Wandusp extends BaseWeb {
     }
 
     public void downloadVideo(Integer type, String path) {
-        int page = 700;
+        int page = 1;
         while (true) {
             List<Video> videoList = getVideoList(type, page);
             if (Objects.isNull(videoList)) {
