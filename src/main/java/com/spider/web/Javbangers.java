@@ -56,8 +56,8 @@ public class Javbangers extends BaseWeb {
                 return null;
             }
             String html = response.body().string();
-            String setCookie = response.headers().get("set-cookie");
-            setCookie(setCookie);
+//            String setCookie = response.headers().get("set-cookie");
+//            setCookie(setCookie);
             response.close();
             Document document = Jsoup.parse(html);
             Element element = document.getElementById("tab_video_info");

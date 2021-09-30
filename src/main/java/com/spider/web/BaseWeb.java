@@ -80,6 +80,9 @@ public abstract class BaseWeb implements ApplicationRunner {
     }
 
     protected boolean videoExistVerify(Video video) {
+        if(Objects.isNull(video)){
+            return false;
+        }
         if (Objects.nonNull(video.getName()) && hasFilterKey(video.getName())) {
             return false;
         }
