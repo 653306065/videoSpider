@@ -175,6 +175,18 @@ wandusp:
   savePath: E:\wandusp\
   playerApi: https://wandusp.cc/addons/dplayer/?url=@{url}&jump=&t=@{t}
 
+hentaicomic:
+  home: https://www.hentaicomic.org
+  updateList: https://www.hentaicomic.org/albums-index-page-@{page}.html
+  tagList: https://www.hentaicomic.org/albums-index-page-@{page}-tag-@{tag}.html
+  url: https://www.hentaicomic.org/photos-gallery-aid-@{id}.html
+  savePath: D:\hentaicomic\
+  thread: 10
+  xpath:
+    page: //div[@class="title"]/a/@href
+    title: //div[@class="title"]/a/@title
+    imageList: //section[@id="image-container"]/img[@class="list-img lazyload"]/@data-src
+
 video:
   minWidth: 640
   minHeight: 640

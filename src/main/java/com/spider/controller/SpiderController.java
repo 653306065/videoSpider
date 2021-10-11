@@ -79,6 +79,22 @@ public class SpiderController extends BaseController {
     @Autowired
     private Javhihi javhihi;
 
+    @Autowired
+    private Hentaicomic hentaicomic;
+
+    @ApiOperation("下载 hentaicomic 漫画")
+    @GetMapping("/hentaicomic/start")
+    public ResponseVo<Object> hentaicomic(@RequestParam(name = "thread", defaultValue = "5") Integer thread,
+                                      @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
+                                      @RequestParam(name = "savePath", required = false) String savePath,
+                                      @RequestParam(name = "tag", required = false) String tag) {
+        hentaicomic.setEnableProxy(enableProxy);
+        hentaicomic.setThread(thread);
+        hentaicomic.setSavePath(savePath);
+        threadPoolExecutor.execute(() -> hentaicomic.download(tag));
+        return ResponseVo.succee();
+    }
+
     @ApiOperation("下载 javhihi 无码视频")
     @GetMapping("/javhihi/uncensored")
     public ResponseVo<Object> javhihi(@RequestParam(name = "thread", defaultValue = "5") Integer thread,
