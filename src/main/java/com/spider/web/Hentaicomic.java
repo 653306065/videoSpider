@@ -52,6 +52,7 @@ public class Hentaicomic extends BaseWeb {
         if (Objects.nonNull(tag)) {
             url = tagList.replace("@{page}", String.valueOf(page)).replace("@{tag}", tag);
         }
+        logger.info("page:{}",url);
         TagNode tagNode = HtmlCleanerUtil.getTagNode(url, getEnableProxy());
         if (Objects.isNull(tagNode)) {
             return null;
