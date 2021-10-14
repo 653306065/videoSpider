@@ -136,6 +136,7 @@ public class XVideos extends BaseWeb {
                     }
                 }
             });
+            page++;
         }
     }
 }
