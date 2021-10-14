@@ -144,7 +144,7 @@ public class DownloadAop {
         }
 
         try {
-            logger.info("{},验证通过,code:{}", video.getName(),video.getAvCode());
+            logger.info("{},验证通过,code:{},videoUrl:{}", video.getName(),video.getAvCode(),video.getVideoUrl());
             File videoFile = new File(video.getSavePath());
             Boolean result = (Boolean) joinPoint.proceed();
             if (!result) {

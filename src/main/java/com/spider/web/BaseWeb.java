@@ -10,12 +10,14 @@ import com.spider.utils.FileUtils;
 import com.spider.utils.SpringContentUtil;
 import com.spider.utils.download.HlsDownloader;
 import com.spider.utils.download.MultithreadingDownload;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.env.Environment;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -46,7 +48,7 @@ public abstract class BaseWeb implements ApplicationRunner {
     protected String fileSeparator = File.separator;
 
     protected Integer defaultEndPage = 500;
-    
+
     //配置线程数
     protected Integer thread;
 
@@ -60,17 +62,17 @@ public abstract class BaseWeb implements ApplicationRunner {
     protected String home;
 
     protected boolean hasFilterKey(String name) {
-        for(FilterRule key:FilterRuleServcie.filterRuleList){
+        for (FilterRule key : FilterRuleServcie.filterRuleList) {
             if (key.getEnable()) {
                 if (key.getType() == FilterRule.Rule.String) {
                     if (name.contains(key.getRule()) || name.toLowerCase().contains(key.getRule().toLowerCase()) || name.toUpperCase().contains(key.getRule().toUpperCase())) {
-                        logger.info("{},包含过滤规则:{}",name,key.getRule());
+                        logger.info("{},包含过滤规则:{}", name, key.getRule());
                         return true;
                     }
                 } else if (key.getType() == FilterRule.Rule.RegExp) {
-                    Pattern pattern= Pattern.compile(key.getRule(),Pattern.CASE_INSENSITIVE);
+                    Pattern pattern = Pattern.compile(key.getRule(), Pattern.CASE_INSENSITIVE);
                     if (pattern.matcher(name).matches()) {
-                        logger.info("{},包含过滤规则:{}",name,key.getRule());
+                        logger.info("{},包含过滤规则:{}", name, key.getRule());
                         return true;
                     }
                 }
@@ -80,7 +82,7 @@ public abstract class BaseWeb implements ApplicationRunner {
     }
 
     protected boolean videoExistVerify(Video video) {
-        if(Objects.isNull(video)){
+        if (Objects.isNull(video)) {
             return false;
         }
         if (Objects.nonNull(video.getName()) && hasFilterKey(video.getName())) {
@@ -110,6 +112,10 @@ public abstract class BaseWeb implements ApplicationRunner {
             logger.info("{},{},avCode已存在", video.getName(), video.getAvCode());
             return false;
         }
+        if (Objects.nonNull(video.getQuality()) && StringUtils.equalsAny(video.getQuality(), "144p", "144P", "240p", "240P", "250P", "250p", "360p", "360P", "480p", "480P")) {
+            logger.info("{},视频分辨率过低", video.getName());
+            return false;
+        }
 
         if (Objects.nonNull(video.getName())) {
             List<String> keyList = FileUtils.getSearchKeyList(video.getName());
@@ -119,21 +125,21 @@ public abstract class BaseWeb implements ApplicationRunner {
                     return false;
                 }
                 AvInfo avInfo = avInfoService.findOnekeyValue("code", key);
-                if(Objects.nonNull(avInfo)&&avInfo.isHasVideo()){
+                if (Objects.nonNull(avInfo) && avInfo.isHasVideo()) {
                     logger.info("视频已存在,{}", avInfo.getVideoSavePath());
                     return false;
                 }
             }
         }
 
-        if(Objects.nonNull(video.getName())){
+        if (Objects.nonNull(video.getName())) {
             for (Map.Entry<String, List<String>> entry : AvInfoService.codeTransformMap.entrySet()) {
                 for (String code : entry.getValue()) {
-                    if (video.getName().contains(code)||video.getName().toLowerCase().contains(code.toLowerCase())||video.getName().toUpperCase().contains(code.toUpperCase())) {
-                        Video findVideo= videoService.findOnekeyValue("avCode",entry.getKey());
-                        if(Objects.nonNull(findVideo)){
-                            logger.info("{},acCode已存在,{}", video.getName(),findVideo.getSavePath());
-                            return  false;
+                    if (video.getName().contains(code) || video.getName().toLowerCase().contains(code.toLowerCase()) || video.getName().toUpperCase().contains(code.toUpperCase())) {
+                        Video findVideo = videoService.findOnekeyValue("avCode", entry.getKey());
+                        if (Objects.nonNull(findVideo)) {
+                            logger.info("{},acCode已存在,{}", video.getName(), findVideo.getSavePath());
+                            return false;
                         }
                     }
                 }

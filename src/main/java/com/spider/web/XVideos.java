@@ -40,6 +40,7 @@ public class XVideos extends BaseWeb {
 
     public List<Video> channelsVideo(String channel, Integer page) {
         String url = channels.replace("@{channels}", channel).replace("@{page}", String.valueOf(page));
+        logger.info(url);
         String html = OKHttpUtils.post(url, getEnableProxy());
         if (Objects.isNull(html)) {
             return null;
