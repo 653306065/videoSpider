@@ -74,6 +74,7 @@ public class XVideos extends BaseWeb {
 
 
     public Video getVideoInfo(Video video) {
+        logger.info(video.getSourceUrl());
         TagNode tagNode = HtmlCleanerUtil.getTagNode(video.getSourceUrl(), getEnableProxy());
         if (Objects.isNull(tagNode)) {
             return null;
@@ -83,36 +84,53 @@ public class XVideos extends BaseWeb {
             List<String> tagList = Stream.of(tagObjects).map(String::valueOf).collect(Collectors.toList());
             video.setTags(tagList);
             List<? extends TagNode> scriptList = tagNode.getElementListByName("script", true);
-            String data = scriptList.stream().filter(node -> String.valueOf(node.getText()).contains("setVideoHLS")).map(TagNode::getText).findFirst().get().toString();
-            String m3u8Master = data.split("setVideoHLS")[1].split("'")[1].split("'")[0];
-            String m3u8urlText = OKHttpUtils.get(m3u8Master, getEnableProxy());
-            String[] strArray = m3u8urlText.split("\n");
-            m3u8urlText = Stream.of(strArray).map(str -> {
-                if (str.contains("NAME")) {
-                    return str.split(",NAME")[0];
+            //m3u8
+            if(scriptList.stream().filter(node -> String.valueOf(node.getText()).contains("setVideoHLS")).count()>0){
+                String data = scriptList.stream().filter(node -> String.valueOf(node.getText()).contains("setVideoHLS")).map(TagNode::getText).findFirst().get().toString();
+                String m3u8Master = data.split("setVideoHLS")[1].split("'")[1].split("'")[0];
+                String m3u8urlText = OKHttpUtils.get(m3u8Master, getEnableProxy());
+                String[] strArray = m3u8urlText.split("\n");
+                m3u8urlText = Stream.of(strArray).map(str -> {
+                    if (str.contains("NAME")) {
+                        return str.split(",NAME")[0];
+                    }
+                    return str;
+                }).collect(Collectors.joining("\n"));
+                MasterPlaylist masterPlaylist = hlsDownloader.getMasterPlaylist(m3u8urlText);
+                //分辨率排序
+                List<Variant> list = masterPlaylist.variants().stream().filter(variant -> variant.resolution().isPresent()).
+                        sorted(Comparator.comparing(variant -> variant.resolution().get().height() * variant.resolution().get().width())).
+                        collect(Collectors.toList());
+                Collections.reverse(list);
+                if (CollectionUtils.isEmpty(list)) {
+                    list = masterPlaylist.variants();
                 }
-                return str;
-            }).collect(Collectors.joining("\n"));
-            MasterPlaylist masterPlaylist = hlsDownloader.getMasterPlaylist(m3u8urlText);
-            //分辨率排序
-            List<Variant> list = masterPlaylist.variants().stream().filter(variant -> variant.resolution().isPresent()).
-                    sorted(Comparator.comparing(variant -> variant.resolution().get().height() * variant.resolution().get().width())).
-                    collect(Collectors.toList());
-            Collections.reverse(list);
-            if (CollectionUtils.isEmpty(list)) {
-                list = masterPlaylist.variants();
-            }
-            if (!list.get(0).uri().startsWith("http")) {
-                if (list.get(0).uri().startsWith("/")) {
-                    String[] strs = m3u8Master.split("/");
-                    video.setVideoUrl(strs[0] + "/" + strs[1] + "/" + strs[2] + list.get(0).uri());
+                if (!list.get(0).uri().startsWith("http")) {
+                    if (list.get(0).uri().startsWith("/")) {
+                        String[] strs = m3u8Master.split("/");
+                        video.setVideoUrl(strs[0] + "/" + strs[1] + "/" + strs[2] + list.get(0).uri());
+                    } else {
+                        video.setVideoUrl(m3u8Master.substring(0, m3u8Master.lastIndexOf("/") + 1) + list.get(0).uri());
+                    }
                 } else {
-                    video.setVideoUrl(m3u8Master.substring(0, m3u8Master.lastIndexOf("/") + 1) + list.get(0).uri());
+                    video.setVideoUrl(list.get(0).uri());
                 }
-            } else {
-                video.setVideoUrl(list.get(0).uri());
+                return video;
+            }else{//直链
+                //high
+                if(scriptList.stream().filter(node -> String.valueOf(node.getText()).contains("setVideoUrlHigh")).count()>0){
+                    String data = scriptList.stream().filter(node -> String.valueOf(node.getText()).contains("setVideoUrlHigh")).map(TagNode::getText).findFirst().get().toString();
+                    String url = data.split("setVideoUrlHigh")[1].split("'")[1].split("'")[0];
+                    video.setVideoUrl(url);
+                }
+                //low
+               if(scriptList.stream().filter(node -> String.valueOf(node.getText()).contains("setVideoUrlLow")).count()>0){
+                   String data = scriptList.stream().filter(node -> String.valueOf(node.getText()).contains("setVideoUrlLow")).map(TagNode::getText).findFirst().get().toString();
+                   String url = data.split("setVideoUrlLow")[1].split("'")[1].split("'")[0];
+                   video.setVideoUrl(url);
+               }
+               return video;
             }
-            return video;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -133,7 +151,11 @@ public class XVideos extends BaseWeb {
                         video.setName(FileUtils.repairPath(video.getName())+".mp4");
                         String path=savePath+channel+fileSeparator+simpleDateFormat.format(new Date())+fileSeparator+video.getName();
                         video.setSavePath(path);
-                        hlsDownloader.downloadByVideo(video,getThread(),getEnableProxy());
+                        if(video.getVideoUrl().contains("m3u8")){
+                            hlsDownloader.downloadByVideo(video,getThread(),getEnableProxy());
+                        }else{
+                            multithreadingDownload.videoDownload(video,null,getEnableProxy(),1,defaultSegmentSize);
+                        }
                     }
                 }
             });
