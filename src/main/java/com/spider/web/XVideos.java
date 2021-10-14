@@ -31,15 +31,24 @@ public class XVideos extends BaseWeb {
     @Value("${xvideos.xpath.resolution}")
     private String xpathResolution;
 
-    @Value("${xvideos.xpath.duration}")
-    private String xpathDuration;
-
     @Value("${xvideos.xpath.tag}")
     private String xpathTag;
+
+    @Value("${xvideos.tag}")
+    private String tag;
 
 
     public List<Video> channelsVideo(String channel, Integer page) {
         String url = channels.replace("@{channels}", channel).replace("@{page}", String.valueOf(page));
+        return videoList(url);
+    }
+
+    public List<Video> tagVideos(String tag, Integer page) {
+        String url = this.tag.replace("@{tag}", tag).replace("@{page}", String.valueOf(page));
+        return videoList(url);
+    }
+
+    public List<Video> videoList(String url) {
         logger.info(url);
         String html = OKHttpUtils.post(url, getEnableProxy());
         if (Objects.isNull(html)) {
@@ -53,8 +62,6 @@ public class XVideos extends BaseWeb {
             List<String> titleList = Stream.of(titleObjects).map(String::valueOf).collect(Collectors.toList());
             Object[] resolutionObjects = tagNode.evaluateXPath(xpathResolution);
             List<String> resolutionList = Stream.of(resolutionObjects).map(String::valueOf).collect(Collectors.toList());
-            Object[] durationObjects = tagNode.evaluateXPath(xpathDuration);
-            List<String> durationList = Stream.of(resolutionObjects).map(String::valueOf).collect(Collectors.toList());
             List<Video> videoList = new ArrayList<>();
             for (int i = 0; i < urlList.size(); i++) {
                 Video video = new Video();
@@ -85,7 +92,7 @@ public class XVideos extends BaseWeb {
             video.setTags(tagList);
             List<? extends TagNode> scriptList = tagNode.getElementListByName("script", true);
             //m3u8
-            if(scriptList.stream().filter(node -> String.valueOf(node.getText()).contains("setVideoHLS")).count()>0){
+            if (scriptList.stream().filter(node -> String.valueOf(node.getText()).contains("setVideoHLS")).count() > 0) {
                 String data = scriptList.stream().filter(node -> String.valueOf(node.getText()).contains("setVideoHLS")).map(TagNode::getText).findFirst().get().toString();
                 String m3u8Master = data.split("setVideoHLS")[1].split("'")[1].split("'")[0];
                 String m3u8urlText = OKHttpUtils.get(m3u8Master, getEnableProxy());
@@ -116,20 +123,20 @@ public class XVideos extends BaseWeb {
                     video.setVideoUrl(list.get(0).uri());
                 }
                 return video;
-            }else{//直链
+            } else {//直链
                 //high
-                if(scriptList.stream().filter(node -> String.valueOf(node.getText()).contains("setVideoUrlHigh")).count()>0){
+                if (scriptList.stream().filter(node -> String.valueOf(node.getText()).contains("setVideoUrlHigh")).count() > 0) {
                     String data = scriptList.stream().filter(node -> String.valueOf(node.getText()).contains("setVideoUrlHigh")).map(TagNode::getText).findFirst().get().toString();
                     String url = data.split("setVideoUrlHigh")[1].split("'")[1].split("'")[0];
                     video.setVideoUrl(url);
                 }
                 //low
-               if(scriptList.stream().filter(node -> String.valueOf(node.getText()).contains("setVideoUrlLow")).count()>0){
-                   String data = scriptList.stream().filter(node -> String.valueOf(node.getText()).contains("setVideoUrlLow")).map(TagNode::getText).findFirst().get().toString();
-                   String url = data.split("setVideoUrlLow")[1].split("'")[1].split("'")[0];
-                   video.setVideoUrl(url);
-               }
-               return video;
+                if (scriptList.stream().filter(node -> String.valueOf(node.getText()).contains("setVideoUrlLow")).count() > 0) {
+                    String data = scriptList.stream().filter(node -> String.valueOf(node.getText()).contains("setVideoUrlLow")).map(TagNode::getText).findFirst().get().toString();
+                    String url = data.split("setVideoUrlLow")[1].split("'")[1].split("'")[0];
+                    video.setVideoUrl(url);
+                }
+                return video;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -141,20 +148,46 @@ public class XVideos extends BaseWeb {
         int page = 0;
         while (true) {
             List<Video> videoList = channelsVideo(channel, page);
-            if(videoList==null){
+            if (videoList == null) {
                 continue;
             }
             videoList.stream().forEach(video -> {
-                if(videoExistVerify(video)){
-                    video=getVideoInfo(video);
-                    if(Objects.nonNull(video)){
-                        video.setName(FileUtils.repairPath(video.getName())+".mp4");
-                        String path=savePath+channel+fileSeparator+simpleDateFormat.format(new Date())+fileSeparator+video.getName();
+                if (videoExistVerify(video)) {
+                    video = getVideoInfo(video);
+                    if (Objects.nonNull(video)) {
+                        video.setName(FileUtils.repairPath(video.getName()) + ".mp4");
+                        String path = savePath + channel + fileSeparator + simpleDateFormat.format(new Date()) + fileSeparator + video.getName();
                         video.setSavePath(path);
-                        if(video.getVideoUrl().contains("m3u8")){
-                            hlsDownloader.downloadByVideo(video,getThread(),getEnableProxy());
-                        }else{
-                            multithreadingDownload.videoDownload(video,null,getEnableProxy(),1,defaultSegmentSize);
+                        if (video.getVideoUrl().contains("m3u8")) {
+                            hlsDownloader.downloadByVideo(video, getThread(), getEnableProxy());
+                        } else {
+                            multithreadingDownload.videoDownload(video, null, getEnableProxy(), 1, defaultSegmentSize);
+                        }
+                    }
+                }
+            });
+            page++;
+        }
+    }
+
+    public void downloadTagVideo(String tag) {
+        int page = 0;
+        while (true) {
+            List<Video> videoList = tagVideos(tag, page);
+            if (videoList == null) {
+                continue;
+            }
+            videoList.stream().forEach(video -> {
+                if (videoExistVerify(video)) {
+                    video = getVideoInfo(video);
+                    if (Objects.nonNull(video)) {
+                        video.setName(FileUtils.repairPath(video.getName()) + ".mp4");
+                        String path = savePath + tag + fileSeparator + simpleDateFormat.format(new Date()) + fileSeparator + video.getName();
+                        video.setSavePath(path);
+                        if (video.getVideoUrl().contains("m3u8")) {
+                            hlsDownloader.downloadByVideo(video, getThread(), getEnableProxy());
+                        } else {
+                            multithreadingDownload.videoDownload(video, null, getEnableProxy(), 1, defaultSegmentSize);
                         }
                     }
                 }

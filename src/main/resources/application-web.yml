@@ -177,7 +177,7 @@ wandusp:
 
 hentaicomic:
   home: https://www.hentaicomic.org
-  updateList: https://www.hentaicomic.org/albums-index-page-@{page}.html
+  updateList: https://www.hentaicomic.org/albums-index-page-@{page}cate-9.html
   tagList: https://www.hentaicomic.org/albums-index-page-@{page}-tag-@{tag}.html
   url: https://www.hentaicomic.org/photos-gallery-aid-@{id}.html
   savePath: D:\hentaicomic\
@@ -191,6 +191,7 @@ hentaicomic:
 xvideos:
   home: https://www.xvideos.com
   channels: https://www.xvideos.com/channels/@{channels}/videos/new/@{page}
+  tag: https://www.xvideos.com/tags/@{tag}/@{page}
   thread: 5
   enableProxy: true
   savePath: D:\xvideos\

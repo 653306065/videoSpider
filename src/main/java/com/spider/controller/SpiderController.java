@@ -85,6 +85,20 @@ public class SpiderController extends BaseController {
     @Autowired
     private XVideos xVideos;
 
+    @ApiOperation("下载 xVideos tag视频")
+    @GetMapping("/xVideos/tag/start")
+    public ResponseVo<Object> xVideosTag(@RequestParam(name = "thread", defaultValue = "5") Integer thread,
+                                      @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
+                                      @RequestParam(name = "savePath", required = false) String savePath,
+                                      @RequestParam(name = "tag") String tag) {
+        xVideos.setEnableProxy(enableProxy);
+        xVideos.setThread(thread);
+        xVideos.setSavePath(savePath);
+        threadPoolExecutor.execute(() -> xVideos.downloadTagVideo(tag));
+        return ResponseVo.succee();
+    }
+
+
     @ApiOperation("下载 xVideos 渠道视频")
     @GetMapping("/xVideos/channels/start")
     public ResponseVo<Object> xVideos(@RequestParam(name = "thread", defaultValue = "5") Integer thread,
