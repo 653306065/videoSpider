@@ -182,10 +182,24 @@ hentaicomic:
   url: https://www.hentaicomic.org/photos-gallery-aid-@{id}.html
   savePath: D:\hentaicomic\
   thread: 10
+  enableProxy: true
   xpath:
     page: //div[@class="title"]/a/@href
     title: //div[@class="title"]/a/@title
     imageList: //section[@id="image-container"]/img[@class="list-img lazyload"]/@data-src
+
+xvideos:
+  home: https://www.xvideos.com
+  channels: https://www.xvideos.com/channels/@{channels}/videos/new/@{page}
+  thread: 5
+  enableProxy: true
+  savePath: D:\xvideos\
+  xpath:
+    video: //div[@class="thumb-under"]/p[@class="title"]/a/@href
+    title: //div[@class="thumb-under"]/p[@class="title"]/a/@title
+    resolution: //div[@class="thumb-under"]/p[@class="metadata"]//span[@class="video-hd-mark"]/text()
+    duration: //div[@class="thumb-under"]/p[@class="metadata"]//span[@class="duration"]/text()
+    tag: //div[@class="video-metadata video-tags-list ordered-label-list cropped"]//a[@class="btn btn-default"]/text()
 
 video:
   minWidth: 640

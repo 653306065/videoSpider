@@ -82,6 +82,22 @@ public class SpiderController extends BaseController {
     @Autowired
     private Hentaicomic hentaicomic;
 
+    @Autowired
+    private XVideos xVideos;
+
+    @ApiOperation("下载 xVideos 渠道视频")
+    @GetMapping("/xVideos/channels/start")
+    public ResponseVo<Object> xVideos(@RequestParam(name = "thread", defaultValue = "5") Integer thread,
+                                          @RequestParam(name = "enableProxy", defaultValue = "false") Boolean enableProxy,
+                                          @RequestParam(name = "savePath", required = false) String savePath,
+                                          @RequestParam(name = "channels", required = true) String channels) {
+        xVideos.setEnableProxy(enableProxy);
+        xVideos.setThread(thread);
+        xVideos.setSavePath(savePath);
+        threadPoolExecutor.execute(() -> xVideos.downloadChannelVideo(channels));
+        return ResponseVo.succee();
+    }
+
     @ApiOperation("下载 hentaicomic 漫画")
     @GetMapping("/hentaicomic/start")
     public ResponseVo<Object> hentaicomic(@RequestParam(name = "thread", defaultValue = "5") Integer thread,

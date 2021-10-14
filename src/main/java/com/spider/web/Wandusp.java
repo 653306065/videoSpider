@@ -93,7 +93,7 @@ public class Wandusp extends BaseWeb {
                         String[] strs = m3u8Master.split("/");
                         video.setVideoUrl(strs[0] + "/" + strs[1] + "/" + strs[2] + list.get(0).uri());
                     } else {
-                        video.setVideoUrl(m3u8Master.substring(0, m3u8Master.lastIndexOf("/") + 1) + masterPlaylist.variants().get(0).uri());
+                        video.setVideoUrl(m3u8Master.substring(0, m3u8Master.lastIndexOf("/") + 1) + list.get(0).uri());
                     }
                 }else{
                     video.setVideoUrl(list.get(0).uri());
