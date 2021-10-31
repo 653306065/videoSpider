@@ -108,7 +108,7 @@ public class Wandusp extends BaseWeb {
     }
 
     public void downloadVideo(Integer type, String path) {
-        int page = 856;
+        int page = 1;
         while (true) {
             List<Video> videoList = getVideoList(type, page);
             if (Objects.isNull(videoList)) {
@@ -127,7 +127,7 @@ public class Wandusp extends BaseWeb {
                     }
                 }
             });
-            page--;
+            page++;
         }
 
     }

@@ -68,7 +68,7 @@ public class Javbus extends BaseWeb {
                         String path = savePath + "actresses" + fileSeparator + FileUtils.repairPath(name) + ".jpg";
                         FileUtils.byteToFile(imgBytes, path);
                     }
-                    actressesInfo.setJavbusPhoto(imgBytes);
+                    //actressesInfo.setJavbusPhoto(imgBytes);
                     actressesInfo.setJavbusPhotoUrl(imgUrl);
                 }
                 actressesInfo.setName(name);
@@ -107,7 +107,7 @@ public class Javbus extends BaseWeb {
                         avInfo.setName(title);
                         byte[] imgBytes = OKHttpUtils.getBytes(imgSrc, enableProxy);
                         if (Objects.nonNull(imgBytes)) {
-                            avInfo.setThumb(imgBytes);
+                            //avInfo.setThumb(imgBytes);
                         }
                     }
                     Elements dates = element.getElementsByTag("date");
@@ -149,7 +149,7 @@ public class Javbus extends BaseWeb {
             if (Objects.nonNull(imgBytes)) {
                 String path = savePath + "av" + File.separator + avInfo.getCode().trim() + File.separator + "cover.jpg";
                 FileUtils.byteToFile(imgBytes, path);
-                avInfo.setCover(imgBytes);
+                //avInfo.setCover(imgBytes);
             }
         }
         Elements infos = document.getElementsByClass("info");

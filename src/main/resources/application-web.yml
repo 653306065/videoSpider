@@ -104,7 +104,7 @@ javbangers:
   home: https://www.javbangers.com/
   template: https://www.javbangers.com/categories/@{categories}/?mode=async&function=get_block&block_id=list_videos_common_videos_list&sort_by=post_date&from=@{page}&_=@{time}
   savePath: E:\javbangers\
-  cookie: PHPSESSID=69b3cc6488844acada15644c2260c56e; kt_ips=16.162.55.151; kt_member=f82caf2f2503f85b26e9732f40682c78; kt_tcookie=1; kt_is_visited=1
+  cookie: PHPSESSID=f6262e129e37aa6aad665180561d31ab; kt_ips=148.163.172.26; kt_member=fee4327aea10745020e70f392bd24004; kt_tcookie=1; kt_is_visited=1
   enableProxy: true
   thread: 5
 
