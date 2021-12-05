@@ -104,11 +104,11 @@ public class Hentaicomic extends BaseWeb {
             if (list.size() == 0) {
                 break;
             }
-            list.forEach(photo -> {
-                String name = photo.getName();
-                List<ImageVo> imageVoList = getImageList(photo.getId());
+            for(PhotoVo photoVo:list){
+                String name = photoVo.getName();
+                List<ImageVo> imageVoList = getImageList(photoVo.getId());
                 ExecutorService executorService = Executors.newFixedThreadPool(getThread());
-                imageVoList.forEach(imageVo -> {
+                imageVoList.stream().forEach(imageVo -> {
                     executorService.execute(() -> {
                         String savePath = getSavePath() + name + fileSeparator + imageVo.getName();
                         if (Objects.nonNull(tag)) {
@@ -120,12 +120,17 @@ public class Hentaicomic extends BaseWeb {
                 });
                 executorService.shutdown();
                 while (true) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     if (executorService.isTerminated()) {
                         logger.info("{},下载完成", name);
                         break;
                     }
                 }
-            });
+            }
             page++;
         }
     }

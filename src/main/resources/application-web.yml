@@ -104,7 +104,7 @@ javbangers:
   home: https://www.javbangers.com/
   template: https://www.javbangers.com/categories/@{categories}/?mode=async&function=get_block&block_id=list_videos_common_videos_list&sort_by=post_date&from=@{page}&_=@{time}
   savePath: E:\javbangers\
-  cookie: PHPSESSID=f6262e129e37aa6aad665180561d31ab; kt_ips=148.163.172.26; kt_member=fee4327aea10745020e70f392bd24004; kt_tcookie=1; kt_is_visited=1
+  cookie: PHPSESSID=7d3d4b2ceafa0caf2aac087fefbebb0f; kt_ips=18.167.85.217; kt_member=7029b468a69b03bd1dcfb27798a240ec; kt_tcookie=1; kt_is_visited=1
   enableProxy: true
   thread: 5
 
@@ -177,7 +177,7 @@ wandusp:
 
 hentaicomic:
   home: https://www.hentaicomic.org
-  updateList: https://www.hentaicomic.org/albums-index-page-@{page}cate-9.html
+  updateList: https://www.hentaicomic.org/albums-index-page-@{page}-cate-9.html
   tagList: https://www.hentaicomic.org/albums-index-page-@{page}-tag-@{tag}.html
   url: https://www.hentaicomic.org/photos-gallery-aid-@{id}.html
   savePath: D:\hentaicomic\
