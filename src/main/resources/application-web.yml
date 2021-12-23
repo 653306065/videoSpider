@@ -70,7 +70,7 @@ javhihi:
 pornhub:
   home: https://www.pornhub.com
   savePath: E:\pornhub\
-  searchUrl: https://www.pornhub.com/video/search?search=@{key}&hd=1&page=@{page}&p=professional&min_duration=10
+  searchUrl: https://www.pornhub.com/video/search?search=@{key}&hd=1&page=@{page}&p=professional&min_duration=20
   channels: https://pornhub.com/channels/@{channelName}/videos?o=da&page=@{page}
   categories:
     - hentai

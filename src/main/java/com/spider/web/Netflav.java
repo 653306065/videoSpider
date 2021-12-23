@@ -50,53 +50,54 @@ public class Netflav extends BaseWeb {
         if (CollectionUtil.isEmpty(docs)) {
             return null;
         }
-        List<Video> videoList = new ArrayList<>();
+
+        List<JSONObject> jsonObjectList=new ArrayList<>();
         for (int i = 0; i < docs.size(); i++) {
             JSONObject info = docs.getJSONObject(i);
+            jsonObjectList.add(info);
+        }
+
+       return jsonObjectList.parallelStream().map(info->{
             String videoId = info.getString("videoId");
             String videoUrl = videoTemplate.replace("@{videoId}", videoId);
-            Document videoDocument = JsoupUtil.getDocument(videoUrl, enableProxy);
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            Video video=new Video();
+            video.setAvCode(info.getString("code"));
+            video.setName(info.getString("title"));
+            if(videoExistVerify(video)){
+                Document videoDocument = JsoupUtil.getDocument(videoUrl, enableProxy);
+                if (Objects.nonNull(videoDocument)) {
+                    if(Objects.nonNull(videoDocument.getElementById("__NEXT_DATA__"))){
+                        JSONObject videoJson = JSON.parseObject(videoDocument.getElementById("__NEXT_DATA__").data());
+                        JSONObject videoInfo = videoJson.getJSONObject("props").getJSONObject("initialState").getJSONObject("video").getJSONObject("data");
+                        if(Objects.nonNull(videoInfo)){
+                            video.setName(videoInfo.getString("title"));
+                            try {
+                                video.setPubDate(simpleDateFormat.parse(videoInfo.getString("videoDate")));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            video.setCategories(Collections.singletonList(videoInfo.getString("category")));
+                            video.setFormat("mp4");
+                            video.setSourceUrl(videoUrl);
+                            video.setIntroduction(videoInfo.getString("description"));
+                            String src = videoInfo.getString("src");
+                            video.setVideoUrl(src);
+                            video.setTags(videoInfo.getJSONArray("tags").stream().map(Objects::toString).collect(Collectors.toList()));
+                            video.setStarNames(videoInfo.getJSONArray("actors").stream().map(Objects::toString).collect(Collectors.toList()));
+                            return video;
+                        }
+                    }
+                }
             }
-            if (Objects.isNull(videoDocument)) {
-                continue;
-            }
-            if(Objects.isNull(videoDocument.getElementById("__NEXT_DATA__"))){
-                continue;
-            }
-            JSONObject videoJson = JSON.parseObject(videoDocument.getElementById("__NEXT_DATA__").data());
-            JSONObject videoInfo = videoJson.getJSONObject("props").getJSONObject("initialState").getJSONObject("video").getJSONObject("data");
-            if(Objects.isNull(videoInfo)){
-                continue;
-            }
-            Video video = new Video();
-            video.setName(videoInfo.getString("title"));
-            try {
-                video.setPubDate(simpleDateFormat.parse(videoInfo.getString("videoDate")));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            video.setCategories(Collections.singletonList(videoInfo.getString("category")));
-            video.setFormat("mp4");
-            video.setSourceUrl(videoUrl);
-            video.setIntroduction(videoInfo.getString("description"));
-            String src = videoInfo.getString("src");
-            video.setVideoUrl(src);
-            video.setTags(videoInfo.getJSONArray("tags").stream().map(Objects::toString).collect(Collectors.toList()));
-            video.setStarNames(videoInfo.getJSONArray("actors").stream().map(Objects::toString).collect(Collectors.toList()));
-            videoList.add(video);
-        }
-        return videoList;
+            return null;
+        }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     public void downloadVideo(String category, String genre) {
-        int page = 13;//前面页数为其他格式
+        int page = 119;//前面页数为其他格式
         while (true) {
             List<Video> videoList = getVideoList(category,genre, page);
-            if (CollectionUtil.isEmpty(videoList)) {
+            if (Objects.isNull(videoList)) {
                 continue;
             }
             videoList.forEach(video -> {
@@ -107,13 +108,17 @@ public class Netflav extends BaseWeb {
                 }
                 video.setSavePath(path);
                 if (videoExistVerify(video)) {
-                    video.setVideoUrl(getFileUrl(video.getVideoUrl()));
-                    if (Objects.nonNull(video.getVideoUrl())) {
-                        multithreadingDownload.videoDownload(video, null, enableProxy, thread, defaultSegmentSize);
+                    try {
+                        video.setVideoUrl(getFileUrl(video.getVideoUrl()));
+                        if (Objects.nonNull(video.getVideoUrl())) {
+                            multithreadingDownload.videoDownload(video, null, enableProxy, thread, defaultSegmentSize);
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
                     }
                 }
             });
-            page++;
+            page--;
         }
     }
 

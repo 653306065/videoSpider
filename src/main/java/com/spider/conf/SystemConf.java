@@ -11,12 +11,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Configuration
 public class SystemConf {
 
-    @PostConstruct
-    public void init() {
-        int availableProcessors = Runtime.getRuntime().availableProcessors();
-        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", String.valueOf(availableProcessors * 2 + 1));
-    }
-
     @Bean("scheduleThreadPool")
     public ThreadPoolExecutor threadPoolExecutor(){
         int availableProcessors = Runtime.getRuntime().availableProcessors();
